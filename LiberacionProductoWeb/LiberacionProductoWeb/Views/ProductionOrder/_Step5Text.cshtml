@@ -1,0 +1,59 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model LiberacionProductoWeb.Models.ProductionOrderViewModels.ProductionOrderViewModel;
+@inject IViewLocalizer Localizer
+
+<div class="panel-group" id="step-5-accordion">
+    <div class="panel panel-primary overflow-hidden">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                   data-parent="#step-5-accordion" href="#step-5-collapse-three" aria-expanded="true">
+                    <i id="icon-5" class="fa fa-plus-circle pull-right"></i>
+                    5. Lotificación y análisis de producto
+                </a>
+            </h3>
+        </div>
+        <div id="step-5-collapse-three" class="@Model.ShowPanelSteps" style="">
+            <div class="panel-body">
+                <p>
+                    El proceso de almacenamiento de @(Model.ProductName) medicinal se realiza
+                    en un tanque termo @(Model.ProductName != "CO2" ? "(recipiente criogénico)" : "") con código
+                    @(Model.SelectedTankFilter).
+                </p>
+
+                <p>
+                    La lotificación del producto se realiza en cumplimiento con el
+                    procedimiento "Lotificación de productos medicinales, OO/P-08-008 - 10"
+                    vigente.
+                </p>
+
+                <p>
+                    La cantidad de producto (tamaño del lote) se calcula de acuerdo
+                    al diseño del tanque de producto terminado y a la variable de monitoreo
+                    utilizada para la determinación de nivel. El tamaño del lote se indica en
+                    la tabla 8 - Lotificación y analisis de producto.
+                    
+                </p>
+
+                <p>
+                    La liberación del producto a granel para su posterior acondicionamiento,
+                    se realiza ejecutando los análisis al producto en el tanque de
+                    almacenamiento, de acuerdo a lo indicado en el "Plan de calidad de
+                    @(Model.ProductName), @(Model.ProductCode)" de @(Model.Location) e
+                    implica que el Responsable sanitario revisa que se cumplan las
+                    condiciones y/o especificaciones indicadas en este documento y, que
+                    cuando existan incumplimientos se documente el "Informe de desviación,
+                    CC/R-01-028 - 30" correspondiente, de acuerdo a lo establecido en el
+                    procedimiento "Control de desviaciones, CC/P-01-009-30".
+                </p>
+
+                <p>
+                    El resultado de los análisis al producto en el tanque de almacenamiento
+                    y, el número de lote de producción asignado, se registra en la Tabla 8-
+                    Lotificación y análisis del producto.
+                </p>
+
+            </div>
+        </div>
+    </div>
+</div>

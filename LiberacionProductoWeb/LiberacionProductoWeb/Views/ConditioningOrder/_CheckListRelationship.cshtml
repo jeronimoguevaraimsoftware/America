@@ -1,0 +1,145 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Identity;
+@using LiberacionProductoWeb.Localize;
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Helpers;
+@using Microsoft.AspNetCore.Mvc;
+@model LiberacionProductoWeb.Models.ConditioningOrderViewModels.ConditioningOrderViewModel;
+@inject IStringLocalizer<Resource> resource;
+
+
+<div style="overflow-y: scroll; height: 300px;">
+    <div class="input-group">
+        @if (Model.CheckListRelationShip != null)
+        {
+            <table id="table-checklist" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th colspan="5">Tabla checklist</th>
+                    </tr>
+                    <tr>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Alias/N°de pipa del checklist</th>
+                        <th scope="col">TourNumber</th>
+                        <th scope="col">Pipa</th>
+                        <th scope="col">Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int tourNumberIndex = 0;
+                        var message = string.Empty;
+                        var url = Context.Request.Host.Value;
+                        var style = string.Empty;
+                    }
+                    @foreach (var entry in Model.CheckListRelationShip)
+                    {
+                        style = (entry.Complete.HasValue ? entry.Complete.Value == true ? style = "pointer-events: none;" : style = string.Empty : style = string.Empty);
+                    <tr>
+                        <td>
+                            <input id="Status-@tourNumberIndex" value="@entry.Status" type="text" hidden />
+                            @entry.Status
+                        </td>
+                        <td>
+                            @if (bool.Parse(entry.Source))
+                            {
+                                message = "CheckList ";
+                                @*///web*@
+                                <a asp-controller="CheckListQuestions" asp-action="QuestionsOne"
+                                   asp-route-idOA="@entry.ConditioningOrderId" asp-route-checkListId="@entry.Id" target="_blank">
+                                    @message  @entry.Alias
+                                </a>
+                            }
+                            else
+                            {
+                                message = "Descargar ";
+                                @*///manual*@
+                                <a href='http://@url/@resource.GetString("PathCheckListFrontEnd").Value/@entry.File' target="popup"><i class='fas fa-file-download'></i> @message  @entry.Alias</a>
+                            }
+                            <input id="Id-@tourNumberIndex" value="@entry.Id" type="text" hidden />
+                            <input id="Source-@tourNumberIndex" value="@entry.Source" type="text" hidden />
+                        </td>
+                        <td style="@style">
+                            @if (!string.IsNullOrEmpty(style))
+                            {
+                                <input id="PipeFillingControlTourNumber-@tourNumberIndex" value="@entry.TourNumber" type="text" disabled />
+                            }
+                            else
+                            {
+                                @Html.DropDownListFor(m => m.SelectedPipeFillingControl, Model.ListPipeFillingControl, "-Por favor seleccione un TourNumber", new { @class = "form-control", @Id = "SelectedPipeFillingControl-" + @tourNumberIndex, @onchange = "getTournumber(this)" })
+                                <input id="PipeFillingControlTourNumber-@tourNumberIndex" type="text" hidden />
+                            }
+                        </td>
+                        <td style="@style">
+                            @if (!string.IsNullOrEmpty(style))
+                            {
+
+                                <input id="PipeFillingPipeNumber-@tourNumberIndex" value="@entry.PipeNumber" type="text" disabled />
+                            }
+                            else
+                            {
+                                @Html.DropDownListFor(m => m.SelectedPipeFilling, Model.ListPipeFilling, "-Por favor seleccione una Pipa", new { @class = "form-control", @Id = "SelectedPipeFilling-" + @tourNumberIndex, @Name = "SelectedPipeFilling-" + @tourNumberIndex, @onchange = "getPipenumber(this)" })
+                                <input id="PipeFillingPipeNumber-@tourNumberIndex" type="text" hidden />
+                            }
+                        </td>
+                        <td>
+                            @if (!entry.Complete.Value)
+                            {
+                                <button class='btn btn btn-inverse' type="button" style="margin: 20px auto;" onclick="DeleteChecklist(@entry.Id,2)">
+                                    <i class="fa fa-trash-alt"></i>Eliminar
+                                </button>
+                            }
+                        </td>
+                        <td hidden>
+                            <input id="RelationShip-@tourNumberIndex" value="@entry.Complete.Value.ToString()" type="text" hidden />
+                        </td>
+                    </tr>
+                        tourNumberIndex++;
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+@section Styles {
+
+    <link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+    <link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+    <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+
+}
+
+@section scripts {
+
+    <environment names="Development,Staging,Production">
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+        <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+        <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+        <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+        <script src="~/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.html5.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.print.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+        <script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+        <script src="~/js/demo.min.js"></script>
+        <script src="~/js/apps.min.js"></script>
+        <script src="~/js/catalogs.js"></script>
+
+        <script src="~/plugins/DataTables/media/js/DataDownload/jszip.min.js"></script>
+        <script src="~/plugins/DataTables/media/js/DataDownload/pdfmake.min.js"></script>
+        <script src="~/plugins/DataTables/media/js/DataDownload/buttons.html5.min.js"></script>
+        <script src="~/plugins/DataTables/media/js/DataDownload/vfs_fonts.js"></script>
+
+    </environment>
+}

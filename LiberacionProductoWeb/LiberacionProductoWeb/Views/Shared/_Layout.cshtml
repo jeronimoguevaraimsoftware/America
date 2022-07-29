@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<head>
+
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - LiberacionProductoWeb </title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+
+
+
+    <!-- ================== BEGIN BASE CSS STYLE ================== -->
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,300,700" rel="stylesheet" id="fontFamilySrc" />
+    <link href="~/plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet" />
+    <!--
+    <link href="~/plugins/bootstrap/bootstrap-4.1.1/css/bootstrap.min.css" rel="stylesheet" />
+    -->
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/plugins/font-awesome/5.1/css/all.css" rel="stylesheet" />
+    <link href="~/css/animate.min.css" rel="stylesheet" />
+    <link href="~/css/style.min.css" rel="stylesheet" />
+    <link href="~/css/Linde.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" id="fontFamilySrc" />
+
+
+    <!-- ================== END BASE CSS STYLE ================== -->
+    <!-- Add local styles, mostly for plugins css file -->
+    @if (IsSectionDefined("Styles"))
+    {
+        @RenderSection("Styles", required: false)
+    }
+
+</head>
+
+<body>
+    <!-- begin #page-loader -->
+    <div id="page-loader" class="page-loader fade in"><span class="spinner">Loading...</span></div>
+    <!-- end #page-loader -->
+    <!-- Wrapper-->
+    <div id="page-container"
+        class="fade page-container page-header-fixed page-sidebar-fixed page-with-two-sidebar page-with-footer page-with-top-menu page-without-sidebar">
+
+        @await Html.PartialAsync("_TopNavbar")
+        <!-- Navigation -->
+        @* @await Html.PartialAsync("_Navigation") *@
+        <!-- Main view  -->
+        @RenderBody()
+
+        <!-- Navigation right -->
+        @* @await Html.PartialAsync("_NavigationRight") *@
+        <!-- Footer -->
+        @await Html.PartialAsync("_Footer")
+
+    </div>
+    <!-- End wrapper-->
+    <!-- ================== BEGIN BASE JS ================== -->
+    <script src="~/plugins/jquery/jquery-3.3.1.min.js"></script>
+    <script src="~/plugins/jquery-ui/jquery-ui.min.js"></script>
+
+    <!--
+    <script src="~/plugins/bootstrap/bootstrap-4.1.1/js/bootstrap.bundle.min.js"></script>
+    -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/plugins/DataTables/media/js/DataDownload/jquery.dataTables.min.js"></script>
+    <!--[if lt IE 9]>
+        <script src="../assets/crossbrowserjs/html5shiv.js"></script>
+        <script src="../assets/crossbrowserjs/respond.min.js"></script>
+    <![endif]-->
+    <script src="~/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="~/plugins/jquery-cookie/jquery.cookie.js"></script>
+    <script src="~/plugins/jquery-ui/jquery.ui.datepicker-es.min.js" crossorigin="anonymous"></script>
+    <!-- ================== END BASE JS ================== -->
+
+    <script>
+        function saveOnClose() {
+            if (typeof Save == 'function') {
+                Save()
+            }
+
+            $.ajax({
+                type: "GET",
+                url: "/Account/Logout",
+                success: function () {
+                    window.location.href = "/Home";
+                },
+                failure: function () {
+                    window.location.href = "/Home";
+                }
+            })
+        }
+
+        function Serch() {
+            $.ajax({
+                type: "GET",
+                url: "/Home/SerchDistributionBatch?DistributionBatch=" + $('#SerchDistributionBatch').val(),
+                success: function (response) {
+                    if (response.result === "fail") {
+                        $.gritter.add({
+                            title: "",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+                    }
+                    else {
+                        $("#SerchToolDiv").html(response);
+                        $("#SerchDistributionBatch").val("");
+                    }
+                },
+            })
+        }
+    </script>
+
+    @RenderSection("scripts", required: false)
+</body>
+
+</html>

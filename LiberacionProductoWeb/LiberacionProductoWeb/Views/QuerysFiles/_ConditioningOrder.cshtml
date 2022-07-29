@@ -1,0 +1,88 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model List<LiberacionProductoWeb.Models.Principal.DetailOA>
+@inject IViewLocalizer Localizer
+
+<div id="conditioning-orders-container" class="row">
+    <h1 class="page-header">Orden de acondicionamiento</h1>
+    <div class="panel panel-primary" style="width: 100%;">
+        <div class="panel-heading">
+            <div class="btn-group pull-left">
+                <button type="button" class="btn btn-white m-r-5" onclick="ExportPdfOA()">
+                    <i class="fa fa-file-pdf"></i>
+                    Exportar a PDF
+                </button>
+            </div>
+        </div>
+        <div class="panel-body">
+            @if (Model == null || Model.Count == 0)
+            {
+                <p>NA</p>
+            }
+            else
+            {
+                <table id="tableOA" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Calibración de equipos analíticos</th>
+                            <th scope="col">Calibración de equipos básculas y flujómetros</th>
+                            <th scope="col">Despeje de línea</th>
+                            <th scope="col">Equipos (accesorios)</th>
+                            <th scope="col">Cantidad total de producto</th>
+                            <th scope="col">Cromatograma Inicial</th>
+                            <th scope="col">Cromatograma Final</th>
+                            <th scope="col">Orden de acondicionamiento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.State</td>
+                                <td>@item.CalibrationAnalyticalEquipment</td>
+                                <td>@item.CalibrationScalelEquipment</td>
+                                <td>@item.LineBreak</td>
+                                <td>@item.Accessories</td>
+                                <td>@item.TotalProduct</td>
+                                <td>
+                                    @if (string.IsNullOrEmpty(item.InitialChromotogram) && item.ProductId == "NI")
+                                    {
+                                        <span>Archivo no disponible</span>
+                                    }
+                                    else if (string.IsNullOrEmpty(item.InitialChromotogram))
+                                    {
+                                        <span>NA</span>
+                                    }
+                                    else
+                                    {
+                                        <a href="/QuerysFiles/DownloadFileOA?Id=@item.ConditioningOrder&Analisis=Initial" target="_blank">Ver archivo</a>
+                                    }
+                                </td>
+                                <td>
+                                    @if (string.IsNullOrEmpty(item.FinalChromotogram) && item.ProductId == "NI")
+                                    {
+                                        <span>Archivo no disponible</span>
+                                    }
+                                    else if (string.IsNullOrEmpty(item.FinalChromotogram))
+                                    {
+                                        <span>NA</span>
+                                    }
+                                    else
+                                    {
+                                        <a href="/QuerysFiles/DownloadFileOA?Id=@item.ConditioningOrder&Analisis=Final" target="_blank">Ver archivo</a>
+                                    }
+                                </td>
+                                <td>
+                                    <a href="/ConditioningOrder/Index?Id=@item.ConditioningOrder">
+                                        Ver orden de
+                                        acondicionamiento
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>

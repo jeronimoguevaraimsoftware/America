@@ -1,0 +1,80 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@model LiberacionProductoWeb.Models.ConditioningOrderViewModels.ConditioningOrderViewModel;
+@inject IViewLocalizer Localizer
+
+<input asp-for="@Model.EquipamentProcessesError" hidden="hidden" />
+
+<table id="table-4" class="table table-striped table-bordered" style="width:100%;">
+    <thead>
+        <tr>
+            <th colspan="8">
+                Tabla 4: Equipos (accesorios) empleados en el proceso de acondicionamiento
+            </th>
+        </tr>
+        <tr>
+            <th scope="col">Tour number</th>
+            <th scope="col">Número de pipa</th>
+            <th scope="col">Bahía (área)</th>
+            <th scope="col">Bomba de llenado</th>
+            <th scope="col">Manguera de llenado</th>
+            <th scope="col">Manguera de descarga</th>
+            <th scope="col">Revisado por</th>
+            <th scope="col">Observaciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int equipamentProcessesIndex = 0;
+        }
+        @foreach (var item in Model.EquipamentProcessesList)
+        {
+            <tr>
+                <td hidden="hidden" id="EquipamentProcessesId@(equipamentProcessesIndex)">@item.Id</td>
+                <td>
+                    <input asp-for="@item.TourNumber" id="EquipamentProcessesTour@(equipamentProcessesIndex)"
+                    hidden="hidden" />
+                    @item.TourNumber
+                </td>
+                <td>
+                    <input asp-for="@item.PipeNumber" id="EquipamentProcessesNumberPipe@(equipamentProcessesIndex)"
+                    hidden="hidden" />
+                    @item.PipeNumber
+                </td>
+                <td>
+                    <select asp-for="@item.Bay" asp-items="Model.BayAreaFilter" class="selectpicker show-menu-arrow"
+                    data-style="btn-inverse" data-live-search="true" title="Selecciona"
+                    id="EquipamentProcessesBay@(equipamentProcessesIndex)"
+                    onchange="selectBayAreaFilter(this.value, @equipamentProcessesIndex)">
+                    </select>
+                </td>
+                <td>
+                    <input asp-for="@item.Bomb" id="EquipamentProcessesBomb@(equipamentProcessesIndex)" disabled />
+                </td>
+                <td>
+                    <input asp-for="@item.Hosefill" id="EquipamentProcessesHosefill@(equipamentProcessesIndex)" disabled />
+                </td>
+                <td>
+                    <input asp-for="@item.HoseDownload" id="EquipamentProcessesHoseDownload@(equipamentProcessesIndex)" />
+                </td>
+                <td>
+                    @if (string.IsNullOrEmpty(item.ReviewedBy) || !item.ReviewedDate.HasValue)
+                    {
+                        <button id="btnEquipamentProcessesReviewedSignature@(equipamentProcessesIndex)" type="button"
+                    class="btn btn-success sign-equipment-process"
+                    onclick="signEquipamentProcessesRecord(@(equipamentProcessesIndex))">Firma</button>
+                    }
+                    <input asp-for="@item.ReviewedBy" id="EquipamentProcessesReviewedBy@(equipamentProcessesIndex)"
+                    hidden="hidden" />
+                    <input asp-for="@item.ReviewedDate" id="EquipamentProcessesReviewedDate@(equipamentProcessesIndex)"
+                    hidden="hidden" />
+                    <div id="EquipamentProcessesReviewedSignature@(equipamentProcessesIndex)"></div>
+                </td>
+                <td>
+                    <input type="text" class="form-control" asp-for="@item.Notes"
+                    id="EquipamentProcessesNotes@(equipamentProcessesIndex)" />
+                </td>
+            </tr>
+            equipamentProcessesIndex++;
+        }
+    </tbody>
+</table>

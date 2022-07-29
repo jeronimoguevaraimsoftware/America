@@ -1,0 +1,85 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model LiberacionProductoWeb.Models.ProductionOrderViewModels.ProductionOrderViewModel;
+@inject IViewLocalizer Localizer
+
+<div class="panel-group" id="step-3-accordion">
+    <div class="panel panel-primary overflow-hidden">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                    data-parent="#step-3-accordion" href="#step-3-collapse-three" aria-expanded="true">
+                    <i id="icon-3" class="fa fa-plus-circle pull-right"></i>
+                    3. Monitoreo de las etapas principales del proceso de producción
+                </a>
+            </h3>
+        </div>
+        <div id="step-3-collapse-three" class="@Model.ShowPanelSteps"style="">
+            <div class="panel-body">
+                <p>3.1 Supervisión de las operaciones.</p>
+
+                <p>
+                    La supervisión de las operaciones de producción está bajo la
+                    responsabilidad del Superintendente de planta y no se requiere una
+                    supervisión específica en cada lote, porque un cambio en los rangos de
+                    operación fuera de los límites especificados, requiere de un nivel de
+                    acceso al sistema computarizado diferente al empleado por los
+                    operadores.
+                </p>
+
+                <p>
+                    El comportamiento del proceso de producción se supervisa en el sistema
+                    computarizado de control de planta iFix, verificando que los parámetros
+                    de control en proceso y parámetros críticos de proceso, se encuentren
+                    dentro del rango especificado. En caso de incumplimiento, se notifica al
+                    Superintendente de planta y/o Gerente regional de producción, se
+                    documenta el "Informe de desviación, CC/R-01-028 - 30" y se aplica lo
+                    establecido en el procedimiento "Control de desviaciones,
+                    CC/P-01-009-30". La información extraida (gráficos) del sistema
+                    computarizado de control de plantas iFix, forma parte del expediente de
+                    fabricación del lote en la Tabla 5 para las variables de control en
+                    proceso y en la Tabla 6 para los parámetros críticos de proceso.
+                </p>
+
+                <p>
+                    En las gráficas de las variables de control en proceso y de los
+                    parámetros críticos de proceso, obtenidas del sistema de control de
+                    planta iFix, se incluye el comportamiento de las variables y controles
+                    en proceso durante el periodo de fabricación del lote. Las gráficas
+                    muestran en el eje de las "Y" las unidades de ingeniería y, en el eje de
+                    las "X" el tiempo de fabricación del lote; ademas la siguiente información:
+                </p>
+
+                <p>a) El "tag" de identificación del instrumento o equipo de proceso.</p>
+                <p>
+                    b) La etapa/equipo y los parametros que se están monitoreando.
+                </p>
+                
+
+                <p>
+                    La evaluación del cumplimiento de las variables de control en proceso y
+                    de los parámetros críticos de proceso, se llevan a cabo verificando
+                    visualmente que no existan puntos fuera de los rangos establecidos
+                    (máximo y mínimo). En caso de presentarse puntos fuera de los rangos
+                    establecidos, el sistema iFix aísla el proceso evitando que ingrese
+                    producto al tanque de almacenamiento, además ventea el producto que no
+                    cumple con la especificación y, de esta forma, no permite la
+                    contaminación cruzada con otra corriente de proceso ni con el producto almacenado en el tanque.
+                </p>
+
+                <p>
+                    El resultado del monitoreo de las etapas principales del proceso de
+                    producción del lote, se registran en la la Tabla 5 para las variables de
+                    control en proceso y, en la Tabla 6 para los parámetros críticos de
+                    proceso. Cuando en alguna(s) de las variables de control proceso y/o de
+                    los parámetros críticos de proceso existan puntos fuera de los rangos
+                    establecidos, se documentará el número de folio del "Informe de
+                    desviación, CC/R-01-028 - 30" correspondiente o bien, la justificación
+                    del incumplimiento de acuerdo al procedimiento "Manejo de contingencias
+                    para la producción de @(Model.ProductName), @(Model.ProductCode)" de la
+                    @(Model.Location)
+                </p>
+
+            </div>
+        </div>
+    </div>
+</div>

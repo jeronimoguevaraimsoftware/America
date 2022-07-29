@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="xrRichText1.SerializableRtfString" xml:space="preserve">
+    <value>ewBcAHIAdABmADEAXABkAGUAZgBmADAAewBcAGYAbwBuAHQAdABiAGwAewBcAGYAMAAgAEMAYQBsAGkAYgByAGkAOwB9AHsAXABmADEAIABUAGkAbQBlAHMAIABOAGUAdwAgAFIAbwBtAGEAbgA7AH0AewBcAGYAMgAgAEEAcgBpAGEAbAA7AH0AfQB7AFwAYwBvAGwAbwByAHQAYgBsACAAOwBcAHIAZQBkADAAXABnAHIAZQBlAG4AMABcAGIAbAB1AGUAMAAgADsAXAByAGUAZAAwAFwAZwByAGUAZQBuADAAXABiAGwAdQBlADIANQA1ACAAOwB9AHsAXAAqAFwAZABlAGYAYwBoAHAAIABcAGYAMQBcAGYAcwAyADQAfQB7AFwAcwB0AHkAbABlAHMAaABlAGUAdAAgAHsAXABxAGwAXABmADEAXABmAHMAMgA0ACAATgBvAHIAbQBhAGwAOwB9AHsAXAAqAFwAYwBzADEAXABmADEAXABmAHMAMgA0AFwAYwBmADEAIABEAGUAZgBhAHUAbAB0ACAAUABhAHIAYQBnAHIAYQBwAGgAIABGAG8AbgB0ADsAfQB7AFwAKgBcAGMAcwAyAFwAcwBiAGEAcwBlAGQAbwBuADEAXABmADEAXABmAHMAMgA0AFwAYwBmADEAIABMAGkAbgBlACAATgB1AG0AYgBlAHIAOwB9AHsAXAAqAFwAYwBzADMAXABmADEAXABmAHMAMgA0AFwAdQBsAFwAYwBmADIAIABIAHkAcABlAHIAbABpAG4AawA7AH0AewBcACoAXAB0AHMANABcAHQAcwByAG8AdwBkAFwAZgAxAFwAZgBzADIANABcAHEAbABcAHQAcwBjAGUAbABsAHAAYQBkAGQAZgBsADMAXAB0AHMAYwBlAGwAbABwAGEAZABkAGwAMQAwADgAXAB0AHMAYwBlAGwAbABwAGEAZABkAGYAYgAzAFwAdABzAGMAZQBsAGwAcABhAGQAZABmAHIAMwBcAHQAcwBjAGUAbABsAHAAYQBkAGQAcgAxADAAOABcAHQAcwBjAGUAbABsAHAAYQBkAGQAZgB0ADMAXAB0AHMAdgBlAHIAdABhAGwAdABcAGMAbAB0AHgAbAByAHQAYgAgAE4AbwByAG0AYQBsACAAVABhAGIAbABlADsAfQB7AFwAKgBcAHQAcwA1AFwAdABzAHIAbwB3AGQAXABzAGIAYQBzAGUAZABvAG4ANABcAGYAMQBcAGYAcwAyADQAXABxAGwAXAB0AHIAYgByAGQAcgB0AFwAYgByAGQAcgBzAFwAYgByAGQAcgB3ADEAMABcAHQAcgBiAHIAZAByAGwAXABiAHIAZAByAHMAXABiAHIAZAByAHcAMQAwAFwAdAByAGIAcgBkAHIAYgBcAGIAcgBkAHIAcwBcAGIAcgBkAHIAdwAxADAAXAB0AHIAYgByAGQAcgByAFwAYgByAGQAcgBzAFwAYgByAGQAcgB3ADEAMABcAHQAcgBiAHIAZAByAGgAXABiAHIAZAByAHMAXABiAHIAZAByAHcAMQAwAFwAdAByAGIAcgBkAHIAdgBcAGIAcgBkAHIAcwBcAGIAcgBkAHIAdwAxADAAXAB0AHMAYwBlAGwAbABwAGEAZABkAGYAbAAzAFwAdABzAGMAZQBsAGwAcABhAGQAZABsADEAMAA4AFwAdABzAGMAZQBsAGwAcABhAGQAZABmAHIAMwBcAHQAcwBjAGUAbABsAHAAYQBkAGQAcgAxADAAOABcAHQAcwB2AGUAcgB0AGEAbAB0AFwAYwBsAHQAeABsAHIAdABiACAAVABhAGIAbABlACAAUwBpAG0AcABsAGUAIAAxADsAfQB9AHsAXAAqAFwAbABpAHMAdABvAHYAZQByAHIAaQBkAGUAdABhAGIAbABlAH0AXABuAG8AdQBpAGMAbwBtAHAAYQB0AFwAaAB0AG0AYQB1AHQAcwBwAFwAcwBwAGwAeQB0AHcAbgBpAG4AZQBcAGEAbABuAHQAYgBsAGkAbgBkAFwAZQB4AHAAcwBoAHIAdABuAFwAcwBwAGwAdABwAGcAcABhAHIAXABuAG8AZwByAG8AdwBhAHUAdABvAGYAaQB0AFwAdQB0AGkAbgBsAFwAbgBvAGIAcgBrAHcAcgBwAHQAYgBsAFwAZgB0AG4AbAB5AHQAdwBuAGkAbgBlAFwAbgBvAHQAYwB2AGEAcwBwAFwAZABuAHQAYgBsAG4AcwBiAGQAYgBcAGYAbwByAG0AcwBoAGEAZABlAFwAcABhAHIAZABcAHAAbABhAGkAbgBcAHEAbABcAGYAMgBcAGYAcwAxADgAXABjAGYAMQBcAHAAYQByAFwAcABhAHIAZABcAHAAbABhAGkAbgBcAHEAbAB7AFwAZgAyAFwAZgBzADEAOABcAGMAZgAxACAARQBuACAAbABhACAAfQB7AFwAZgAyAFwAZgBzADEAOABcAGMAZgAxACAAVABhAGIAbABhACAANAA6ACAARQBxAHUAaQBwAG8AcwAgACgAYQBjAGMAZQBzAG8AcgBpAG8AcwApACAAZQBtAHAAbABlAGEAZABvAHMAIABlAG4AIABlAGwAIABwAHIAbwBjAGUAcwBvACAAZABlACAAYQBjAG8AbgBkAGkAYwBpAG8AbgBhAG0AaQBlAG4AdABvAH0AewBcAGYAMgBcAGYAcwAxADgAXABjAGYAMQAgACwAIABzAGUAIABpAG4AZABpAGMAYQAgAGwAYQAgAGIAbwBtAGIAYQAgAGQAZQAgAGwAbABlAG4AYQBkAG8ALAAgAGwAYQAgAGIAYQBoAFwAdQAyADMANwBcACcAZQBkAGEAIABkAGUAIABjAGEAcgBnAGEALAAgAGwAYQAgAG0AYQBuAGcAdQBlAHIAYQAgAGQAZQAgAHQAcgBhAG4AcwBmAGUAcgBlAG4AYwBpAGEAIAB1AHQAaQBsAGkAegBhAGQAYQAgAGUAbgAgAGwAYQBzACAAYgBhAGgAXAB1ADIAMwA3AFwAJwBlAGQAYQAgAGQAZQAgAGwAbABlAG4AYQBkAG8AIABwAGEAcgBhACAAYwBhAGQAYQAgAGMAYQByAGcAYQAgAGQAZQAgAHAAcgBvAGQAdQBjAHQAbwAgAGUAbgAgAGwAYQBzACAAdQBuAGkAZABhAGQAZQBzACAAZABlACAAZABpAHMAdAByAGkAYgB1AGMAaQBcAHUAMgA0ADMAXAAnAGYAMwBuACAAeQAsACAAbABhACAAbQBhAG4AZwB1AGUAcgBhACAAZABlACAAdAByAGEAbgBzAGYAZQByAGUAbgBjAGkAYQAgAGQAZQAgAGwAYQAgAHUAbgBpAGQAYQBkACwAIABsAGEAIABjAHUAYQBsACAAZQBzACAAdQB0AGkAbABpAHoAYQBkAGEAIABlAG4AIABsAGEAIABkAGUAcwBjAGEAcgBnAGEAIABkAGUAbAAgAHAAcgBvAGQAdQBjAHQAbwAgAGgAYQBjAGkAYQAgAGUAbAAgAHQAYQBuAHEAdQBlACAAZABlAGwAIABjAGwAaQBlAG4AdABlAC4AfQBcAGYAMgBcAGYAcwAxADgAXABjAGYAMQBcAHAAYQByAFwAcABhAHIAZABcAHAAbABhAGkAbgBcAHEAbABcAGYAMgBcAGYAcwAxADgAXABjAGYAMQBcAHAAYQByAFwAcABhAHIAZABcAHAAbABhAGkAbgBcAHEAbABcAGYAMgBcAGYAcwAxADgAXABjAGYAMQBcAHAAYQByAFwAcABhAHIAZABcAHAAbABhAGkAbgBcAHEAbABcAGYAMgBcAGYAcwAxADgAXABjAGYAMQBcAHAAYQByAFwAcABhAHIAZABcAHAAbABhAGkAbgBcAHEAbABcAGYAMgBcAGYAcwAxADgAXABjAGYAMQBcAHAAYQByAFwAcABhAHIAZABcAHAAbABhAGkAbgBcAHEAbABcAGYAMgBcAGYAcwAxADgAXABjAGYAMQBcAHAAYQByAH0A</value>
+  </data>
+  <data name="label32.Text" xml:space="preserve">
+    <value>Los equipos de monitoreo utilizados durante el acondicionamiento de producto en las unidades de distribución, se indican en el "Plan de calidad de ParamProduct, que aplique en ParamPlant  y su estado de calibración puede obtenerse de la etiqueta de calibración adherida al equipo, o del registro de calibración correspondiente y que se encuentra disponible en forma impresa o en el sistema INFOR EAM.
+
+Verificar y registrar el estado de calibración de los equipos de monitoreo indicados en la Tabla 1 - Equipos analíticos.</value>
+  </data>
+  <metadata name="objectDataSource1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <data name="label5.Text" xml:space="preserve">
+    <value>En la Tabla 2 se documentan el equipo(accesorio) utilizado para el acondicionamiento de producto en las unidades de distribución, tales como báscula/flujómetro utilizado para determinar la cantidad de producto cargado en la unidad de distribución.</value>
+  </data>
+  <data name="label50.Text" xml:space="preserve">
+    <value>La supervisión de las operaciones de llenado de las unidades de distribución está bajo la responsabilidad del Superintendente de planta y, no se requiere una supervisión específica en cada lote debido a que no existen variables que puedan modificarse por los operarios.
+
+Las unidades de distribución son rastreables a un listado disponible en la base de datos de logística y distribución (PALS) y, en el "Inventario de cilindros móviles (Pipas) autorizadas para transporte de producto grado Medicinal, CC/R-01-005 -10". El llenado de cada unidad de distribución se documenta en la Tabla 5 - Control de llenado de pipas.
+
+La hora de la actividad de acondicionamiento es rastreable en la columna de hora de análisis final de pipa, de la Tabla 5 - Control de llenado de pipas.
+
+La responsabilidad del llenado es de la persona que realiza el análisis y, es rastreable en la Tabla 5 - Control de llenado de pipas.
+
+El lote de distribución asignado al producto acondicionado en la unidad de distribución, se asigna de acuerdo a lo establecido en el procedimiento "Lotificación de productos medicinales, OO/P-08-008 - 10" y es rastreable en la Tabla 4 - Control de llenado de pipas y en el certificado de análisis correspondiente que se emita.
+
+La fecha de caducidad del producto acondicionado en cada unidad de distribución, se establece considerando 03 meses a partir de la fecha de asignación del lote de distribución.
+
+Previo al llenado de cada unidad de distribución, se realiza una inspección visual de las condiciones en que se recibe la unidad en la instalación, aplicando el formato "Recepción de pipas en plantas y centros de transferencia, OO/R-07-005- 10".
+
+Cualquier desviación que se presente durante el acondicionamiento del producto, reportarla al Superintendente de planta y/o personal asignado, y registrarla de acuerdo a lo establecido en el procedimiento "Control de desviaciones, CC/P-01-009 - 30".
+
+La etapa de cuarentena de las unidades de distribución (envases primarios), está constituida desde el momento en que se recibe la unidad y, hasta que se le realiza su análisis inicial de acuerdo a lo indicado en el "Plan de calidad de ParamProduct correspondiente a la ParamPlant".
+
+La etapa de cuarentena del producto acondicionado en la unidad de distribución, está constituida desde el momento en que se concluye el llenado de la unidad de distribución y, hasta que se le realiza su análisis final, de acuerdo a lo indicado en el "Plan de calidad de ParaProduct, código" de ParamPlant.</value>
+  </data>
+</root>

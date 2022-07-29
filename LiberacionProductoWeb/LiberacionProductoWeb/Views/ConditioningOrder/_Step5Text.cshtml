@@ -1,0 +1,105 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model LiberacionProductoWeb.Models.ConditioningOrderViewModels.ConditioningOrderViewModel;
+@inject IViewLocalizer Localizer
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel-group" id="step-5-accordionOA">
+            <div class="panel panel-primary overflow-hidden">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                            data-parent="#step-5-accordionOA" href="#step-5-collapseOA-three" aria-expanded="true">
+                            <i id="icon-5" class="fa fa-plus-circle pull-right"></i>
+                            Control de llenado de pipas.
+                        </a>
+                    </h3>
+                </div>
+                <div id="step-5-collapseOA-three" class="@Model.ShowPanelSteps" style="">
+                    <div class="panel-body">
+                        <p>
+                            La supervisión de las operaciones de llenado de las unidades de
+                            distribución
+                            está bajo la responsabilidad del Superintendente de planta y, no se requiere una
+                            supervisión específica en cada lote debido a que no existen variables
+                            que
+                            puedan modificarse por los operarios.
+                        </p>
+
+                        <p>
+                            Las unidades de distribución son rastreables a un listado disponible en
+                            la
+                            base de datos de logística y distribución (PALS) y, en el "Inventario de cilindros móviles (Pipas) autorizadas para transporte de producto grado Medicinal, CC/R-01-005 -10". El llenado de cada unidad de distribución
+                            se
+                            documenta en la Tabla 5 - Control de llenado de pipas.
+                        </p>
+
+                        <p>
+                            La hora de la actividad de acondicionamiento es rastreable en la columna
+                            de
+                            hora de análisis final de pipa, de la Tabla 5 - Control de llenado de
+                            pipas.
+                        </p>
+
+                        <p>
+                            La responsabilidad del llenado es de la persona que realiza el análisis
+                            y, es
+                            rastreable en la Tabla 5 - Control de llenado de pipas.
+                        </p>
+
+                        <p>
+                            El lote de distribución asignado al producto acondicionado en la unidad
+                            de
+                            distribución, se asigna de acuerdo a lo establecido en el procedimiento
+                            "Lotificación de productos medicinales, OO/P-08-008 - 10" y es
+                            rastreable en
+                            la Tabla 5 - Control de llenado de pipas y en el certificado de análisis
+                            correspondiente que se emita.
+                        </p>
+
+                        <p>
+                            La fecha de caducidad del producto acondicionado en cada unidad de
+                            distribución, se establece considerando 03 meses a partir de la fecha de
+                            asignación del lote de distribución.
+                        </p>
+
+                        <p>
+                            Previo al llenado de cada unidad de distribución, se realiza una
+                            inspección
+                            visual de las condiciones en que se recibe la unidad en la instalación,
+                            aplicando el formato "Recepción de pipas en plantas y centros de
+                            transferencia, OO/R-07-005- 10".
+                        </p>
+
+                        <p>
+                            Cualquier desviación que se presente durante el acondicionamiento del
+                            producto, reportarla al Superintendente de planta y/o personal asignado, y
+                            registrarla de acuerdo a lo establecido en el procedimiento "Control de
+                            desviaciones, CC/P-01-009 - 30".
+                        </p>
+
+                        <p>
+                            La etapa de cuarentena de las unidades de distribución (envases
+                            primarios),
+                            está constituida desde el momento en que se recibe la unidad y, hasta
+                            que se
+                            le realiza su análisis inicial de acuerdo a lo indicado en el "Plan de
+                            calidad de @(Model.Product)" de " @(Model.Plant) ".
+                        </p>
+
+                        <p>
+                            La etapa de cuarentena del producto acondicionado en la unidad de
+                            distribución, está constituida desde el momento en que se concluye el
+                            llenado de la unidad de distribución y, hasta que se le realiza su
+                            análisis
+                            final, de acuerdo a lo indicado en el "Plan de calidad de @(Model.Product),
+                            correspondiente a la @(Model.Plant)".
+                        </p>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>

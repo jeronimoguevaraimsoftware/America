@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\deploy liberacion</_PublishTargetUrl>
+    <History>True|2022-07-29T17:07:29.9018864Z;True|2022-07-26T10:15:03.7311760-05:00;True|2022-07-26T09:39:01.8873813-05:00;True|2022-07-25T19:17:04.6634028-05:00;False|2022-07-25T19:16:03.0351190-05:00;True|2022-07-25T18:54:38.8665518-05:00;</History>
+  </PropertyGroup>
+</Project>

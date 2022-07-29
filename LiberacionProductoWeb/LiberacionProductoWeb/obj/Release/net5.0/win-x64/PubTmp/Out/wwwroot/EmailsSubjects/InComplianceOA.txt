@@ -1,0 +1,1 @@
+Lote de distribución {CaseTag:paramLote} en la Orden de Acondicionamiento pendiente de liberar.

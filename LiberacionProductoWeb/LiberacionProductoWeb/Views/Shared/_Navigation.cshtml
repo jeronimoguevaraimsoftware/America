@@ -1,0 +1,71 @@
+﻿@using LiberacionProductoWeb.Helpers;
+
+<!-- begin #sidebar -->
+<div id="top-menu" class="top-menu">
+    <!-- begin sidebar scrollbar -->
+    <div class="container-fluid">
+        <!-- begin sidebar nav -->
+        <ul class="nav">
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                @* <li class="nav-header">Menú</li> *@
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        @* <i class="fa fa-clipboard-list"></i> *@
+                        <span>Mis tareas pendientes</span>
+                    </a>
+                </li>
+                <li>
+                    @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_EXPEDIENTE_DE_LOTE))
+                    {
+                        <a asp-controller="QuerysFiles" asp-action="Index">
+                            @* <i class="fa fa-file-alt"></i> *@
+                            <span>Consulta de expediente de lote</span>
+
+                        </a>
+                    }
+                </li>
+                <li>
+                    @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTA_GENERAL))
+                    {
+                        <a asp-controller="QuerysGeneral" asp-action="Index">
+                            @* <i class="fa fa-search"></i> *@
+                            <span>Consulta general</span>
+                        </a>
+                    }
+                </li>
+                <li class="has-sub">
+                    <a href="javascript:;">
+                        @* <i class="fa fa-chart-line"></i> *@
+                        <span>Reportes</span>
+                    </a>
+                    <ul class="sub-menu">
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_RAP_TANQUES))
+                        {
+                            <li><a href="@Url.Action("Index", "RAPTanques")">RAP - Tanques</a></li>
+                        }
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_RAP_PIPAS))
+                        {
+                            <li><a href="@Url.Action("Index", "RAPPipas")">RAP - Pipas</a></li>
+                        }
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_REPORTE_AUDIT_TRAIL))
+                        {
+                            <li><a href="@Url.Action("Index", "ReportAuditTrail")">Reporte Audit Trail</a></li>
+                        }
+                    </ul>
+                </li>
+
+            }
+        </ul>
+        <!-- end sidebar nav -->
+    </div>
+    <!-- end sidebar scrollbar -->
+</div>
+
+<!-- end #sidebar -->
+<!-- ================== BEGIN BASE JS ================== -->
+<script src="~/plugins/jquery/jquery-3.3.1.min.js"></script>
+<script src="~/plugins/jquery-ui/jquery-ui.min.js"></script>
+
+<!-- ================== END BASE JS ================== -->

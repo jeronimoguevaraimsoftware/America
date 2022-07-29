@@ -1,0 +1,42 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model LiberacionProductoWeb.Models.ConditioningOrderViewModels.ConditioningOrderViewModel;
+@inject IViewLocalizer Localizer
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel-group" id="step-2-accordionOA">
+            <div class="panel panel-primary overflow-hidden">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                            data-parent="#step-2-accordionOA" href="#step-2-collapseOA-three" aria-expanded="true">
+                            <i id="icon-2" class="fa fa-plus-circle pull-right"></i>
+                            Equipos analíticos
+                        </a>
+                    </h3>
+                </div>
+                <div id="step-2-collapseOA-three" class="@Model.ShowPanelSteps" style="">
+                    <div class="panel-body">
+                        <p>
+                            Los equipos de monitoreo utilizados durante el acondicionamiento de
+                            producto
+                            en las unidades de distribución, se indican en el "Plan de calidad de
+                            @(Model.Product), que aplique en @(Model.Plant) y su estado de calibración
+                            puede
+                            obtenerse de la etiqueta de calibración adherida al equipo, o del
+                            registro
+                            de calibración correspondiente y que se encuentra disponible en forma
+                            impresa o en el sistema INFOR EAM.
+                        </p>
+
+                        <p>
+                            Verificar y registrar el estado de calibración de los equipos de
+                            monitoreo
+                            indicados en la Tabla 1 - Equipos analíticos.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

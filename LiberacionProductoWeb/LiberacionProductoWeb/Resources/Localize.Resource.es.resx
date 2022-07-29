@@ -1,0 +1,557 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AccessDenied" xml:space="preserve">
+    <value>Acceso Denegado</value>
+  </data>
+  <data name="Action" xml:space="preserve">
+    <value>Accion</value>
+  </data>
+  <data name="Activitie" xml:space="preserve">
+    <value>Actividad a completar</value>
+  </data>
+  <data name="BtnFilter" xml:space="preserve">
+    <value>Limpiar filtros</value>
+  </data>
+  <data name="BtnFind" xml:space="preserve">
+    <value>Buscar</value>
+  </data>
+  <data name="CheckLisPipas" xml:space="preserve">
+    <value>Check List de Verificación de Pipas</value>
+  </data>
+  <data name="EmptyTable" xml:space="preserve">
+    <value>No hay registros que mostrar</value>
+  </data>
+  <data name="EndDate" xml:space="preserve">
+    <value>Fecha final</value>
+  </data>
+  <data name="ErrorPrincipal" xml:space="preserve">
+    <value>Servicio no disponible, favor de intentar más tarde.</value>
+  </data>
+  <data name="Info" xml:space="preserve">
+    <value>Mostrando página _PAGE_ de _PAGES_</value>
+  </data>
+  <data name="InfoEmpty" xml:space="preserve">
+    <value>Mostrando 0 a 0 de registros</value>
+  </data>
+  <data name="InfoFiltered" xml:space="preserve">
+    <value>(filtrado de _MAX_ registros totales)</value>
+  </data>
+  <data name="LengthMenu" xml:space="preserve">
+    <value>Mostrar _MENU_ registros por página</value>
+  </data>
+  <data name="LoadingRecords" xml:space="preserve">
+    <value>Cargando...</value>
+  </data>
+  <data name="LogOut" xml:space="preserve">
+    <value>Salir</value>
+  </data>
+  <data name="NoInformation" xml:space="preserve">
+    <value>Sin informacion</value>
+  </data>
+  <data name="PageNext" xml:space="preserve">
+    <value>Siguiente</value>
+  </data>
+  <data name="PagePreviuos" xml:space="preserve">
+    <value>Anterior</value>
+  </data>
+  <data name="Paginatefirst" xml:space="preserve">
+    <value>Primero</value>
+  </data>
+  <data name="Paginatelast" xml:space="preserve">
+    <value>Segundo</value>
+  </data>
+  <data name="Plant" xml:space="preserve">
+    <value>Planta</value>
+  </data>
+  <data name="Processing" xml:space="preserve">
+    <value>Procesando...</value>
+  </data>
+  <data name="Product" xml:space="preserve">
+    <value>Producto</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Filtrar</value>
+  </data>
+  <data name="Select" xml:space="preserve">
+    <value>Selecciona</value>
+  </data>
+  <data name="SelectAction" xml:space="preserve">
+    <value>Selecciona</value>
+  </data>
+  <data name="SelectActivitie" xml:space="preserve">
+    <value>Selecciona</value>
+  </data>
+  <data name="SelectPlant" xml:space="preserve">
+    <value>Selecciona</value>
+  </data>
+  <data name="SelectProduct" xml:space="preserve">
+    <value>Selecciona</value>
+  </data>
+  <data name="SelectState" xml:space="preserve">
+    <value>Selecciona</value>
+  </data>
+  <data name="SelectTank" xml:space="preserve">
+    <value>Selecciona</value>
+  </data>
+  <data name="StartDate" xml:space="preserve">
+    <value>Fecha inicial</value>
+  </data>
+  <data name="State" xml:space="preserve">
+    <value>Estado</value>
+  </data>
+  <data name="Tank" xml:space="preserve">
+    <value>No. de tanque</value>
+  </data>
+  <data name="ValidateBtnFilter" xml:space="preserve">
+    <value>Selecciona planta, producto, tanque, actividades, estado</value>
+  </data>
+  <data name="ValidateHtml" xml:space="preserve">
+    <value>Se requiere capturar este campo</value>
+  </data>
+  <data name="ValidateStartDateEndDate" xml:space="preserve">
+    <value>Selecciona fecha inicio y fecha final</value>
+  </data>
+  <data name="ZeroRecords" xml:space="preserve">
+    <value>No se encontraron registros coincidentes</value>
+  </data>
+  <data name="Presentation" xml:space="preserve">
+    <value>Presentación</value>
+  </data>
+  <data name="Purity" xml:space="preserve">
+    <value>Pureza</value>
+  </data>
+  <data name="HealthRegister" xml:space="preserve">
+    <value>Registro sanitario</value>
+  </data>
+  <data name="PharmaceuticalForm" xml:space="preserve">
+    <value>Forma farmacéutica</value>
+  </data>
+  <data name="SelectPresentation" xml:space="preserve">
+    <value>-Por favor seleccione una presentacion</value>
+  </data>
+  <data name="SelectPurity" xml:space="preserve">
+    <value>-Por favor seleccione la pureza</value>
+  </data>
+  <data name="SelectHealthRegister" xml:space="preserve">
+    <value>-Por favor seleccione el registro sanitario</value>
+  </data>
+  <data name="SelectPharmaceuticalForm" xml:space="preserve">
+    <value>-Por favor seleccione la forma farmaceútica</value>
+  </data>
+  <data name="Argon" xml:space="preserve">
+    <value>Argón</value>
+  </data>
+  <data name="CO2" xml:space="preserve">
+    <value>CO2</value>
+  </data>
+  <data name="Hydrogen" xml:space="preserve">
+    <value>Hidrógeno</value>
+  </data>
+  <data name="Nitrogen" xml:space="preserve">
+    <value>Nitrógeno</value>
+  </data>
+  <data name="Oxygen" xml:space="preserve">
+    <value>Oxígeno</value>
+  </data>
+  <data name="ForLotify" xml:space="preserve">
+    <value>Por lotificar</value>
+  </data>
+  <data name="OrderReject" xml:space="preserve">
+    <value>La cancelación ha sido rechazada con éxito</value>
+  </data>
+  <data name="OrderSend" xml:space="preserve">
+    <value>La solicitud  enviada para su evaluación</value>
+  </data>
+  <data name="OrderApprove" xml:space="preserve">
+    <value>La orden de producción ha sido cancelada con éxito</value>
+  </data>
+  <data name="CommentReasonReject" xml:space="preserve">
+    <value>NA</value>
+  </data>
+  <data name="PathCheckListBackEnd" xml:space="preserve">
+    <value>C:\inetpub\wwwroot\LiberacionProductoMedicinal\ChecklistManual</value>
+  </data>
+  <data name="PathCheckListFrontEnd" xml:space="preserve">
+    <value>CheckListManual</value>
+  </data>
+  <data name="OrderApproveOA" xml:space="preserve">
+    <value>La orden de acondicionamiento ha sido cancelada con éxito</value>
+  </data>
+  <data name="OrderRejectOA" xml:space="preserve">
+    <value>La orden de acondicionamiento ha sido rechazada con éxito</value>
+  </data>
+  <data name="OrderSendOA" xml:space="preserve">
+    <value>La solicitud de cancelación ha sido enviada para su evaluación</value>
+  </data>
+  <data name="ScaleFound" xml:space="preserve">
+    <value>Báscula encontrada</value>
+  </data>
+  <data name="Pendding" xml:space="preserve">
+    <value>Pendiente</value>
+  </data>
+  <data name="PathPipeFillingCustomersFiles" xml:space="preserve">
+    <value>C:\inetpub\wwwroot\LiberacionProductoMedicinal\CustomersFiles</value>
+  </data>
+	<data name="PathPipeFillingCustomersFilesFrontEnd" xml:space="preserve">
+    <value>CustomersFiles</value>
+	  </data>
+  <data name="PDFOpBatchDetails" xml:space="preserve">
+    <value>El proceso de almacenamiento de Oxígeno medicinal se realiza en un tanque termo ParamLot con código ParamTankCode.
+La lotificación del producto se realiza en cumplimiento con el procedimiento "Lotificación de productos medicinales, OO/P-08-008 - 10" vigente.
+La cantidad de producto (tamaño del lote) se calcula de acuerdo al diseño del tanque de producto terminado y a la variable de monitoreo utilizada para la determinación de nivel. El tamaño del lote se indica en la Tabla 8- Lotificación y análisis de producto.
+La liberación del producto a granel para su posterior acondicionamiento, se realiza ejecutando los análisis al producto en el tanque de almacenamiento, de acuerdo a lo indicado en el "Plan de calidad de Oxígeno, ParamProduct" de ParamPlant e implica que el Responsable sanitario revisa que se cumplan las condiciones y/o especificaciones indicadas en este documento y, que cuando existan incumplimientos se documente el "Informe de desviación, CC/R-01-028 - 30" correspondiente, de acuerdo a lo establecido en el procedimiento "Control de desviaciones, CC/P-01-009-30".
+El resultado de los análisis al producto en el tanque de almacenamiento y, el número de lote de producción asignado, se registra en la Tabla 8- Lotificación y análisis del producto.</value>
+  </data>
+  <data name="PDFOpEP" xml:space="preserve">
+    <value>1.1 Equipos de producción.
+
+Los equipos principales en la producción, son rastreables en los listados de la base de datos del sistema INFOR EAM y, corresponden a los indicados en la Tabla 1 - Equipos de produción.
+
+Verificar que los equipos de proceso correspondan a los indicados en la tabla 1, se encuentren identificados y en buen estado.
+
+1.2. Equipos de monitoreo.
+
+Los equipos de monitoreo del proceso se indican en el "Plan de calidad de ParamProduct" de planta "ParamPlant" y, su estado de calibración puede obtenerse de la etiqueta de calibración adherida al equipo, o del registro de calibración correspondiente y que se encuentra disponible en forma impresa o en el sistema INFOR EAM.
+
+Verificar y registrar el estado de calibración de los equipos de monitoreo indicados en la Tabla 2 - Equipos de monitoreo.</value>
+  </data>
+  <data name="PDFOpPL" xml:space="preserve">
+    <value>ParamChangeCO2
+
+Por lo que, para el despeje de línea se considera lo siguiente:
+
+a) Existe trazabilidad al lote de producto anterior. Esta información está disponible en la "bitácora de operación establecida en ParamPlant". La planta es dedicada esto significa que parte de la misma materia prima (aire) y en la obtencion del producto no hay fuentes de contaminación de otros productos.
+
+b) El área se encuentra limpia e identificada. Considerando que el producto es un gas, se tiene que manejar en un sistema cerrado, es decir, no entra en contacto directo con el medio ambiente y no es susceptible de alguna fuente de contaminación externa. Por lo anterior, la limpieza del área de fabricación no se lleva a cabo al inicio de cada lote, sino de acuerdo a lo indicado en el "Programa de orden y limpieza externa a líneas y equipos de proceso, MM/R-07-001-10" y, en el "Programa de limpieza a instalaciones, OO/R-07-001-30", en donde están establecidas las actividades a realizar, enfocadas a una limpieza externa con el propósito de imagen.
+
+c) El personal utiliza el uniforme limpio y adecuado. El personal de la operación utiliza el uniforme de algodón y el equipo de protección personal apropiado a la actividad que desempeña (por ejemplo: pantalón, camisa manga larga, tapones auditivos, lentes, casco y zapatos de seguridad, mandil criogénico, protector facial), de acuerdo a lo establecido en la sección de "Higiene del personal e instalaciones de los empleados, CC/M-01-013-30" del "Manual de BPM y prerrequisitos". Esto considerando que el personal no entra en contacto directo con el producto al ser un sistema cerrado y por lo cual no representa una posible fuente de contaminación del proceso y/o producto.
+
+d) La documentación corresponde al lote indicado. La documentación de inicio de lote está disponible en tiempo real a través de las gráficas de las variables de control en proceso, de los parámetros críticos de proceso y de los atributos críticos de calidad, obtenidas del sistema computarizado iFix, el cual está validado.
+
+e) Se cuenta con los insumos de acuerdo a la lista de materiales para ser pesados y están identificados correctamente. La materia prima utilizada es el aire ambiental y las líneas de proceso están identificadas de acuerdo a la normatividad aplicable a la instalación y el producto. No hay alguna otra materia prima o insumo que sea necesario adicionar durante todo el proceso y, que requiera ser pesado e identificado.
+
+f) El área y equipos de proceso están libres de documentos, insumos y/o cualquier otra entidad que no corresponden a la lista de materiales y el lote en cuestión. El único insumo utilizado en el proceso de fabricación es el aire ambiental y, la documentación se maneja en forma electrónica, por lo que no existe la posibilidad de la presencia de cualquier otra fuente de contaminación.
+
+g) Los equipos e instrumentos presentes en el área están limpios e identificados: Considerando que el producto es un gas se tiene que manejar en sistema cerrado, es decir, no entra en contacto con el medio ambiente y no es susceptible a alguna fuente de contaminación externa; la limpieza de cada equipo no se lleva a cabo al inicio de cada lote, si no de acuerdo a lo indicado en el “Programa de Limpieza a Instalaciones, OO/R-07-001 -30” y en el “Programa de Orden y Limpieza externa a líneas y equipos de proceso, MM/R-07-001–10”, donde están establecidas las actividades a realizar que se enfocan a una limpieza externa con propósito de imagen y, en el procedimiento “Limpieza de equipos de proceso, MM/P-08-001 - 30” cuando se realiza la limpieza interna, dado que al ser equipos dedicados y cerrados, no habría posibilidad de que algún contaminante visualmente detectable entre en contacto directo con el producto, ni contaminación cruzada entre productos.
+
+h) Los instrumentos están calibrados. Los equipos de monitoreo se indican en el "Plan de calidad de ParamProduct" de planta "ParamPlant" y su estado de calibración puede verificarse de la etiqueta de calibración adherida al equipo. Esta actividad se evidencía en la evidencía en la Tabla 2 - Equipos de monitoreo.
+
+i) No existe alguna fuente potencial de contaminación. Considerando que la producción es en un sistema cerrado y por consiguiente, el producto no entra en contacto con el medio ambiente, no hay fuentes de contaminación externa que afecten al producto, y al emplearse equipos dedicados en la producción, no hay fuente de cotaminación interna.
+
+Considerando todos los puntos anteriores, se considera que se lleva a cabo un adecuado despeje de línea cuando todos los puntos se cumplen. La realización de esta actividad se documenta en la Tabla 3 - Despeje de línea.</value>
+  </data>
+  <data name="PDFOpReleaseProduct" xml:space="preserve">
+    <value>El proceso de producción de Oxígeno medicinal es un proceso cerrado, continuo y en planta dedicada, en el que el rendimiento no influye en el cumplimiento de especificaciones.
+	
+Adicionalmente, en la fabricación del Oxígeno medicinal no es significativo el cálculo del rendimiento del producto terminado contra la masa de aire (materia prima) que ingresa al proceso, debido a que:
+
+a) El tanque de almacenamiento siempre tiene producto remanente del lote anterior (por cuestiones operativas y para mantener la integridad mecánica del recipiente).
+
+b) La alimentación de producto terminado al tanque de almacenamiento es continua.
+
+c) No hay variación de materias primas y la proporción de los componentes del aire (O2, N2 y Ar) no cambia.
+
+d) La producción se controla en función del flujo de aire que ingresa al proceso.
+
+e) La producción de una mayor o menor cantidad de un producto, influye en la cantidad a obtener de los otros 2 productos.
+
+Por consiguiente, la eficiencia y productividad del proceso se mide en función de la cantidad de O2 equivalente producido mensualmente vs los kWh de energía eléctrica utilizados para tal fin.
+
+Liberación del producto
+
+Con la firma del responsable sanitario en la Tabla 9- Liberación del producto, se avala que:
+
+a) se ha realizado un adecuado despeje de línea,
+
+b) el producto a granel almacenado en el tanque cumple con las especificaciones establecidas en la FEUM vigente y, las buenas prácticas de fabricación,
+
+c) la documentación se encuentra completa,
+
+d) la validación del proceso de producción de ParamProduct medicinal en ParamPlant, se encuentra vigente,
+
+e) los controles de cambios se administran de acuerdo a lo establecido en el procedimiento “CC/P-08-001 – 30” vigente y,
+
+f) en caso de incumplimientos, se documentó el "Informe de desviación, CC/R-01-028 - 30" y se condujo de acuerdo a lo establecido en el procedimiento “Control de desviaciones, CC/P-01-009- 30” vigente, por lo tanto, el producto puede ser empleado en la siguiente etapa del proceso de fabricación.</value>
+  </data>
+  <data name="InitialTextDLOP" xml:space="preserve">
+    <value>La producción de gases medicinales a partir del aire ambiental, se realiza en una unidad de separación de aire (ASU, por sus siglas en inglés), mediante el proceso de destilación fraccionada, el cual se fundamenta en la separación de los principales componentes del aire (O2, N2 y Ar), debido a las diferencias entre sus volatilidades relativas.
+
+La unidad de separación de aire, es el conjunto de equipos (caseta de filtros, compresores, separadores de humedad, malla molecular, sistemas de enfriamiento y lubricación, columna de destilación, condensador principal, recipientes criogénicos, entre otros) que permite la disociación de los componentes del aire. Verificar el diagrama de flujo "Producción de Oxígeno medicinal, " en el SCD.</value>
+  </data>
+  <data name="OnlyCO2TextOP" xml:space="preserve">
+    <value>La producción de CO2 medicinal, se realiza mediante la purificación del CO2 crudo (raw gas) a través de un sistema específico para la remoción de los contaminantes esperados en la fuente del raw gas (integrado por filtros, compresores, separadores de humedad, intercambiadores de calor, etc), así como de un secado mediante alúmina (selexsorb) y un sistema de eliminación de olor y sabor a través de carbón activado. La corriente de gas ya purificada es sometida a un proceso de destilación y licuefacción en el cual se eliminan las impurezas incondensables para finalmente almacenar el producto final en su fase líquida, en los tanques de planta.
+
+El sistema de purificación de la planta Morelos está integrado principalmente por un hidrolizador para remover las posibles trazas de azufre y, de un equipo catalítico que elimina el óxido de etileno y otras trazas de impurezas.
+
+Verificar el procedimiento “Fabricación de Dióxido de Carbono (CO2) grado Medicinal de planta "Morelos CO2 .</value>
+  </data>
+  <data name="SubsectionRPyLPCO2" xml:space="preserve">
+    <value>c) El flujo de materia prima (raw gas) varía en función del comportamiento del proceso de producción del proveedor, por lo que es más representativo para la operación calcular un rendimiento de la producción del día (KPI de ton raw gas / ton CO2).
+
+Sin embargo, y únicamente como referencia, se realiza un cálculo de la cantidad de materia prima utilizada para cada lote de producto fabricado, de acuerdo a lo establecido en el procedimiento “Cálculo del rendimiento de producto CO2, OO/P-08-009 - 806”, esta información se registra en el registro "Rendimiento del proceso de producción de CO2 grado medicinal - planta Morelos".
+
+Al ser una referencia, no se requiere de un rango de aceptación en el rendimiento obtenido, ya que la variación en el flujo de raw gas genera fluctuaciones en la presión y temperatura de la línea de succión de raw gas, lo que repercute en el resultado del rendimiento.</value>
+  </data>
+  <data name="SubsectionRPyLPOP" xml:space="preserve">
+    <value>c) No hay variación de materias primas y la proporción de los componentes del aire (O2, N2 y Ar) no cambia.
+
+d) La producción se controla en función del flujo de aire que ingresa al proceso.
+
+e) La producción de una mayor o menor cantidad de un producto, influye en la cantidad a obtener de los otros 2 productos.
+
+Por consiguiente, la eficiencia y productividad del proceso se mide en función de la cantidad de O2 equivalente producido mensualmente vs los kWh de energía eléctrica utilizados para tal fin.
+Liberación del producto</value>
+  </data>
+  <data name="AnaliticsEqOA" xml:space="preserve">
+    <value>Los equipos de monitoreo utilizados durante el acondicionamiento de producto en las unidades de distribución, se indican en el "Plan de calidad de ParamProduct, que aplique en ParamPlant  y su estado de calibración puede obtenerse de la etiqueta de calibración adherida al equipo, o del registro de calibración correspondiente y que se encuentra disponible en forma impresa o en el sistema INFOR EAM.
+
+Verificar y registrar el estado de calibración de los equipos de monitoreo indicados en la Tabla 1 - Equipos analíticos.</value>
+  </data>
+  <data name="APTextOA" xml:space="preserve">
+    <value>El acondicionamiento de producto se realiza en unidades de distribución dedicadas a un solo producto y, que cuentan con los accesorios específicos para el producto que transportan. Cada unidad cuenta con un número económico que la identifica de las otras y, así como con la identificación del producto que transporta.
+
+Por lo que, para el despeje de línea, el técnico de producción o llenado de pipas realiza y se asegura se cumplan los siguientes lineamientos:
+
+a) Existe trazabilidad al lote de producto anterior.
+
+b) El área se encuentra limpia e identificada. El producto líquido se maneja en un sistema cerrado, es decir, no entra en contacto con el medio ambiente y no es susceptible a alguna fuente de contaminación externa; la limpieza no se lleva a cabo al inicio del acondicionamiento de producto en cada unidad de distribución, sino de acuerdo a lo indicado en el "Programa de limpieza a instalaciones, OO/R-07-001 - 30" y, en el "Programa de orden y limpieza externa a líneas y equipos de proceso, MM/R-07-001 - 10", donde están establecidas las actividades a realizar enfocadas a una limpieza externa, con el propósito de imagen, dado que al ser un sistema cerrado no hay posibilidad de que algún contaminante visualmente detectable, entre en contacto directo con el producto.
+
+c) El personal utiliza el uniforme limpio y adecuado. El personal de la operación utiliza el uniforme de algodón y el equipo de protección personal apropiado a la actividad que de acondicionamiento (pantalón, camisa manga larga, peto, tapones auditivos, lentes, casco y zapatos de seguridad, protector facial), de acuerdo a lo establecido en la sección de "Higiene del personal e instalaciones de los empleados, CC/M-01-013-30" del "Manual de BPM y prerrequisitos" y en el procedimiento de "Llenado de pipas en ParamPlant". Esto considerando que el personal no entra en contacto directo con el producto al ser un sistema cerrado y, por lo cual no representa una posible fuente de contaminación del producto.
+
+d) La documentación corresponde al lote indicado. La documentación del lote de producto acondicionado incluye la información de la Tabla 5- Control de llenado de pipas, el formato de "Verificación de pipas en plantas y centros de transferencia, OO/R-07-005-10" y, el "Certificado de análisis correspondiente.
+
+e) Se cuenta con los insumos y están identificados correctamente. Los insumos utilizados en el acondicionamiento de producto son las unidades de distribución y las mangueras de transferencia utilizadas para la carga y descarga de producto en la unidad. Todos los insumos cuentan con un código único de identificación. El producto granel liberado que se acondicionaría en las unidades de distribución, se encuentra almacenado en un tanque debidamente identificado.
+
+f) El área y equipos de acondicionamiento están libres de documentos e insumos que no corresponden al lote en cuestión. En el área de acondicionamiento no se cuenta con un lugar que permita almacenar documentos de otros lotes y, adicionalmente por restricción de espacio, en cada bahía de llenado no es posible tener dos unidades de distribución al mismo tiempo.
+
+g) Los equipos e instrumentos presentes en el área están limpios e identificados: Considerando que el producto es un gas se tiene que manejar en sistema cerrado, es decir, no entra en contacto con el medio ambiente y no es susceptible a alguna fuente de contaminación externa; la limpieza de cada equipo no se lleva a cabo al inicio de cada lote, si no de acuerdo a lo indicado en el “Programa de Limpieza a Instalaciones, OO/R-07-001 -30” y en el “Programa de Orden y Limpieza externa a líneas y equipos de proceso, MM/R-07-001–10”, donde están establecidas las actividades a realizar que se enfocan a una limpieza externa con propósito de imagen y, en el procedimiento “Limpieza de equipos de proceso, MM/P-08-001 - 30” cuando se realiza la limpieza interna, dado que al ser equipos dedicados y cerrados, no habría posibilidad de que algún contaminante visualmente detectable entre en contacto directo con el producto, ni contaminación cruzada entre productos.
+
+h) Los instrumentos están calibrados. Los equipos de monitoreo se indican en el "Plan de calidad de ParamProduct, de planta ParamPlant" y su estado de calibración puede verificarse de la etiqueta de calibración adherida al equipo. Esta actividad se evidencía en la Tabla 2 - Equipos de monitoreo.
+
+i) No existe alguna fuente potencial de contaminación. Considerando que el acondicionamiento del producto se realiza en un sistema cerrado y por consiguiente, el producto no entra en contacto con el medio ambiente, no hay fuentes de contaminación externa que afecten al producto; y, al emplearse equipos dedicados, no hay fuente de contaminación interna.
+
+Considerando todos los puntos anteriores, se considera que se lleva a cabo un adecuado despeje de línea en el proceso de acondicionamiento, cuando todos los puntos se cumplen. La realización de esta actividad se documenta en la Tabla 3 - Despeje de línea.</value>
+  </data>
+  <data name="CATextOA" xml:space="preserve">
+    <value>El objetivo del certificado de análisis es evidenciar las características de producto medicinal y la rastreabilidad del producto desde el cliente primario hasta la fabricación del producto.
+
+Se emitirá un certificado de análisis (COC-4) - ParamProduct medicinal foliado por cada cliente, despues de analizada la unidad de distribución y de acuerdo a lo reportado en el formato correspondiente:
+
+Los folios de los certificados de análisis emitidos, se registrarán en la Tabla 5 - Control de llenado de pipas, por cada lote de producción fabricado en la instalación.</value>
+  </data>
+  <data name="CLPTextOA" xml:space="preserve">
+    <value>La supervisión de las operaciones de llenado de las unidades de distribución está bajo la responsabilidad del Superintendente de planta y, no se requiere una supervisión específica en cada lote debido a que no existen variables que puedan modificarse por los operarios.
+
+Las unidades de distribución son rastreables a un listado disponible en la base de datos de logística y distribución (PALS) y, en el "Inventario de cilindros móviles (Pipas) autorizadas para transporte de producto grado Medicinal, CC/R-01-005 -10". El llenado de cada unidad de distribución se documenta en la Tabla 5 - Control de llenado de pipas.
+
+La hora de la actividad de acondicionamiento es rastreable en la columna de hora de análisis final de pipa, de la Tabla 5 - Control de llenado de pipas.
+
+La responsabilidad del llenado es de la persona que realiza el análisis y, es rastreable en la Tabla 5 - Control de llenado de pipas.
+
+El lote de distribución asignado al producto acondicionado en la unidad de distribución, se asigna de acuerdo a lo establecido en el procedimiento "Lotificación de productos medicinales, OO/P-08-008 - 10" y es rastreable en la Tabla 5 - Control de llenado de pipas y en el certificado de análisis correspondiente que se emita.
+
+La fecha de caducidad del producto acondicionado en cada unidad de distribución, se establece considerando 03 meses a partir de la fecha de asignación del lote de distribución.
+
+Previo al llenado de cada unidad de distribución, se realiza una inspección visual de las condiciones en que se recibe la unidad en la instalación, aplicando el formato "Recepción de pipas en plantas y centros de transferencia, OO/R-07-005- 10".
+
+Cualquier desviación que se presente durante el acondicionamiento del producto, reportarla al Superintendente de planta y/o personal asignado, y registrarla de acuerdo a lo establecido en el procedimiento "Control de desviaciones, CC/P-01-009 - 30".
+
+La etapa de cuarentena de las unidades de distribución (envases primarios), está constituida desde el momento en que se recibe la unidad y, hasta que se le realiza su análisis inicial de acuerdo a lo indicado en el "Plan de calidad de ParamProduct correspondiente a la ParamPlant".
+
+La etapa de cuarentena del producto acondicionado en la unidad de distribución, está constituida desde el momento en que se concluye el llenado de la unidad de distribución y, hasta que se le realiza su análisis final, de acuerdo a lo indicado en el "Plan de calidad de ParamProduct, código" de ParamPlant.</value>
+  </data>
+  <data name="LPTTextOA" xml:space="preserve">
+    <value>Con la firma del responsable sanitario en la Tabla 7- Cierre de expediente, se avala que:
+
+a) se ha realizado un adecuado despeje de línea,
+
+b) el producto acondicionado en cada una de las unidades de distribución cumple con las especificaciones establecidas en la FEUM vigente y, las buenas prácticas de fabricación,
+
+c) la documentación se encuentra completa,
+
+d) la validación del proceso de producción y acondicionamiento de producto medicinal en planta ParamPlant, se encuentra vigente,
+
+e) los controles de cambios se administran de acuerdo a lo establecido en el procedimiento "Control de Cambios CC/P-08-001  -30" vigente y,
+
+f) en caso de incumplimientos, se documentó el "Informe de desviación, CC/R-01-028 - 30" y se condujo de acuerdo a lo establecido en el procedimiento “Control de desviaciones, CC/P-01-009- 30” vigente, por lo tanto, el producto puede ser enviado a los clientes.</value>
+  </data>
+  <data name="ParagraphCO2_RPA" xml:space="preserve">
+    <value>Las toneladas de producto en los tanques de almacenamiento de planta se calculan capturando el nivel del tanque (In H2O) en la hoja electrónica &lt;&lt; Calculo de masa en tanques de Morelos 2019-05-05 1000 am &gt;&gt; disponible en la computadora de cuarto de control; de acuerdo con lo establecido en el procedimiento &lt;&lt;Manual de usuario de la hoja “Cálculo de masa en tanques de almacenamiento de producto de planta CO2 Morelos”, OO/P-02-017 – 806&gt;&gt;.</value>
+  </data>
+  <data name="ParagraphRPA" xml:space="preserve">
+    <value>El tamaño del lote de producción en toneladas, es determinado por la multiplicación del nivel del tanque reportado en porcentaje (%), el cual se observa en la pantalla del sistema computarizado iFix, por el factor de ingeniería que aplica al tanque de almacenamiento.</value>
+  </data>
+  <data name="RPATextOA" xml:space="preserve">
+    <value>ParamChangeCO2_RPA
+
+El producto contenido en el tanque de almacenamiento de la localidad, es llenado (acondicionamiento) en unidades de distribución dedicadas a un solo tipo de producto, las cuales se registran en la Tabla 5 - Control de llenado de pipas.
+
+En la Tabla 6 - Rendimiento del proceso de acondicionamiento, se reportan la cantidad de producto medicinal fabricado en el lote y, la cantidad de producto acondicionado en las unidades de distribución.
+
+El tamaño de los lotes de producto terminado varía en función de la demanda de producto en el mercado y, el inventario existente del producto en la instalación. En todos los casos existirá una diferencia del producto acondicionado vs el tamaño del lote de producción, debido a que el contenido del tanque de almacenamiento de producto en planta, se utiliza para suministrar producto medicinal y otros grados diferentes al medicinal a los clientes.
+
+El rendimiento no influye en el cumplimiento de especificaciones por ser un proceso cerrado y planta dedicada.</value>
+  </data>
+  <data name="PDFOpReleaseProductCO2" xml:space="preserve">
+    <value>El proceso de producción de ParamProduct medicinal es un proceso cerrado, continuo y en planta dedicada, en el que el rendimiento no influye en el cumplimiento de especificaciones.
+
+Adicionalmente, en la fabricación del ParamProduct medicinal no es significativo el cálculo del rendimiento del producto terminado contra la raw gas (materia prima) que ingresa al proceso, debido a que:
+
+a) El tanque de almacenamiento siempre tiene producto remanente del lote anterior (por cuestiones operativas y para mantener la integridad mecánica del recipiente).
+
+b) La alimentación de producto terminado al tanque de almacenamiento es continua.
+
+c) El flujo de materia prima(raw gas) va en función del comportamiento del proceso de producción del proveedor, por lo que es mas representativo calcular un rendimiento de la producción del día(KPI de ton raw gas/ton CO2).
+
+Por consiguiente, la eficiencia y productividad del proceso se mide en función de la cantidad de O2 equivalente producido mensualmente vs los kWh de energía eléctrica utilizados para tal fin.
+
+Liberación del producto
+
+Con la firma del responsable sanitario en la Tabla 9- Liberación del producto, se avala que:
+
+a) se ha realizado un adecuado despeje de línea,
+
+b) el producto a granel almacenado en el tanque cumple con las especificaciones establecidas en la FEUM vigente y, las buenas prácticas de fabricación,
+
+c) la documentación se encuentra completa,
+
+d) la validación del proceso de producción de ParamProduct medicinal en ParamPlant, se encuentra vigente,
+
+e) los controles de cambios se administran de acuerdo a lo establecido en el procedimiento “CC/P-08-001 – 30” vigente y,
+
+f) en caso de incumplimientos, se documentó el "Informe de desviación, CC/R-01-028 - 30" y se condujo de acuerdo a lo establecido en el procedimiento “Control de desviaciones, CC/P-01-009- 30” vigente, por lo tanto, el producto puede ser empleado en la siguiente etapa del proceso de fabricación.
+</value>
+  </data>
+  <data name="ReRounting" xml:space="preserve">
+    <value>Cancelado por re-eruntamiento</value>
+  </data>
+  <data name="Certified" xml:space="preserve">
+    <value>SI</value>
+  </data>
+  <data name="NA" xml:space="preserve">
+    <value>NA</value>
+  </data>
+  <data name="PathLogoCertificate" xml:space="preserve">
+    <value>C:\inetpub\wwwroot\LiberacionProductoMedicinal\LogoFiles</value>
+  </data>
+  <data name="PathLogoCertificateFrontEnd" xml:space="preserve">
+    <value>LogoFiles</value>
+  </data>
+</root>

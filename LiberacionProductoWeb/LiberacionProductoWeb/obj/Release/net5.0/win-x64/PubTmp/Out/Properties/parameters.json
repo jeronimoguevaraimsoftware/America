@@ -1,0 +1,882 @@
+[
+  {
+    "PlantName": "M15-2 Planta Monterrey PL4",
+    "PlantCode": "PL4",
+    "PlantKey": "5",
+    "DirectoryPath": "C:\\inetpub\\wwwroot\\LiberacionProductoMedicinal\\Archivos_VariablesControl\\M15-2 Planta Monterrey PL4\\",
+    "SheetName": "Hoja2",
+    "Products": [
+      {
+        "ProductName": "Nitrogeno",
+        "ProductCode": "NI",
+        "ProductKey": "NI",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "PDI-500"
+              },
+              {
+                "Name": "TI-510"
+              },
+              {
+                "Name": "PDI-570"
+              },
+              {
+                "Name": "PIC-422"
+              },
+              {
+                "Name": "TI-221"
+              },
+              {
+                "Name": "PIC-305"
+              },
+              {
+                "Name": "LIC-315"
+              }
+
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AE-12A"
+              },
+              {
+                "Name": "AE-2"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "QAAE-3"
+              },
+              {
+                "Name": "QAAE-5"
+              },
+              {
+                "Name": "QAAE-16A"
+              },
+              {
+                "Name": "QAAE-16B"
+              }
+
+            ]
+          }
+
+        ]
+      },
+      {
+        "ProductName": "Oxígeno",
+        "ProductCode": "OX",
+        "ProductKey": "OX",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "PDI-500"
+              },
+              {
+                "Name": "TI-510"
+              },
+              {
+                "Name": "PDI-570"
+              },
+              {
+                "Name": "TI-221"
+              },
+              {
+                "Name": "PIC-305"
+              },
+              {
+                "Name": "LIC-315"
+              }
+
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AE-12A"
+              },
+              {
+                "Name": "AE-1"
+              },
+              {
+                "Name": "AE-12B"
+              },
+              {
+                "Name": "AE-11"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "QAAE-1"
+              },
+              {
+                "Name": "QAAE-2"
+              },
+              {
+                "Name": "QAAE-15A"
+              },
+              {
+                "Name": "QAAE-15B"
+              }
+
+            ]
+          }
+
+        ]
+      }
+    ]
+  },
+  {
+    "PlantName": "M20 Planta Ciudad Sahagun",
+    "PlantCode": "SAH",
+    "PlantKey": "1",
+    "DirectoryPath": "C:\\inetpub\\wwwroot\\LiberacionProductoMedicinal\\Archivos_VariablesControl\\M20 Planta Ciudad Sahagun\\",
+    "SheetName": "Hoja2",
+    "Products": [
+      {
+        "ProductName": "Oxígeno",
+        "ProductCode": "OX",
+        "ProductKey": "OX",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "TIC-534"
+              },
+              {
+                "Name": "LIC-315"
+              },
+              {
+                "Name": "TI-301C"
+              }
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AE-12A"
+              },
+              {
+                "Name": "AE-1"
+              },
+              {
+                "Name": "AE-11"
+              },
+              {
+                "Name": "AE-12B"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "QAAE-1"
+              },
+              {
+                "Name": "QAAE-2"
+              },
+              {
+                "Name": "QAAE-15A"
+              },
+              {
+                "Name": "QAAE-15B"
+              }
+
+            ]
+          }
+
+        ]
+      }
+    ]
+  },
+  {
+    "PlantName": "M24 Planta Tepeji",
+    "PlantCode": "TEP",
+    "PlantKey": "12",
+    "DirectoryPath": "C:\\inetpub\\wwwroot\\LiberacionProductoMedicinal\\Archivos_VariablesControl\\M24 Planta Tepeji\\",
+    "SheetName": "Hoja2",
+    "Products": [
+      {
+        "ProductName": "Nitrogeno",
+        "ProductCode": "NI",
+        "ProductKey": "NI",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "TI 152-2"
+              },
+              {
+                "Name": "TIC 73-2"
+              },
+              {
+                "Name": "LIC 31-2"
+              }
+
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AIT 16-2A"
+              },
+              {
+                "Name": "AIT 16-2B"
+              },
+              {
+                "Name": "AIT 30-2"
+              },
+              {
+                "Name": "AIT 25-5"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "AIT 81-6"
+              },
+              {
+                "Name": "AIT 81-4"
+              },
+              {
+                "Name": "AIT 81-5A"
+              },
+              {
+                "Name": "AIT 81-5B"
+              }
+
+            ]
+          }
+
+        ]
+      },
+      {
+        "ProductName": "Oxígeno",
+        "ProductCode": "OX",
+        "ProductKey": "OX",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "TI 152-2"
+              },
+              {
+                "Name": "TIC 73-2"
+              },
+              {
+                "Name": "LIC 31-2"
+              }
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AIT 16-2A"
+              },
+              {
+                "Name": "AIT 37-1"
+              },
+              {
+                "Name": "AIT 80-12"
+              },
+              {
+                "Name": "AIT 16-2B"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "AIT 80-6"
+              },
+              {
+                "Name": "AIT 81-4"
+              },
+              {
+                "Name": "AIT 80-7A"
+              },
+              {
+                "Name": "AIT 80-7B"
+              }
+
+            ]
+          }
+
+        ]
+      },
+      {
+        "ProductName": "Argon",
+        "ProductCode": "AR",
+        "ProductKey": "AR",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "TI 152-2"
+              },
+              {
+                "Name": "TIC 73-2"
+              },
+              {
+                "Name": "FIC 42-5"
+              },
+              {
+                "Name": "LIC 31-2"
+              }
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AIT 16-2"
+              },
+              {
+                "Name": "AIT 25-5"
+              },
+              {
+                "Name": "AIT 28-2"
+              },
+              {
+                "Name": "AIT 28-2A"
+              },
+              {
+                "Name": "AIT 16-2B"
+              },
+              {
+                "Name": "AIT 41-1"
+              },
+              {
+                "Name": "AIT 46-2"
+              },
+              {
+                "Name": "AIT 47-2"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "AIT 49-2"
+              },
+              {
+                "Name": "AIT 81-6"
+              },
+              {
+                "Name": "AE 83-1"
+              },
+              {
+                "Name": "AE 83-3"
+              }
+
+            ]
+          }
+
+        ]
+      }
+    ]
+  },
+  {
+    "PlantName": "M31 Planta Guadalajara",
+    "PlantCode": "GDL",
+    "PlantKey": "7",
+    "DirectoryPath": "C:\\inetpub\\wwwroot\\LiberacionProductoMedicinal\\Archivos_VariablesControl\\M31 Planta Guadalajara\\",
+    "SheetName": "Hoja2",
+    "Products": [
+      {
+        "ProductName": "Nitrogeno",
+        "ProductCode": "NI",
+        "ProductKey": "NI",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "PDI-500"
+              },
+              {
+                "Name": "TI-510"
+              },
+              {
+                "Name": "PDI-580"
+              },
+              {
+                "Name": "TI-221"
+              },
+              {
+                "Name": "TI-403"
+              },
+              {
+                "Name": "TI-445"
+              }
+
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AI-12"
+              },
+              {
+                "Name": "AI-2A"
+              },
+              {
+                "Name": "AI-2B"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "QAAE-2"
+              },
+              {
+                "Name": "QAAE-3"
+              },
+              {
+                "Name": "QAAE-16A"
+              },
+              {
+                "Name": "QAAE-16B"
+              }
+
+            ]
+          }
+
+        ]
+      },
+      {
+        "ProductName": "Oxígeno",
+        "ProductCode": "OX",
+        "ProductKey": "OX",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "PDI-500"
+              },
+              {
+                "Name": "TI-510"
+              },
+              {
+                "Name": "PDI-580"
+              },
+              {
+                "Name": "TI-221"
+              }
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AI-12"
+              },
+              {
+                "Name": "AI-1"
+              },
+              {
+                "Name": "AI-11"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "QAAE-1"
+              },
+              {
+                "Name": "QAAE-5"
+              },
+              {
+                "Name": "QAAE-15A"
+              },
+              {
+                "Name": "QAAE-15B"
+              }
+
+            ]
+          }
+
+        ]
+      }
+    ]
+  },
+  {
+    "PlantName": "M41 Complejo Coatzacoalcos",
+    "PlantCode": "CTZ",
+    "PlantKey": "2",
+    "DirectoryPath": "C:\\inetpub\\wwwroot\\LiberacionProductoMedicinal\\Archivos_VariablesControl\\M41 Complejo Coatzacoalcos\\",
+    "SheetName": "Hoja2",
+    "Products": [
+      {
+        "ProductName": "Nitrogeno",
+        "ProductCode": "NI",
+        "ProductKey": "NI",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "PDI-500"
+              },
+              {
+                "Name": "TI-510"
+              },
+              {
+                "Name": "PDI-570"
+              },
+              {
+                "Name": "TI-105"
+              }
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AE-12A"
+              },
+              {
+                "Name": "AE-2A"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "QAAE-3A"
+              },
+              {
+                "Name": "QAAE-5A"
+              },
+              {
+                "Name": "QAAE-15C"
+              },
+              {
+                "Name": "QAAE-15D"
+              }
+
+            ]
+          }
+
+        ]
+      },
+      {
+        "ProductName": "Oxígeno",
+        "ProductCode": "OX",
+        "ProductKey": "OX",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "PDI-500"
+              },
+              {
+                "Name": "TI-510"
+              },
+              {
+                "Name": "PDI-570"
+              },
+              {
+                "Name": "TI-105"
+              }
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AE-12A"
+              },
+              {
+                "Name": "AE-1"
+              },
+              {
+                "Name": "AE-12B"
+              },
+              {
+                "Name": "AE-11"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "QAAE-1"
+              },
+              {
+                "Name": "QAAE-2"
+              },
+              {
+                "Name": "AE-15A"
+              },
+              {
+                "Name": "AE-15B"
+              }
+
+            ]
+          }
+
+        ]
+      }
+    ]
+  },
+  {
+    "PlantName": "M43 Planta TAMSA",
+    "PlantCode": "VER",
+    "PlantKey": "8",
+    "DirectoryPath": "C:\\inetpub\\wwwroot\\LiberacionProductoMedicinal\\Archivos_VariablesControl\\M43 Planta TAMSA\\",
+    "SheetName": "Hoja2",
+    "Products": [
+      {
+        "ProductName": "Oxígeno",
+        "ProductCode": "OX",
+        "ProductKey": "OX",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "TI-534"
+              }
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AE-12A"
+              },
+              {
+                "Name": "AE-1"
+              },
+              {
+                "Name": "AE-12B"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "AE-1"
+              },
+              {
+                "Name": "AE-13"
+              },
+              {
+                "Name": "AE-15A"
+              },
+              {
+                "Name": "AE-15B"
+              }
+
+            ]
+          }
+
+        ]
+      }
+    ]
+  },
+  {
+    "PlantName": "M44 Planta Coatzacoalcos (Morelos)",
+    "PlantCode": "MOR",
+    "PlantKey": "13",
+    "DirectoryPath": "C:\\inetpub\\wwwroot\\LiberacionProductoMedicinal\\Archivos_VariablesControl\\M44 Planta Coatzacoalcos (Morelos)\\",
+    "SheetName": "Hoja2",
+    "Products": [
+      {
+        "ProductName": "CO2",
+        "ProductCode": "CD",
+        "ProductKey": "CD",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "PI-400"
+              },
+              {
+                "Name": "TI-400"
+              },
+              {
+                "Name": "TI-240"
+              },
+              {
+                "Name": "PIC-301"
+              },
+              {
+                "Name": "PIC-321"
+              },
+              {
+                "Name": "PIC-501"
+              },
+              {
+                "Name": "PIC-521"
+              },
+              {
+                "Name": "PIC-801"
+              },
+              {
+                "Name": "PIC-823"
+              },
+              {
+                "Name": "PIC-901"
+              },
+              {
+                "Name": "PIC-923"
+              },
+              {
+                "Name": "TIC-1215"
+              },
+              {
+                "Name": "TIC-1221"
+              },
+              {
+                "Name": "TIC-1230"
+              },
+              {
+                "Name": "AIC-1230"
+              }
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AI-20A"
+              },
+              {
+                "Name": "AI-10A"
+              },
+              {
+                "Name": "AI-30A"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "AE-12"
+              },
+              {
+                "Name": "AE-13"
+              },
+              {
+                "Name": "AE-20B"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "PlantName": "M50 Planta Ramos Arizpe PL5",
+    "PlantCode": "RAZ",
+    "PlantKey": "20",
+    "DirectoryPath": "C:\\inetpub\\wwwroot\\LiberacionProductoMedicinal\\Archivos_VariablesControl\\M50 Planta Ramos Arizpe PL5\\",
+    "SheetName": "Hoja2",
+    "Products": [
+      {
+        "ProductName": "Oxígeno",
+        "ProductCode": "OX",
+        "ProductKey": "OX",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "PDI-500"
+              },
+              {
+                "Name": "PDI-2500"
+              },
+              {
+                "Name": "TI-510"
+              },
+              {
+                "Name": "TI-2510"
+              },
+              {
+                "Name": "PDI-570"
+              },
+              {
+                "Name": "TI-221"
+              },
+              {
+                "Name": "PIC-305"
+              },
+              {
+                "Name": "LIC-315"
+              }
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AE-12A"
+              },
+              {
+                "Name": "AE-1"
+              },
+              {
+                "Name": "AE-12B"
+              },
+              {
+                "Name": "AE-11"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "QAAE-1"
+              },
+              {
+                "Name": "QAAE-2"
+              }
+            ]
+          }
+
+        ]
+      }
+    ]
+  }
+]

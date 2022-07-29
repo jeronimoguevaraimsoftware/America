@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <metadata name="objectDataSource1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <data name="xrLabel4.Text" xml:space="preserve">
+    <value>1.1 Equipos de producción.
+
+Los equipos principales en la producción, son rastreables en los listados de la base de datos del sistema INFOR EAM.
+
+Verificar que los equipos de producción se encuentren identificados y en buen estado.
+
+Registrar el resultado de la tabla 1 - Equipos de producción.
+
+1.2. Equipos de monitoreo.
+
+Los equipos de monitoreo del proceso se indican en el "Plan de calidad de Oxígeno, " de "Planta 1" y, su estado de calibración puede obtenerse de la etiqueta de calibración adherida al equipo, o del registro de calibración correspondiente y que se encuentra disponible en forma impresa o en el sistema INFOR EAM.
+
+Verificar y registrar el estado de calibración de los equipos de monitoreo indicados en la Tabla 2 - Equipos de monitoreo.</value>
+  </data>
+  <data name="xrLabel26.Text" xml:space="preserve">
+    <value>La producción de gases medicinales a partir del aire ambiental, se realiza en una unidad de separación de aire (ASU, por sus siglas en inglés), mediante el proceso de destilación fraccionada, el cual se fundamenta en la separación de los principales componentes del aire (O2, N2 y Ar), debido a las diferencias entre sus volatilidades relativas.
+
+La unidad de separación de aire, es el conjunto de equipos (caseta de filtros, compresores, separadores de humedad, malla molecular, sistemas de enfriamiento y lubricación, columna de destilación, condensador principal, recipientes criogénicos, entre otros) que permite la disociación de los componentes del aire. Verificar el diagrama de flujo "Producción de Oxígeno medicinal, " en el SCD.
+
+Por lo que, para el despeje de línea se considera lo siguiente:
+
+a) Existe trazabilidad al lote de producto anterior. Esta información está disponible en la "bitácora de operación establecida en ParamPlant". 
+La planta es dedicada esto significa que parte de la misma materia prima ParamRawMaterial y en la obtencion del producto no hay fuentes de contaminación de otros productos.
+
+b) El área se encuentra limpia e identificada. Considerando que el producto es un gas, se tiene que manejar en un sistema cerrado, es decir, no entra en contacto directo con el medio ambiente y no es susceptible de alguna fuente de contaminación externa. Por lo anterior, la limpieza del área de fabricación no se lleva a cabo al inicio de cada lote, sino de acuerdo a lo indicado en el "Programa de orden y limpieza externa a líneas y equipos de proceso, MM/R-07-001-10" y, en el "Programa de limpieza a instalaciones, OO/R-07-001-30", en donde están establecidas las actividades a realizar, enfocadas a una limpieza externa con el propósito de imagen.
+
+c) El personal utiliza el uniforme limpio y adecuado. El personal de la operación utiliza el uniforme de algodón y el equipo de protección personal apropiado a la actividad que desempeña (por ejemplo: pantalón, camisa manga larga, tapones auditivos, lentes, casco y zapatos de seguridad, mandil criogénico, protector facial), de acuerdo a lo establecido en la sección de "Higiene del personal e instalaciones de los empleados, CC/M-01-013-30" del "Manual de BPM y prerrequisitos".
+Esto considerando que el personal no entra en contacto directo con el producto al ser un sistema cerrado y por lo cual no representa una posible fuente de contaminación del proceso y/o producto.
+
+d) La documentación corresponde al lote indicado. La documentación de inicio de lote está disponible en tiempo real a través de las gráficas de las variables de control en proceso, de los parámetros críticos de proceso y de los atributos críticos de calidad, obtenidas del sistema computarizado iFix, el cual está validado.
+
+e) Se cuenta con los insumos de acuerdo a la lista de materiales para ser pesados y están identificados correctamente. La materia prima utilizada es el ParamRawMaterial2 y las líneas de proceso están identificadas de acuerdo a la normatividad aplicable a la instalación y el producto. No hay alguna otra materia prima o insumo que sea necesario adicionar durante todo el proceso y, que requiera ser pesado e identificado.
+
+f) El área y equipos de proceso están libres de documentos, insumos y/o cualquier otra entidad que no corresponden a la lista de materiales y el lote en cuestión. El único insumo utilizado en el proceso de fabricación es el ParamRawMaterial2 y, la documentación se maneja en forma electrónica, por lo que no existe la posibilidad de la presencia de cualquier otra fuente de contaminación.
+
+g) Los equipos e instrumentos presentes en el área están limpios e identificados. Considerando que el producto es un gas, se tiene que manejar en un sistema cerrado, es decir, no entra en contacto directo con el medio ambiente y, no es susceptible de alguna fuente de contaminación externa. Por lo anterior, la limpieza del área de fabricación no se lleva a cabo al inicio de cada lote, sino de acuerdo a lo indicado en el "Programa de orden y limpieza externa a líneas y equipos de proceso, MM/R-07-001-10" y, en el "Programa de limpieza a instalaciones, OO/R-07-001-30", en donde están establecidas las actividades a realizar, enfocadas a una limpieza externa con el propósito de imagen. La limpieza interna de los equipos y líneas de proceso, cuando se rompe la integridad del sistema (p.e: posterior a un mantenimiento) , se realiza de acuerdo a lo establecido en el procedimiento "Limpieza de equipos de proceso, MM/P-08-001-30".
+
+Por las características del proceso, no existe la posibilidad de que algún contaminante, visualmente detectable, entre en contacto directo con el producto ni existe la posibilidad de contaminación cruzada entre productos.
+
+h) Los instrumentos están calibrados. Los equipos de monitoreo se indican en el "Plan de calidad de Oxígeno, " de planta "Planta 1" y su estado de calibración puede verificarse de la etiqueta de calibración adherida al equipo. Esta actividad se evidencía en la evidencía en la Tabla 2 - Equipos de monitoreo.
+
+i) No existe alguna fuente potencial de contaminación. Considerando que la producción es en un sistema cerrado y por consiguiente, el producto no entra en contacto con el medio ambiente, no hay fuentes de contaminación externa que afecten al producto, y al emplearse equipos dedicados en la producción, no hay fuente de contaminación interna..
+
+Considerando todos los puntos anteriores, se considera que se lleva a cabo un adecuado despeje de línea cuando todos los puntos se cumplen. La realización de esta actividad se documenta en la Tabla 3 - Despeje de línea.</value>
+  </data>
+  <data name="xrLabel60.Text" xml:space="preserve">
+    <value>3.1 Supervisión de las operaciones.
+
+La supervisión de las operaciones de producción está bajo la responsabilidad del Superintendente de planta y no se requiere una supervisión específica en cada lote, porque un cambio en los rangos de operación fuera de los límites especificados, requiere de un nivel de acceso al sistema computarizado diferente al empleado por los operadores.
+
+El comportamiento del proceso de producción se supervisa en el sistema computarizado de control de planta iFix, verificando que los parámetros de control en proceso y parámetros críticos de proceso, se encuentren dentro del rango especificado. En caso de incumplimiento, se notifica al Superintendente de planta y/o Gerente regional de producción, se documenta el "Informe de desviación, CC/R-01-028 - 30" y se aplica lo establecido en el procedimiento "Control de desviaciones, CC/P-01-009-30". La información extraida (gráficos) del sistema computarizado de control de plantas iFix, forma parte del expediente de fabricación del lote en la Tabla 5 para las variables de control en proceso y en la Tabla 6 para los parámetros críticos de proceso.
+
+En las gráficas de las variables de control en proceso y de los parámetros críticos de proceso, obtenidas del sistema de control de planta iFix, se incluye el comportamiento de las variables y controles en proceso durante el periodo de fabricación del lote. Las gráficas muestran en el eje de las "Y" las unidades de ingeniería y, en el eje de las "X" el tiempo de fabricación del lote; ademas la siguiente información:
+
+a) El "tag" de identificación del instrumento o equipo de proceso.
+
+b) La etapa/equipo y los parametros que se están monitoreando.
+
+La evaluación del cumplimiento de las variables de control en proceso y de los parámetros críticos de proceso, se llevan a cabo verificando visualmente que no existan puntos fuera de los rangos establecidos (máximo y mínimo). En caso de presentarse puntos fuera de los rangos establecidos, el sistema iFix aísla el proceso evitando que ingrese producto al tanque de almacenamiento, además ventea el producto que no cumple con la especificación y, de esta forma, no permite la contaminación cruzada con otra corriente de proceso ni con el producto almacenado en el tanque.
+
+El resultado del monitoreo de las etapas principales del proceso de producción del lote, se registran en la la Tabla 5 para las variables de control en proceso y, en la Tabla 6 para los parámetros críticos de proceso. Cuando en alguna(s) de las variables de control proceso y/o de los parámetros críticos de proceso existan puntos fuera de los rangos establecidos, se documentará el número de folio del "Informe de desviación, CC/R-01-028 - 30" correspondiente o bien, la justificación del incumplimiento de acuerdo al procedimiento "Manejo de contingencias para la producción de Oxígeno, OX" de la ParamPlant.</value>
+  </data>
+</root>

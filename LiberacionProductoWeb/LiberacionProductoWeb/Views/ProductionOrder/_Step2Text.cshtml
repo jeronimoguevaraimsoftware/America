@@ -1,0 +1,191 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model LiberacionProductoWeb.Models.ProductionOrderViewModels.ProductionOrderViewModel;
+@inject IViewLocalizer Localizer
+
+<div class="panel-group" id="step-2-accordion">
+    <div class="panel panel-primary overflow-hidden">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                   data-parent="#step-2-accordion" href="#step-2-collapse-three" aria-expanded="true">
+                    <i id="icon-2" class="fa fa-plus-circle pull-right"></i>
+                    2. Despeje de línea
+                </a>
+            </h3>
+        </div>
+        <div id="step-2-collapse-three" class="@Model.ShowPanelSteps" style="">
+            <div class="panel-body">
+                @if (Model.ProductName != "CO2")
+                {
+                    <p>
+                        La producción de gases medicinales a partir del aire ambiental, se
+                        realiza en una unidad de separación de aire (ASU, por sus siglas en
+                        inglés), mediante el proceso de destilación fraccionada, el cual se
+                        fundamenta en la separación de los principales componentes del aire (O2,
+                        N2 y Ar), debido a las diferencias entre sus volatilidades relativas.
+                    </p>
+
+                    <p>
+                        La unidad de separación de aire, es el conjunto de equipos (caseta de
+                        filtros, compresores, separadores de humedad, malla molecular, sistemas
+                        de enfriamiento y lubricación, columna de destilación, condensador
+                        principal, recipientes criogénicos, entre otros) que permite la
+                        disociación de los componentes del aire. Verificar el diagrama de flujo
+                        "Producción de @(Model.ProductName) medicinal", en
+                        el SCD.
+                    </p>
+                }
+                else
+                {
+            <p>
+                La producción de CO2 medicinal, se realiza mediante la purificación del CO2 crudo (raw gas) 
+                a través de un sistema específico para la remoción de los contaminantes esperados en la fuente 
+                del raw gas (integrado por filtros, compresores, separadores de humedad, intercambiadores de calor, etc), 
+                así como de un secado mediante alúmina (selexsorb) y un sistema de eliminación de olor y sabor a través 
+                de carbón activado. La corriente de gas ya purificada es sometida a un proceso de destilación y licuefacción 
+                en el cual se eliminan las impurezas incondensables para finalmente almacenar el producto final en su fase 
+                líquida, en los tanques de planta.
+
+            </p>
+
+            <p>
+                El sistema de purificación de la planta Morelos está integrado principalmente por un hidrolizador para remover 
+                las posibles trazas de azufre y, de un equipo catalítico que elimina el óxido de etileno y otras trazas de impurezas.
+            </p>
+
+            <p>
+                Verificar el procedimiento "Fabricación de Dióxido de Carbono (CO2) grado Medicinal de planta Morelos CO2".
+            </p>
+                }
+
+
+                <p>Por lo que, para el despeje de línea se considera lo siguiente:</p>
+
+                <p>
+                    a) Existe trazabilidad al lote de producto anterior. Esta información
+                    está disponible en la "bitácora de operación establecida en la @(Model.Location)".
+                    La planta es dedicada esto significa que parte de la misma materia prima @(Model.ProductName != "CO2" ? "(aire)":"(raw gas)")
+                    y en la obtencion del producto no hay fuentes de contaminación de otros productos.
+
+
+                </p>
+
+
+
+                <p>
+                    b) El área se encuentra limpia e identificada. Considerando que el
+                    producto es un gas, se tiene que manejar en un sistema cerrado, es
+                    decir, no entra en contacto directo con el medio ambiente y no es
+                    susceptible de alguna fuente de contaminación externa. Por lo anterior,
+                    la limpieza del área de fabricación no se lleva a cabo al inicio de cada
+                    lote, sino de acuerdo a lo indicado en el "Programa de orden y limpieza
+                    externa a líneas y equipos de proceso, MM/R-07-001-10" y, en el
+                    "Programa de limpieza a instalaciones, OO/R-07-001-30", en donde están
+                    establecidas las actividades a realizar, enfocadas a una limpieza
+                    externa con el propósito de imagen.
+                </p>
+
+                <p>
+                    c) El personal utiliza el uniforme limpio y adecuado. El
+                    personal de la operación utiliza el uniforme de algodón y el equipo de
+                    protección personal apropiado a la actividad que desempeña (por ejemplo:
+                    pantalón, camisa manga larga, tapones auditivos, lentes, casco y zapatos
+                    de seguridad, mandil criogénico, protector facial), de acuerdo a lo
+                    establecido en la sección de "Higiene del personal e instalaciones de
+                    los empleados, CC/M-01-013-30" del "Manual de BPM y prerrequisitos".
+                    Esto considerando que el personal no entra en contacto directo con el
+                    producto al ser un sistema cerrado y por lo cual no representa una
+                    posible fuente de contaminación del proceso y/o producto.
+                </p>
+
+                <p>
+                    d) La documentación corresponde al lote indicado. La documentación de
+                    inicio de lote está disponible en tiempo real a través de las gráficas
+                    de las variables de control en proceso, de los parámetros críticos de
+                    proceso y de los atributos críticos de calidad, obtenidas del sistema
+                    computarizado iFix, el cual está validado.
+                </p>
+
+                <p>
+                    e) Se cuenta con los insumos de acuerdo a la lista de materiales para ser
+                    pesados y están identificados correctamente. La materia prima utilizada
+                    es el @(Model.ProductName != "CO2" ? "aire ambiental" : "CO2 crudo(raw gas)") y las lineas de proceso están identificadas de
+                    acuerdo a la normatividad aplicable a la instalación y el producto. No
+                    hay alguna otra materia prima o insumo que sea necesario adicionar
+                    durante todo el proceso y, que requiera ser pesado e identificado.
+                </p>
+
+                <p>
+                    f) El área y equipos de proceso están libres de documentos, insumos y/o
+                    cualquier otra entidad que no corresponden a la lista de materiales y el
+                    lote en cuestión. El único insumo utilizado en el proceso de
+                    fabricación es el @(Model.ProductName != "CO2" ? "aire ambiental" : "CO2 crudo(raw gas)") y, la documentación se maneja en forma
+                    electrónica, por lo que no existe la posibilidad de la presencia de
+                    cualquier otra fuente de contaminación.
+                </p>
+
+                <p>
+                    g) Los equipos e instrumentos presentes en el área están limpios e
+                    identificados: Considerando que el producto es un gas se tiene que
+                    manejar en sistema cerrado, es decir, no entra en contacto con el
+                    medio ambiente y no es susceptible a alguna fuente de contaminación
+                    externa; la limpieza de cada equipo no se lleva a cabo al inicio de
+                    cada lote, si no de acuerdo a lo indicado en el “Programa de Limpieza
+                    a Instalaciones, OO/R-07-001 -30” y en el “Programa de Orden y
+                    Limpieza externa a líneas y equipos de proceso, MM/R-07-001–10”, donde
+                    están establecidas las actividades a realizar que se enfocan a una
+                    limpieza externa con propósito de imagen y, en el procedimiento
+                    “Limpieza de equipos de proceso, MM/P-08-001 - 30” cuando se realiza
+                    la limpieza interna, dado que al ser equipos dedicados y cerrados,
+                    no habría posibilidad de que algún contaminante visualmente detectable
+                    entre en contacto directo con el producto, ni contaminación cruzada
+                    entre productos.
+                    @*g) Los equipos e instrumentos presentes en el área están limpios e
+                        identificados. Considerando que el producto es un gas, se tiene que
+                        manejar en un sistema cerrado, es decir, no entra en contacto directo
+                        con el medio ambiente y, no es susceptible de alguna fuente de
+                        contaminación externa. Por lo anterior, la limpieza del área de
+                        fabricación no se lleva a cabo al inicio de cada lote, sino de acuerdo a
+                        lo indicado en el "Programa de orden y limpieza externa a líneas y
+                        equipos de proceso, MM/R-07-001-10" y, en el "Programa de limpieza a
+                        instalaciones, OO/R-07-001-30", en donde están establecidas las
+                        actividades a realizar, enfocadas a una limpieza externa con el
+                        propósito de imagen. La limpieza interna de los equipos y líneas de
+                        proceso, cuando se rompe la integridad del sistema (p.e: posterior a un
+                        mantenimiento) , se realiza de acuerdo a lo establecido en el
+                        procedimiento "Limpieza de equipos de proceso, MM/P-08-001-30".*@
+                </p>
+
+                <p>
+                    @*  Por las características del proceso, no existe la posiblidad de que algún
+                        contaminante, visualmente detectable, entre en contacto directo con el
+                        producto ni existe la posibilidad de contaminación cruzada entre
+                        productos.*@
+                </p>
+
+                <p>
+                    h) Los instrumentos están calibrados. Los equipos de monitoreo se indican
+                    en el "Plan de calidad de @(Model.ProductName), @(Model.ProductCode)" de
+                    planta "@(Model.Location)" y su estado de calibración puede verificarse
+                    de la etiqueta de calibración adherida al equipo. Esta actividad se
+                    evidencía en la Tabla 2 - Equipos de monitoreo.
+                </p>
+
+                <p>
+                    i) No existe alguna fuente potencial de contaminación. Considerando que
+                    la producción es en un sistema cerrado y por consiguiente, el producto
+                    no entra en contacto con el medio ambiente, no hay fuentes de
+                    contaminación externa que afecten al producto, y al emplearse equipos
+                    dedicados en la producción, no hay fuente de contaminación interna.
+                </p>
+
+                <p>
+                    Considerando todos los puntos anteriores, se considera que se lleva a
+                    cabo un adecuado despeje de línea cuando todos los puntos se cumplen. La
+                    realización de esta actividad se documenta en la Tabla 3 - Despeje de
+                    línea.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

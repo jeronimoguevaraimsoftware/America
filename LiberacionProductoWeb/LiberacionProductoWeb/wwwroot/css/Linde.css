@@ -1,0 +1,12 @@
+﻿.break {
+    background: #CEDCE3 /*#3E87BC*/;
+    height: 1px;
+    margin: 5px 0 10px 0;
+    width: 100%;
+}
+
+.PantallaPrincipalContenedor {
+    border: 1px solid #CEDCE3;
+    margin: 5px 0 5px 0;
+    border-radius: 0px;
+}

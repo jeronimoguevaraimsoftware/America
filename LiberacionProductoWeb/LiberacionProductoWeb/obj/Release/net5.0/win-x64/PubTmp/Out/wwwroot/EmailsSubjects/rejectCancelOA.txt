@@ -1,0 +1,1 @@
+Orden de acondicionamiento cancelación rechazada {CaseTag:paramLote}. 

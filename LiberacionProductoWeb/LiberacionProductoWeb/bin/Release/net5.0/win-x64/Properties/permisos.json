@@ -1,0 +1,200 @@
+﻿[
+  {
+    "Section": "Expediente",
+    "Permissions": [
+      {
+        "Key": "e1",
+        "Text": "Consultar Mis tareas pendientes"
+      },
+      {
+        "Key": "e2",
+        "Text": "Consultar Expediente de Lote"
+      },
+      {
+        "Key": "e3",
+        "Text": "Consulta general"
+      },
+      {
+        "Key": "e4",
+        "Text": "Crear OP"
+      },
+      {
+        "Key": "e5",
+        "Text": "Editar OP"
+      },
+      {
+        "Key": "e6",
+        "Text": "Cancelar OP"
+      },
+      {
+        "Key": "e8",
+        "Text": "Aprobar cancelación OP"
+      },
+      {
+        "Key": "e9",
+        "Text": "Consultar OP"
+      },
+      {
+        "Key": "e10",
+        "Text": "Exportar OP"
+      },
+      {
+        "Key": "e11",
+        "Text": "Editar OA"
+      },
+      {
+        "Key": "e12",
+        "Text": "Consultar OA"
+      },
+      {
+        "Key": "e13",
+        "Text": "Exportar OA"
+      },
+      {
+        "Key": "e14",
+        "Text": "Editar Verificación de Pipas"
+      },
+      {
+        "Key": "e15",
+        "Text": "Consultar Verificación de Pipas"
+      },
+      {
+        "Key": "e16",
+        "Text": "Exportar Check List Verificación de Pipas"
+      },
+      {
+        "Key": "e17",
+        "Text": "Cancelar Check List de Verificación de Pipas"
+      },
+      {
+        "Key": "e18",
+        "Text": "Consultar RAP-Tanques"
+      },
+      {
+        "Key": "e19",
+        "Text": "Consultar RAP-Pipas"
+      },
+      {
+        "Key": "e20",
+        "Text": "Complemento de RAP-Pipas"
+      },
+      {
+        "Key": "e22",
+        "Text": "Consultar Reporte Audit Trail"
+      },
+      {
+        "Key": "e24",
+        "Text": "Complemento de RAP-Tanques"
+      }
+    ]
+  },
+  {
+    "Section": "Catálogos",
+    "Permissions": [
+      {
+        "Key": "c1",
+        "Text": "Consultar Catalogo de Usuarios"
+      },
+      {
+        "Key": "c2",
+        "Text": "Editar Catalogo de Usuarios"
+      },
+      {
+        "Key": "c3",
+        "Text": "Eliminar registro en Catálogo de Usuarios"
+      },
+      {
+        "Key": "c4",
+        "Text": "Consultar Catálogo de Roles"
+      },
+      {
+        "Key": "c5",
+        "Text": "Editar Catálogo de Roles"
+      },
+      {
+        "Key": "c6",
+        "Text": "Eliminar rol del Catálogo de Roles"
+      },
+      {
+        "Key": "c7",
+        "Text": "Consultar Catálogo General"
+      },
+      {
+        "Key": "c8",
+        "Text": "Editar Catálogo General"
+      },
+      {
+        "Key": "c9",
+        "Text": "Eliminar registro de Catálogo General"
+      },
+      {
+        "Key": "c10",
+        "Text": "Consultar Catálogo fórmula farmacéutica"
+      },
+      {
+        "Key": "c11",
+        "Text": "Editar Catálogo fórmula farmacéutica"
+      },
+      {
+        "Key": "c12",
+        "Text": "Eliminar registro de Catálogo fórmula farmacéutica"
+      },
+      {
+        "Key": "c13",
+        "Text": "Consultar Catálogo Producto"
+      },
+      {
+        "Key": "c14",
+        "Text": "Editar Catálogo de Producto"
+      },
+      {
+        "Key": "c15",
+        "Text": "Eliminar registro de Catálogo Producto"
+      },
+      {
+        "Key": "c16",
+        "Text": "Consultar Catálogo Estudio de estabilidad del producto"
+      },
+      {
+        "Key": "c17",
+        "Text": "Editar Catálogo Estudio de estabilidad del producto"
+      },
+      {
+        "Key": "c18",
+        "Text": "Eliminar registro de Catálogo Estudio de estabilidad del producto"
+      },
+      {
+        "Key": "c19",
+        "Text": "Consultar Catálogo Disposición de PNC"
+      },
+      {
+        "Key": "c20",
+        "Text": "Editar Catálogo Disposición de PNC"
+      },
+      {
+        "Key": "c21",
+        "Text": "Eliminar registro de Catálogo Disposición de PNC"
+      },
+      {
+        "Key": "c22",
+        "Text": "Consultar Envase Primario y Presentación"
+      },
+      {
+        "Key": "c23",
+        "Text": "Editar Envase Primario y Presentación"
+      },
+      {
+        "Key": "c24",
+        "Text": "Eliminar Envase Primario y Presentación"
+      },
+      {
+        "Key": "c25",
+        "Text": "Consultar Cambios al Certificado de Calidad"
+      },
+      {
+        "Key": "c26",
+        "Text": "Editar Cambios al Certificado de Calidad"
+      }
+    ]
+  }
+]

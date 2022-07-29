@@ -1,0 +1,164 @@
+﻿@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IStringLocalizer<Resource> resource;
+@model LiberacionProductoWeb.Models.ConfigViewModels.ConfiguracionUsuarioVM
+@{
+    ViewData["Title"] = "Index";
+    var selectPlant = resource.GetString("SelectPlant");
+    var selectProduct = resource.GetString("SelectProduct");
+    var selectTank = resource.GetString("SelectTank");
+    var selectActivitie = resource.GetString("SelectActivitie");
+    var selectState = resource.GetString("SelectState");
+    var startDate = resource.GetString("StartDate");
+    var endDate = resource.GetString("EndDate");
+    var plant = resource.GetString("Plant");
+    var product = resource.GetString("Product");
+    var tank = resource.GetString("Tank");
+    var activitie = resource.GetString("Activitie");
+    var state = resource.GetString("State");
+    var btnFind = resource.GetString("BtnFind");
+    var btnFilter = resource.GetString("BtnFilter");
+}
+<form method="get" asp-action="Index" asp-controller="Home">
+
+    <div class="PantallaPrincipalContenedor form-group-sm">
+        <br />
+        <div class="form-inline col-md-14">
+            <label for="Plant" class="mr-sm-2">@plant</label>
+            @if (Model != null)
+            {
+                @Html.DropDownList("Plant", Model.ListPlants, selectPlant, htmlAttributes: new { id = "Plant", Name =
+            "Plant", @class = "form-control col-2" })
+            }
+            <label for="Producto" class="mr-sm-2">@product:</label>
+            @if (Model != null)
+            {
+                @Html.DropDownList("Product", Model.ListProducts, selectProduct, htmlAttributes: new { id = "Product", Name
+            = "Product", @class = "form-control col-2", @onchange = "getTankXProduct(this)" })
+            }
+            <label for="email" class="mr-sm-2">@tank:</label>
+            @if (Model != null)
+            {
+                @Html.DropDownList("Tank", Model.ListTanks, selectTank, htmlAttributes: new { id = "Tank", Name = "Tank",
+            @class = "form-control col-2" })
+            }
+            <label for="FechaInicial" class="mr-sm-2">@startDate:</label>
+            <input id="FechaInicial" name="StartDate" type="date" class="form-control col-2"
+                value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+        </div>
+        <br />
+        <div class="form-inline col-lg-14">
+            <label for="FechaFinal" class="mr-sm-2">@endDate:</label>
+            <input id="FechaFinal" name="EndDate" type="date" class="form-control col-2"
+                value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+            <label for="Actividades" class="mr-sm-2">@activitie:</label>
+            @if (Model != null)
+            {
+                @Html.DropDownList("Activities", Model.ListActivities, selectActivitie, htmlAttributes: new { id =
+            "Activities", Name = "Activities", @class = "form-control col-2" })
+            }
+            <label for="estado" class="mr-sm-2">@state:</label>
+            @if (Model != null)
+            {
+                @Html.DropDownList("State", Model.ListStates, selectState, htmlAttributes: new { id = "State", Name =
+            "State", @class = "form-control col-2" })
+            }
+        </div>
+        <br />
+        <!-- Mensaje de error -->
+        <div class="col-md-12" id="message"></div>
+        <div style="display: flex; justify-content: flex-end">
+            <button type="submit" id="Buscar" class="btn btn-primary">
+                <i class="fas fa-search"></i> @btnFind
+            </button>
+            <button class="btn" type="button" id="Filtros" and style="background-color:transparent">
+                <i class="fas fa-brush"></i> @btnFilter
+            </button>
+        </div>
+        <br />
+    </div>
+
+
+    <div class="PantallaPrincipalContenedor form-group-sm">
+        <div>
+            <div class="panel panel-primary ">
+                <div class="panel-heading">
+                    <div class="btn-group pull-left">
+                        @*<a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel"><i class="fa
+                            fa-file-excel"></i> Exportar a Excel</a>*@
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-white m-r-5" id="ClearFilters"><i
+                                class="fa fa-eraser"></i>Limpiar Filtros</a>
+                    </div>
+                    <div class="btn-group pull-right">
+
+                    </div>
+                    <h4 class="panel-title">
+                        &nbsp;
+                    </h4>
+                </div>
+                <!-- Mensaje de error -->
+                <div class="col-md-12" id="message"></div>
+                <div class="panel-body ">
+                    <div class="table-responsive">
+                        <table id="data-table" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th scope="col" hidden="hidden">Id</th>
+                                    <th scope="col">Fecha de creación</th>
+                                    <th scope="col">No. de Lote de PROD</th>
+                                    <th scope="col">Planta</th>
+                                    <th scope="col">Producto</th>
+                                    <th scope="col">Tanque</th>
+                                    <th scope="col">Actividad a completar</th>
+                                    <th scope="col">Estado</th>
+                                    <th scope="col">Motivo Cancelación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var entry in Model.ListpenddingTasks)
+                                {
+                                    <tr>
+                                        <td hidden="hidden">
+                                            @entry.Id
+                                        </td>
+                                        <td>
+                                            @entry.FechaDeCreacion.ToString("yyyy/MM/dd")
+                                        </td>
+                                        <td>
+                                            <a href="/ProductionOrder/Index?Id=@entry.Id">@entry.NumeroLoteProduccion</a>
+                                        </td>
+
+                                        <td>
+                                            @entry.Planta
+                                        </td>
+                                        <td>
+                                            @entry.Producto
+                                        </td>
+                                        <td>
+                                            @entry.Tanque
+                                        </td>
+                                        <td>
+                                            @entry.ActividadACompletar
+                                        </td>
+                                        <td>
+                                            @entry.Estado
+                                        </td>
+                                        <td>
+                                            @entry.MotivoCancelacion
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-center">
+        <div class="text-center">
+            @Html.ValidationMessage("Error", new { @class = "text-danger" })
+        </div>
+    </div>
+</form>

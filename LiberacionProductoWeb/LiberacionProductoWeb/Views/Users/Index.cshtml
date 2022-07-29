@@ -1,0 +1,717 @@
+﻿@model LiberacionProductoWeb.Models.ConfigViewModels.UsuariosViewModel;
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@using LiberacionProductoWeb.Helpers;
+@using System.Globalization;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IStringLocalizer<Resource> resource;
+
+@{
+    ViewData["Title"] = "Usuarios";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var btnFilter = resource.GetString("BtnFilter");
+    var notInformation = resource.GetString("NoInformation");
+    var lengthMenu = resource.GetString("LengthMenu");
+    var searchPlaceholder = resource.GetString("SearchPlaceholder");
+    var info = resource.GetString("Info");
+    var emptyTable = resource.GetString("EmptyTable");
+    var paginatefirst = resource.GetString("Paginatefirst");
+    var paginatelast = resource.GetString("Paginatelast");
+    var pageNext = resource.GetString("PageNext");
+    var pagePreviuos = resource.GetString("PagePreviuos");
+    var loadingRecords = resource.GetString("LoadingRecords");
+    var processing = resource.GetString("Processing");
+    var zeroRecords = resource.GetString("ZeroRecords");
+    var infoEmpty = resource.GetString("InfoEmpty");
+    var infoFiltered = resource.GetString("InfoFiltered");
+}
+
+@await Html.PartialAsync("~/Views/Shared/_Navigation.cshtml")
+
+<!-- ============================================================== -->
+<!-- Page wrapper  -->
+<!-- ============================================================== -->
+<div id="content" class="content">
+
+
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li class="breadcrumb-item"><a href="javascript:;">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="javascript:;">Catálogos</a></li>
+        <li class="breadcrumb-item active">Usuarios</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Catálogo de usuarios</h1>
+    <!-- end page-header -->
+
+
+    <div class="section-container section-with-top-border p-b-10">
+        <div class="row">
+
+            <div class="col-lg-20">
+                <form>
+                    <div class="row">
+                        <div class="col-lg-3 m-b-15">
+                            <div class="m-b-5"><b>Planta: </b></div>
+                            <div class="input-group">
+                                <select multiple asp-for="SelectedPlantsFilter" asp-items="Model.PlantsFilter"
+                                        class="selectpicker show-menu-arrow" data-style="btn-inverse"
+                                        data-live-search="true" title="Selecciona"> </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 m-b-15">
+                            <div class="m-b-5"><b>Usuario: </b></div>
+
+                            <select multiple asp-for="SelectedUsersFilter" asp-items="Model.UsersFilter"
+                                    class="selectpicker show-menu-arrow combobox" data-style="btn-inverse"
+                                    data-live-search="true" title="Selecciona">
+                            </select>
+                        </div>
+
+                        <div class="col-lg-3 m-b-15">
+                            <div class="m-b-5"><b>Rol:</b></div>
+                            <div class="input-group">
+                                <select multiple asp-for="SelectedProfilesFilter" asp-items="Model.ProfilesFilter"
+                                        class="selectpicker show-menu-arrow combobox" data-style="btn-inverse"
+                                        data-live-search="true" title="Selecciona">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 m-b-15">
+                            <div class="m-b-5"><b>Estado:</b></div>
+                            <select multiple asp-for="SelectedStatusFilter"
+                                    class="selectpicker show-menu-arrow combobox" data-style="btn-inverse"
+                                    title="Selecciona">
+                                <option value='true'>Activo</option>
+                                <option value='false'>Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                    </div>
+
+
+                    &nbsp;
+                    <button type="submit" class="btn btn-inverse">Buscar</button>
+                    &nbsp;
+                    <a href="@Url.Action("ClearFilters", "Users")" class="btn btn-white m-r-5">
+                        <i class="fa fa-eraser"></i> Limpiar filtros
+                    </a>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="section-container section-with-top-border p-b-5">
+
+
+
+
+        <div class="row">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+
+                    <div class="btn-group pull-left">
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.EDITAR_CATALOGO_DE_USUARIOS))
+                        {
+                            <a href="javascript:;" class="waves-effect waves-light btn btn-white m-r-5" id="add-entry">
+                                <i class="fa fa-plus"></i> Agregar usuario
+                            </a>
+                        }
+                        <a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel">
+                            <i class="fa fa-file-excel"></i> Exportar a excel
+                        </a>
+                    </div>
+                    <div class="btn-group pull-right">
+                        <a href="javascript:;" class="btn btn-white m-r-5" id="ClearFilters">
+                            <i class="fa fa-eraser"></i>Limpiar filtros
+                        </a>
+                    </div>
+
+                    <h4 class="panel-title">
+                        &nbsp;
+                    </h4>
+                </div>
+
+                <!-- Mensaje de error -->
+                <div class="col-md-12" id="message"></div>
+                <div class="panel-body">
+
+                    <div>
+                        <table id="data-table" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="no-sort" style="width:100px"></th>
+                                    <th>Nombre</th>
+                                    <th>Usuario de red</th>
+                                    <th>Correo</th>
+                                    <th>Roles</th>
+                                    <th>Planta</th>
+                                    <th>Estado</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var usuario in Model.Usuarios)
+                                {
+
+
+                                    <tr>
+
+                                        <td>
+                                            @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.ELIMINAR_REGISTRO_EN_CATALOGO_DE_USUARIOS))
+                                            {
+                                                <a href="#question-delete" data-id="@usuario.Id" data-toggle="modal"
+                                           class="btn btn-default btn-xs openDiag"><i class="fa fa-trash-alt"></i></a>
+                                            }
+                                            @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.EDITAR_CATALOGO_DE_USUARIOS))
+                                            {
+                                                <a href='javascript:void(0)' onclick='editOnClick(this);return false;'
+                                           id='editData' class='btn btn-default btn-xs' data-id='@usuario.Id'>
+                                                    <i class='fa fa-edit'></i>
+                                                </a>
+                                            }
+                                        </td>
+                                        <td>
+                                            @usuario.NombreUsuario
+                                        </td>
+                                        <td>
+                                            @usuario.MexeUsuario
+                                        </td>
+                                        <td>
+                                            @usuario.EmailUsuario
+                                        </td>
+                                        <td>
+                                            @string.Join(" , ", usuario.RolesUsuario)
+                                        </td>
+                                        <td>
+                                            @string.Join(" , ", usuario.PlantasUsuario)
+                                        </td>
+                                        <td>
+                                            @{
+                                                if (Convert.ToBoolean(usuario.EstatusUsuario))
+                                                {
+                                                    @: Activo
+                                                }
+                                                else
+                                                {
+                                                    @: Inactivo
+                                                }
+                                            }
+                                        </td>
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <!-- Modal delete-->
+                <!-- BEGIN modal delete sector -->
+                <div class="modal fade" id="question-delete">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header p-b-xs">
+                                <h3 class="modal-title text-red">Advertencia</h3>
+                                <button class="close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        El registro será eliminado
+                                    </div>
+                                    <div class="col-md-3">
+
+                                        <form asp-controller="Users" asp-action="Delete" method="post"
+                                              class="form-inline" role="form">
+                                            <input type="hidden" name="Id" id="Id">
+                                            <button type="submit"
+                                                    class="btn btn-danger btn-lg btn-block">
+                                                Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="modal-footer">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END modal -->
+
+
+            </div>
+
+        </div>
+
+
+
+
+    </div>
+
+</div>
+
+@section Styles {
+
+
+<link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+<link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+<link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+<link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+
+
+<link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+<link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+<link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+
+<link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+
+<link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+
+}
+
+
+
+@section scripts {
+
+<environment names="Development,Staging,Production">
+    <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+
+    <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+
+    <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+    <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+    <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+
+
+    <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+
+    <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+
+    <script src="~/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+    <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+
+    <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.html5.min.js"></script>
+    <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.print.min.js"></script>
+    <script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+
+    <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+    <script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+
+    <script src="~/js/demo.min.js"></script>
+    <script src="~/js/apps.min.js"></script>
+    <script src="~/js/catalogs.js"></script>
+</environment>
+
+
+
+<script>
+    $(function () {
+
+        if ('@Model.MensajeError'.length > 1) {
+            $('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeError </div>');
+        }
+    });
+
+    $(function () {
+
+        if ('@Model.MensajeInfo'.length > 1) {
+            $('#message').append('<div class="alert alert-success"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeInfo </div>');
+        }
+    });
+
+    $(document).on("click", ".openDiag", function () {
+        $('#Id').val($(this).data("id"));
+    });
+
+
+    var refresh = function () {
+        window.location.href = '@Url.Action("Index","Users")';
+    }
+
+    @{
+        var plantsTag = "<select multiple id='plantas' class='selectpicker show-menu-arrow' data-style='btn-white' data-live-search='true'  title='Selecciona'>";
+
+        foreach (var item in Model.PlantsFilter)
+        {
+        plantsTag += "<option value='" + item.Value +  "'>" + item.Text + "</option>";
+
+        }
+
+        plantsTag += "</select>";
+
+
+        var profilesTag = "<select multiple id='roles' class='selectpicker show-menu-arrow' data-style='btn-white'  title='Selecciona'>";
+
+        foreach (var item in Model.ProfilesFilter)
+        {
+        profilesTag += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+
+        }
+
+        profilesTag += "</select>";
+
+
+        var extUsersTag = "<select onChange='onChangeUser(this);' id='extuser' data-live-search='true' class='selectpicker show-menu-arrow' data-style='btn-white'  title='Selecciona'>";
+
+        foreach (var item in Model.ExternalUsersFilter)
+        {
+        extUsersTag += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+
+        }
+
+        extUsersTag += "</select>";
+
+        }
+
+
+        var getEditRow = function (Id) {
+
+        var ret = null;
+        $.ajax({
+            async: false,
+            url: "/Users/GetHTMLTagsById/" + Id,
+            dataType: "json",
+            success: function (data) {
+                ret = data.html;
+            }
+        });
+
+        return ret;
+
+    };
+
+
+    var getNewRow = function () {
+        var result = "<tr>" +
+            "<td> <a href='javascript:void(0)' onclick='removeOnClick(this);return false;'  class='delete-data btn btn-danger btn-xs btn-space' data-id='-1' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
+            "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='saveData' class='save-data btn btn-info btn-xs btn-space' data-id='-1' ><i class='fa fa-save'></i></a> </td>" +
+            "<td>@Html.Raw(extUsersTag)</td>" +
+            "<td><input class='form-control' id='mexe' type='text'></td>" +
+            "<td><input class='form-control' id='correo' type='text'></td>" +
+            "<td>@Html.Raw(profilesTag)</td>" +
+            "<td>@Html.Raw(plantsTag)</td>" +
+            "<td><select id='estado' class='form-control'><option  value='true'>Activo</option><option value='false'>Inactivo</option></select> </td>" +
+            "</tr>"
+        return result;
+    };
+
+
+
+    var removeOnClick = function (event) {
+        $(event).closest("tr").remove();
+        isCreate = false;
+        isEdit = false;
+        $("#ExporttoExcel").removeClass("disabled");
+        $("#add-entry").removeClass("disabled")
+    };
+
+    var isEdit = false;
+    var isCreate = false;
+
+    var onChangeUser = function (e) {
+
+        var id = $(e).val();
+
+
+        $.ajax({
+            async: false,
+            url: "/Users/GetDataById/" + id,
+            dataType: "json",
+            success: function (data) {
+                $(e).closest("tr").each(function () {
+                    $.each(this.cells, function () {
+                        //gets values for each cell
+                        $(this).find("#mexe").val(data.usuario);
+                        $(this).find("#correo").val(data.email);
+                    });
+                });
+            }
+        });
+
+
+    };
+
+    var editOnClick = function (event) {
+
+        var Id = $(event).data("id");
+
+
+        if (isCreate) {
+            return false;
+        }
+
+
+        if (!isEdit) {
+            //remueve y pinta los controles
+            isEdit = true;
+            $("#add-entry").addClass("disabled");
+            $("#ExporttoExcel").addClass("disabled");
+            $(event).closest("tr").replaceWith(getEditRow(Id));
+            $('.selectpicker').selectpicker();
+        }
+    };
+
+
+    var saveConfirm = function (event) {
+
+
+        if (isEdit) {
+            $("#add-entry").removeClass("disabled");
+            $("#ExporttoExcel").removeClass("disabled");
+        }
+
+        isEdit = false;
+        isCreate = false;
+
+
+
+
+        var id = $(event).data("id");
+
+        if (id === -1) {
+            id = "";
+        }
+
+        var idext = "";
+        var nombre = "";
+        var mexe = "";
+        var correo = "";
+        var roles = "";
+        var plantas = "";
+        var estado = "";
+
+        $(event).closest("tr").each(function () {
+            $.each(this.cells, function () {
+                //gets values for each cell
+
+                if ($(this).find("#plantas").length) {
+                    plantas = $(this).find("#plantas").val().join(', ');
+                }
+
+                if ($(this).find("#roles").length) {
+                    roles = $(this).find("#roles").val().join(', ');
+                }
+
+                if ($(this).find("#mexe").length) {
+                    mexe = $(this).find("#mexe").val();
+                }
+
+                if ($(this).find("#correo").length) {
+                    correo = $(this).find("#correo").val();
+                }
+
+                if ($(this).find("#estado").length) {
+                    estado = $(this).find("#estado").val();
+                }
+
+
+                if ($(this).find("#extuser").length) {
+                    idext = $(this).find("#extuser").val();
+                    nombre = $(this).find("#extuser").find(":selected").text();
+                }
+
+            });
+        });
+
+
+        $.ajax({
+            type: "POST",
+            url: "/Users/SaveOrEdit",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("XSRF-TOKEN",
+                    $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            data: JSON.stringify({
+                id: String(id),
+                plantasUsuario: plantas,
+                rolesUsuario: roles,
+                nombreUsuario: nombre,
+                mexeUsuario: mexe,
+                emailUsuario: correo,
+                estatusUsuario: estado,
+                externalUsuario: idext
+            }),
+            contentType: "application/json",
+            dataType: "json",
+            success: function (response) {
+
+                if (response.message) {
+
+                    $.gritter.add({
+                        title: "Error",
+                        text: response.message,
+                        class_name: "gritter-light"
+                    })
+                } else {
+                    //sucess add, needs to refresh and show message
+                    window.location.href = '@Url.Action("Index","Users")';
+                }
+
+
+
+            },
+            failure: function (response) {
+
+                //failure, shgow messahe with error
+                alert("Fail");
+
+            }
+        });
+    }
+
+
+    var saveOnClick = function (event) {
+
+
+        bootbox.confirm({
+            message: "¿Deseas guardar los cambios?",
+            buttons: {
+                confirm: {
+                    label: 'Si',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    saveConfirm(event);
+                }
+            }
+        });
+
+
+
+
+    };
+
+
+    $(document).ready(function () {
+
+        App.init();
+        Demo.init();
+
+
+
+        //radioswitch.init()
+
+        //$("#form").validate();
+
+        $('#data-table thead tr').clone(true).appendTo('#data-table thead');
+        $('#data-table thead tr:eq(1) th').each(function (i) {
+
+            if (i === 0)
+                return;
+
+            var title = $(this).text();
+            $(this).html('<input type="text" placeholder="Buscar" />');
+
+            $('input', this).on('keyup change', function () {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw();
+                }
+            });
+        });
+
+
+        var table = $("#data-table").DataTable(
+            {
+                pageLength: 20,
+                orderCellsTop: true,
+                fixedHeader: true,
+                bLengthChange: false,
+                bFilter: true,
+                bAutoWidth: false,
+                searching: true,
+                sDom: 'lrtip',
+                "bInfo": false,
+                buttons: [
+                    {
+                        extend: 'csv',
+                        charset: 'utf',
+                        bom: true
+                    }
+                ],
+                "dom": 'rtp',
+                "language": {
+                    "search": '<a href="@Url.Action("Index", "home" )" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> @btnFilter</a> <br><div><i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                    "searchPlaceholder": '@searchPlaceholder',
+                    "emptyTable": "@emptyTable",
+                    "lengthMenu": "@lengthMenu",
+                    "info": "@info",
+                    "paginate": {
+                        "first": "@paginatefirst",
+                        "last": "@paginatelast",
+                        "next": "@pageNext",
+                        "previous": "@pagePreviuos"
+                    },
+                    "loadingRecords": "@loadingRecords",
+                    "processing": "@processing",
+                    "zeroRecords": "@zeroRecords",
+                    "infoEmpty": "@infoEmpty",
+                    "infoFiltered": "@infoFiltered",
+                },
+                "order": [],
+                "columnDefs": [{
+                    "targets": 'no-sort',
+                    "orderable": false,
+                }]
+
+            });
+
+
+        $("#ExporttoExcel").on("click", function () {
+            table.button('.buttons-csv').trigger();
+        });
+
+        $('#add-entry').on('click', function (event) {
+            event.preventDefault();
+
+            //$('#addGeneralCatalog').modal('show');
+            $("#add-entry").addClass("disabled")
+            if (!isCreate) {
+                isCreate = true;
+                $("#ExporttoExcel").addClass("disabled");
+                $('#data-table tr:eq(1)').after(getNewRow());
+
+            }
+            else {
+                $("#add-entry").addClass("disabled")
+            }
+            $('.selectpicker').selectpicker();
+        });
+        $("#ClearFilters").on("click", function () {
+            $('#data-table thead tr:eq(1) th').each(function (i) {
+                if (i === 0)
+                    return;
+                $('input', this).val("").change();
+            });
+        });
+
+        //Data Table manipulation
+        //$.fn.dataTable.render.moment("M/D/YYYY");
+
+        $('.selectpicker').selectpicker();
+
+    });
+</script>
+
+}

@@ -1,0 +1,61 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model LiberacionProductoWeb.Models.ConditioningOrderViewModels.ConditioningOrderViewModel;
+@inject IViewLocalizer Localizer
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel-group" id="step-9-accordionOA">
+            <div class="panel panel-primary overflow-hidden">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                            data-parent="#step-9-accordionOA" href="#step-9-collapseOA-three" aria-expanded="true">
+                            <i id="icon-9" class="fa fa-plus-circle pull-right"></i>
+                            Liberación del producto terminado.
+                        </a>
+                    </h3>
+                </div>
+                <div id="step-9-collapseOA-three" class="@Model.ShowPanelSteps" style="">
+                    <div class="panel-body">
+                        <p>
+                            Con la firma del responsable sanitario en la Tabla 7- Cierre de
+                            expediente, se avala que:
+                        </p>
+
+                        <p>a) se ha realizado un adecuado despeje de línea,</p>
+
+                        <p>
+                            b) el producto acondicionado en cada una de las unidades de distribución
+                            cumple con las especificaciones establecidas en la FEUM vigente y, las
+                            buenas prácticas de fabricación,
+                        </p>
+
+                        <p>c) la documentación se encuentra completa,</p>
+
+                        <p>
+                            d) la validación del proceso de producción y acondicionamiento de
+                            producto
+                            medicinal en @(Model.Plant), se encuentra vigente,
+                        </p>
+
+                        <p>
+                            e) los controles de cambios se administran de acuerdo a lo establecido en
+                            el
+                            procedimiento “CC/P-08-001 – 30” vigente y,
+                        </p>
+
+                        <p>
+                            f) en caso de incumplimientos, se documentó el "Informe de desviación,
+                            CC/R-01-028 - 30" y se condujo de acuerdo a lo establecido en el
+                            procedimiento “Control de desviaciones, CC/P-01-009- 30” vigente,
+                        </p>
+
+                        <p>por lo tanto, el producto puede ser enviado a los clientes.</p>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>

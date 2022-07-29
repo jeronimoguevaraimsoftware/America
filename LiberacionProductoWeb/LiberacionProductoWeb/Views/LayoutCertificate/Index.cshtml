@@ -1,0 +1,507 @@
+﻿@model LiberacionProductoWeb.Models.LayoutCertificateViewModels.LeyendsCertificateVM
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@using Microsoft.AspNetCore.Identity;
+@using LiberacionProductoWeb.Helpers;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IStringLocalizer<Resource> resource;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Cambios al Certificado de Calidad";
+    var url = Context.Request.Host.Value;
+
+}
+@await Html.PartialAsync("~/Views/Shared/_Navigation.cshtml")
+<!-- begin #content -->
+<div id="content" class="content">
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li class="breadcrumb-item"><a href="javascript:;">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="javascript:;">Catálogos</a></li>
+        <li class="breadcrumb-item active">Layout certificado</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Cambios al Certificado de Calidad</h1>
+    <!-- end page-header -->
+    <div class="section-container section-with-top-border p-b-5">
+        @*<label style="color:red">Agunos datos son solo demostrativos, los campos editables son los que se mostrarán en el certificado</label>*@
+        <br />
+        <form method="post" asp-action="CrearEditar" id="CheckListForm" enctype="multipart/form-data">
+            @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.EDITAR_LAYOUT_CERTIFICADO))
+            {
+                <button name="Guardar" class='btn btn' id="Guardar" data-toggle="modal" data-target="#ModalSave" onclick="CrearEditar()" type="button" style="background-color:transparent">
+                    <i class="fa fa-save"></i> Guardar
+                </button>
+                <button class='btn btn' name="Editar" id="Editar" type="button" style="background-color:transparent">
+                    <i class="fa fa-edit"></i> Editar
+                </button>
+                <button class='btn btn' hidden name="Cancelar" id="Cancelar" type="button" style="background-color:transparent">
+                    <i class="fa fa-trash"></i> Cancelar
+                </button>
+            }
+            <br />
+            <div class="container width-600 colorWhite border-danger" id="pdfEdit" style="pointer-events: none; color:silver">
+                <br />
+                <br />
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Cabecero:</label>
+                        <textarea class="form-control" asp-for="HeaderOne" style="height:130px;"></textarea>
+                        <div class="row" style="justify-content: center;">
+                            <label id="HeaderOne-error" class="text-danger"></label>
+                            <div id="character_count"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Logotipo:</label>
+                        <img class="pull-right" id="ImgData" src="http://@url/@resource.GetString("PathLogoCertificateFrontEnd").Value/@Model.HeaderTwo" height="60" width="200" />
+                        <input asp-for="@Model.FileName" readonly hidden />
+                        <input type="file" name="archivos" id="subidaArchivo" class="form-control" accept="image/png, image/jpeg" />
+                        <div class="row" style="justify-content: center;">
+                            <label id="HeaderTwo-error" class="text-danger"></label>
+                            <label id="HeaderTwo-info" class="text-danger">La imagen debe de medir 201px de ancho y alto 54px</label>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="row">
+                    <label>Nota media:</label>
+                    <div class="col-md-12 text-center">
+                        <textarea class="form-control col-md-12" asp-for="LeyendOne"></textarea>
+                        <div class="row" style="justify-content: center;">
+                            <label id="LeyendOne-error" class="text-danger"></label>
+                        </div>
+                        <div id="LeyendOne_count"></div>
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="row">
+                    <div class="col-md-1 text-left">
+                        <label>Notas:</label>
+                    </div>
+                    <div class="col-md-11 text-left">
+                        <textarea class="form-control" asp-for="LeyendTwo"></textarea>
+                        <div class="row" style="justify-content: center;">
+                            <label id="LeyendTwo-error" class="text-danger"></label>
+                        </div>
+                        <div id="LeyendTwo_count"></div>
+                    </div>
+                </div>
+                <br />
+                <hr style="background-color:red" />
+                <label style="color:red">Solo para las plantas seleccionadas</label>
+
+                <select multiple id="SelectedPlantsFilter" name="SelectedPlantsFilter"
+                        asp-for="SelectedPlantsFilter" class="selectpicker show-menu-arrow"
+                        data-style="btn-inverse" onchange="getFooter(this)" data-live-search="true" title="Selecciona">
+                </select>
+                <div class="row" style="justify-content: center;">
+                    <label id="SelectedPlantsFilter-error" class="text-danger"></label>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-left">
+                        <label>Fabricado por:</label>
+                        <br />
+                        <textarea class="form-control" asp-for="Footer"></textarea>
+                        <div class="row" style="justify-content: center;">
+                            <label id="leyendsFooterCertificateVM_Footer-error" class="text-danger"></label>
+                        </div>
+                        <div id="Footer_count"></div>
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="text-center">
+                    vista previa
+                </div>
+
+                <div class="table-responsive" id="table2">
+                    @{
+                        Html.RenderPartial("_Footer", Model);
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@section Styles {
+    <style>
+        .colorWhite {
+            background-color: white
+        }
+    </style>
+    <link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+    <link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/FixedHeader/css/fixedHeader.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+    <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="~/plugins/tinymce/skins/ui/tinymce-5/skin.min.css" rel="stylesheet" />
+}
+<!-- end #content -->
+@section Scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/js/demo.min.js"></script>
+        <script src="~/js/apps.min.js"></script>
+        <script src="~/plugins/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+        <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+        <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+        <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+        <script src="~/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.html5.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.print.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+        <script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+        <script src="~/js/linde.js"></script>
+    </environment>
+    <script>
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlSearchParams.entries());
+        $(document).ready(function () {
+            App.init();
+            Demo.init();
+            getPlans();
+            tinymce.init({
+                selector: '#HeaderOne',
+                height: "190",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                setup: function (ed) {
+                    ed.on('keyup', function (e) {
+                        var max = 300;
+                        var count = CountCharacters("HeaderOne");
+                        document.getElementById("character_count").innerHTML = "Número de caracteres usados: " + count + " de " + max;
+                        if (count > max) {
+                            $("#HeaderOne-error").text("Límite excedido de caracteres")
+                            return false;
+                        }
+                        else {
+                            $("#HeaderOne-error").text("")
+                        }
+                    });
+                }
+            });
+            tinymce.init({
+                selector: '#LeyendOne',
+                height: "140",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                setup: function (ed) {
+                    ed.on('keyup', function (e) {
+                        var max = 250;
+                        var count = CountCharacters("LeyendOne");
+                        document.getElementById("LeyendOne_count").innerHTML = "Número de caracteres usados: " + count + " de " + max;
+                        if (count > max) {
+                            $("#LeyendOne-error").text("Límite excedido de caracteres")
+                            return false;
+                        }
+                        else {
+                            $("#LeyendOne-error").text("")
+                        }
+                    });
+                }
+            });
+            tinymce.init({
+                selector: '#LeyendTwo',
+                height: "180",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                setup: function (ed) {
+                    ed.on('keyup', function (e) {
+                        var max = 480;
+                        var count = CountCharacters("LeyendTwo");
+                        document.getElementById("LeyendTwo_count").innerHTML = "Número de caracteres usados: " + count + " de " + max;
+                        if (count > max) {
+                            $("#LeyendTwo-error").text("Límite excedido de caracteres")
+                            return false;
+                        }
+                        else {
+                            $("#LeyendTwo-error").text("")
+                        }
+                    });
+                }
+            });
+            tinymce.init({
+                selector: '#Footer',
+                height: "180",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                setup: function (ed) {
+                    ed.on('keyup', function (e) {
+                        var max = 500;
+                        var count = CountCharacters("Footer");
+                        document.getElementById("Footer_count").innerHTML = "Número de caracteres usados: " + count + " de " + max;
+                        if (count > max) {
+                            $("#leyendsFooterCertificateVM_Footer-error").text("Límite excedido de caracteres")
+                            return false;
+                        }
+                        else {
+                            $("#leyendsFooterCertificateVM_Footer-error").text("")
+                        }
+                    });
+                }
+            });
+            $("#Editar").on("click", function () {
+                $("#Editar").attr('hidden', true);
+                $("#pdfEdit").removeAttr("style");
+                $("#Cancelar").attr('hidden', false);
+            });
+            $("#subidaArchivo").change(function () {
+                readURL(this);
+            });
+            $("#Cancelar").on("click", function () {
+                $("#Guardar").attr('hidden', false);
+                window.location.reload();
+            });
+      
+        });
+        async function CrearEditar(event) {
+            let validate = true;
+            if (isNullOrEmpty(tinymce.get("HeaderOne").getContent())) {
+                $("#HeaderOne-error").text("Requerido")
+                validate = false;
+                return false;
+            }
+            else {
+                var max = 300;
+                var count = CountCharacters("HeaderOne");
+                document.getElementById("character_count").innerHTML = "Número de caracteres usados: " + count + " de " + max;
+                if (count > max) {
+                    $("#HeaderOne-error").text("Límite excedido de caracteres")
+                    return false;
+                }
+                else {
+                    $("#HeaderOne-error").text("")
+                }
+            }
+            if (isNullOrEmpty(tinymce.get("LeyendOne").getContent())) {
+                $("#LeyendOne-error").text("Requerido")
+                validate = false;
+                return false;
+            }
+            else {
+                var max = 250;
+                var count = CountCharacters("LeyendOne");
+                document.getElementById("LeyendOne_count").innerHTML = "Número de caracteres usados: " + count + " de " + max;
+                if (count > max) {
+                    $("#LeyendOne-error").text("Límite excedido de caracteres")
+                    return false;
+                }
+                else {
+                    $("#LeyendOne-error").text("")
+                }
+            }
+            if (isNullOrEmpty(tinymce.get("LeyendTwo").getContent())) {
+                $("#LeyendTwo-error").text("Requerido")
+                validate = false;
+                return false;
+            }
+            else {
+                var max = 480;
+                var count = CountCharacters("LeyendTwo");
+                document.getElementById("LeyendTwo_count").innerHTML = "Número de caracteres usados: " + count + " de " + max;
+                if (count > max) {
+                    $("#LeyendTwo-error").text("Límite excedido de caracteres")
+                    return false;
+                }
+                else {
+                    $("#LeyendTwo-error").text("")
+                }
+
+            }
+            if (isNullOrEmpty(tinymce.get("Footer").getContent()) && $('#SelectedPlantsFilter').val().length != 0) {
+                $("#leyendsFooterCertificateVM_Footer-error").text("Requerido");
+                $("#SelectedPlantsFilter-error").text("Requerido");
+                validate = false;
+                return false;
+            }
+            else {
+                var max = 500;
+                var count = CountCharacters("Footer");
+                document.getElementById("Footer_count").innerHTML = "Número de caracteres usados: " + count + " de " + max;
+                if (count > max) {
+                    $("#leyendsFooterCertificateVM_Footer-error").text("Límite excedido de caracteres")
+                    return false;
+                }
+                else {
+                    $("#leyendsFooterCertificateVM_Footer-error").text("")
+                }
+            }
+           
+            //if ($('#SelectedPlantsFilter').val().length == 0) {
+            //    $("#SelectedPlantsFilter-error").text("Requerido")
+            //    validate = false;
+            //    return false;
+            //}
+            //else {
+            //    $("#SelectedPlantsFilter-error").text("")
+            //}
+            
+            var fileUpload = $("#subidaArchivo").get(0);
+            var files = fileUpload.files;
+
+            var fileData = new FormData();
+            for (var i = 0; i < files.length; i++) {
+                fileData.append(files[i].name, files[i]);
+            }
+            var style = "font-family: 'Arial'; font-size: 9pt;";
+            let HeaderOneDiv = tinymce.get("HeaderOne").getContent().includes("div");
+            let LeyendOneDiv = tinymce.get("LeyendOne").getContent().includes("div");
+            let LeyendTwoDiv = tinymce.get("LeyendTwo").getContent().includes("div");
+            let FooterDiv = tinymce.get("Footer").getContent().includes("div");
+            fileData.append('HeaderOne', HeaderOneDiv ? tinymce.get("HeaderOne").getContent() : `<div style="${style}">` + tinymce.get("HeaderOne").getContent() + `</div>`);
+            fileData.append('LeyendOne', LeyendOneDiv ? tinymce.get("LeyendOne").getContent() :`<div style="${style}">` + tinymce.get("LeyendOne").getContent() + `</div>`);
+            fileData.append('LeyendTwo', LeyendTwoDiv ? tinymce.get("LeyendTwo").getContent() :`<div style="${style}">` + tinymce.get("LeyendTwo").getContent() + `</div>`);
+            fileData.append('PlantsId', $("#SelectedPlantsFilter").val().join());
+            fileData.append('Footer', FooterDiv ? tinymce.get("Footer").getContent() :`<div style="${style}">` + tinymce.get("Footer").getContent() + `</div>`);
+            fileData.append('FileName', $("#FileName").val());
+            return $.ajax({
+                type: "POST",
+                url: "/LayoutCertificate/CrearEditar",
+                data: fileData,
+                dataType: "json",
+                async: true,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    console.log(response);
+                    if (response.result === "Ok") {
+                        $.gritter.add({
+                            title: "Mensaje",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        });
+                        window.location.reload();
+                    }
+                    else {
+                        $.gritter.add({
+                            title: "Ocurrió un error",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+                    }
+                }
+            })
+        };
+        var getPlans = function () {
+            $.ajax({
+                type: "GET",
+                url: "/Home/GetPlants",
+                success: function (response) {
+                    $("#SelectedPlantsFilter").empty()
+                    $("#SelectedProductsFilter").empty()
+                    $("#SelectedTanksFilter").empty()
+
+                    $("#SelectedProductsFilter").prop("disabled", true)
+                    $("#SelectedTanksFilter").prop("disabled", true)
+
+                    response.data.forEach(function (item) {
+                        $("#SelectedPlantsFilter").append($('<option>', {
+                            value: item.value,
+                            text: item.text
+                        }))
+                    });
+
+                    $('#SelectedPlantsFilter').selectpicker('refresh');
+
+                    if (!isNullOrEmpty(params['SelectedPlantsFilter'])) {
+                        $('#SelectedPlantsFilter').val(params['SelectedPlantsFilter'].split(','))
+                        getProducts("#SelectedPlantsFilter")
+                        $('#SelectedPlantsFilter').selectpicker('refresh');
+                    }
+                }
+            });
+        }
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#ImgData').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+                readImageFile(input.files[0]);
+            }
+        }
+        var getFooter = function (element) {
+            const plantId = $(element).val()
+            $.ajax({
+                type: "GET",
+                url: "/LayoutCertificate/GetFooter?PlantsId=" + $("#SelectedPlantsFilter").val().join(),
+                success: function (response) {
+                    if (response.result === "fail") {
+                        $.gritter.add({
+                            title: "",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+                    }
+                    else {
+                        $("#table2").html(response);
+                    }
+                }
+            });
+        }
+        function CountCharacters(name) {
+            var body = tinymce.get(name).getBody();
+            var content = tinymce.trim(body.innerText || body.textContent);
+            return content.length;
+        };
+
+        function readImageFile(file) {
+            var reader = new FileReader(); 
+            reader.onload = function (e) {
+                var img = new Image();
+                img.src = e.target.result;
+
+                img.onload = function () {
+                    debugger;
+                    var w = this.width;
+                    var h = this.height;
+                    if (w > 201 && h >54) {
+                        document.getElementById('HeaderTwo-info').innerHTML =
+                            document.getElementById('HeaderTwo-info').innerHTML + '<br /> ' +
+                            'Tamaño: <b>' + Math.round((file.size / 1024)) + '</b> KB <br />' +
+                            'Ancho: <b>' + w + '</b> <br />' +
+                            'Alto: <b>' + h + '</b> <br />' +
+                            '<b> La imagen no cumple con las medidas' + '</b> <br />';
+                        $('#subidaArchivo').val(null);
+                        $('#ImgData').attr('src', null);
+                        return false;
+                    }
+                    else {
+                        $("#HeaderTwo-info").text("")
+                        return true;
+                    }
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+        async function Save(event) {
+            CrearEditar(event);
+        }
+
+    </script>
+}

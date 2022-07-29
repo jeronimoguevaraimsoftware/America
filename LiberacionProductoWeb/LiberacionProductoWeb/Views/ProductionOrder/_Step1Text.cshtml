@@ -1,0 +1,50 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model LiberacionProductoWeb.Models.ProductionOrderViewModels.ProductionOrderViewModel;
+@inject IViewLocalizer Localizer
+
+<div class="panel-group" id="step-1-accordion">
+    <div class="panel panel-primary overflow-hidden">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <a class="accordion-toggle accordion" data-toggle="collapse"
+                   data-parent="#step-1-accordion" href="#step-1-collapse-three" aria-expanded="true">
+                    <i id="icon-1" class="fa fa-plus-circle pull-right"></i>
+                    1. Equipos principales
+                </a>
+            </h3>
+        </div>
+        <div id="step-1-collapse-three" class="@Model.ShowPanelSteps" style="">
+            <div class="panel-body">
+                <p>1.1 Equipos de producción.</p>
+
+                <p>
+                    Los equipos principales en la producción, son rastreables en los listados
+                    de la base de datos del sistema INFOR EAM.
+                </p>
+
+                <p>
+                    Verificar que los equipos de producción se encuentren identificados y en buen estado.
+                </p>
+                <p>
+                    Registrar el resultado de la tabla 1 - Equipos de producción. 
+                </p>
+
+                <p>1.2. Equipos de monitoreo.</p>
+
+                <p>
+                    Los equipos de monitoreo del proceso se indican en el "Plan de calidad de
+                    @(Model.ProductName) de 
+                    "@(Model.Location)" y, su estado de calibración puede obtenerse de la
+                    etiqueta de calibración adherida al equipo, o del registro de
+                    calibración correspondiente y que se encuentra disponible en forma
+                    impresa o en el sistema INFOR EAM.
+                </p>
+
+                <p>
+                    Verificar y registrar el estado de calibración de los equipos de
+                    monitoreo indicados en la Tabla 2 - Equipos de monitoreo.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

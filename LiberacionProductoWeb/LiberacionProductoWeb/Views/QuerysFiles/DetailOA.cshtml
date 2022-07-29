@@ -1,0 +1,302 @@
+﻿@model LiberacionProductoWeb.Models.Principal.DetailExpLote;
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@using LiberacionProductoWeb.Helpers;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IStringLocalizer<Resource> resource;
+@{
+    ViewData["Title"] = "DetailOA";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var notInformation = resource.GetString("NoInformation");
+    var lengthMenu = resource.GetString("LengthMenu");
+    var searchPlaceholder = resource.GetString("SearchPlaceholder");
+    var info = resource.GetString("Info");
+    var emptyTable = resource.GetString("EmptyTable");
+    var paginatefirst = resource.GetString("Paginatefirst");
+    var paginatelast = resource.GetString("Paginatelast");
+    var pageNext = resource.GetString("PageNext");
+    var pagePreviuos = resource.GetString("PagePreviuos");
+    var loadingRecords = resource.GetString("LoadingRecords");
+    var processing = resource.GetString("Processing");
+    var zeroRecords = resource.GetString("ZeroRecords");
+    var infoEmpty = resource.GetString("InfoEmpty");
+    var infoFiltered = resource.GetString("InfoFiltered");
+    var validateStartDateEndDate = resource.GetString("ValidateStartDateEndDate");
+    var btnFilter = resource.GetString("BtnFilter");
+}
+
+<!-- Navigation -->
+<div id="top-menu" class="top-menu">
+    <!-- begin sidebar scrollbar -->
+    <div class="container-fluid">
+        <!-- begin sidebar nav -->
+        <ul class="nav">
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                @* <li class="nav-header">Menú</li> *@
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        @* <i class="fa fa-clipboard-list"></i> *@
+                        <span>Mis tareas pendientes</span>
+                    </a>
+                </li>
+                <li class="active">
+                    @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_EXPEDIENTE_DE_LOTE))
+                    {
+                        <a asp-controller="QuerysFiles" asp-action="Index">
+                            @* <i class="fa fa-file-alt"></i> *@
+                            <span>Consulta de expediente de lote</span>
+
+                        </a>
+                    }
+                </li>
+                <li>
+                    @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTA_GENERAL))
+                    {
+                        <a asp-controller="QuerysGeneral" asp-action="Index">
+                            @* <i class="fa fa-search"></i> *@
+                            <span>Consulta general</span>
+                        </a>
+                    }
+                </li>
+                <li class="has-sub">
+                    <a href="javascript:;">
+                        @* <i class="fa fa-chart-line"></i> *@
+                        <span>Reportes</span>
+                    </a>
+                    <ul class="sub-menu">
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_RAP_TANQUES))
+                        {
+                            <li><a href="@Url.Action("Index", "RAPTanques")">RAP - Tanques</a></li>
+                        }
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_RAP_PIPAS))
+                        {
+                            <li><a href="@Url.Action("Index", "RAPPipas")">RAP - Pipas</a></li>
+                        }
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_REPORTE_AUDIT_TRAIL))
+                        {
+                            <li><a href="@Url.Action("Index", "ReportAuditTrail")">Reporte Audit Trail</a></li>
+                        }
+                    </ul>
+                </li>
+
+            }
+        </ul>
+        <!-- end sidebar nav -->
+    </div>
+    <!-- end sidebar scrollbar -->
+</div>
+
+<div id="content" class="content">
+
+
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li class="breadcrumb-item"><a href="javascript:;">Consulta de expediente</a></li>
+        <li class="breadcrumb-item"><a href="javascript:;">Orden de acondicionamiento</a></li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Orden de acondicionamiento</h1>
+    <!-- end page-header -->
+    <div class="section-container section-with-top-border p-b-5">
+        <div class="row">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="btn-group pull-left">
+                        <br />
+                        <br />
+                        <a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel"><i
+                                class="fa fa-file-excel"></i> Exportar a excel</a>
+                    </div>
+                    <div class="btn-group pull-right">
+                        <a asp-controller="QuerysFiles" asp-action="Index" class="btn btn-white m-r-5"
+                            id="ClearFilters"><i class="fa fa-eraser"></i>Limpiar filtros</a>
+                    </div>
+                    <h4 class="panel-title">
+                        &nbsp;
+                    </h4>
+                </div>
+                <!-- Mensaje de error -->
+                <div class="col-md-12" id="message"></div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table id="data-table" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th scope="col" hidden="hidden">Id</th>
+                                    <th scope="col">Estado</th>
+                                    <th scope="col">Calibración de equipos analíticos</th>
+                                    <th scope="col">Calibración de equipos básculas y flujómetros</th>
+                                    <th scope="col">Despeje de línea</th>
+                                    <th scope="col">Equipos (accesorios)</th>
+                                    <th scope="col">Cantidad total de producto</th>
+                                    <th scope="col">Orden de producción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var entry in Model.detailOA)
+                                {
+
+                                    <tr>
+                                        <td hidden="hidden">
+                                            @*<a href="javascript:void(0)" onclick="deleteOnClick(this); return false;"
+                                                data-id="@entry.Id" class="btn btn-default btn-xs"><i class="fa
+                                                fa-trash-alt"></i></a>
+                                                <a href='javascript:void(0)' onclick='editOnClick(this);return false;'
+                                                id='editData' class='btn btn-default btn-xs' data-id='@entry.Id'><i class='fa
+                                                fa-edit'></i></a>*@
+                                            @entry.ConditioningOrder
+                                        </td>
+                                        <td>
+                                            @entry.State
+                                        </td>
+                                        <td>
+                                            @entry.CalibrationAnalyticalEquipment
+                                        </td>
+
+                                        <td>
+                                            @entry.CalibrationScalelEquipment
+                                        </td>
+                                        <td>
+                                            @entry.LineBreak
+                                        </td>
+                                        <td>
+                                            @entry.Accessories
+                                        </td>
+                                        <td>
+                                            @entry.TotalProduct
+                                        </td>
+                                        <td>
+                                            <div class="text-center">
+                                                <a href="QuerysFiles/OrdenProd/@entry.ConditioningOrder"
+                                                data-id="@entry.ConditioningOrder" class='btn btn-success text-white'
+                                                style='cursor:pointer; width:100px;'>
+                                                    <i class='fas fa-edit'></i> Ver orden
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+
+<link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+<link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+<link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+<link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+<link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+<link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+<link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+<link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+
+}
+
+@section scripts {
+
+<environment names="Development,Staging,Production">
+    <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+    <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+    <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+    <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+    <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+    <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+    <script src="~/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+    <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.html5.min.js"></script>
+    <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.print.min.js"></script>
+    <script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+    <script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+    <script src="~/js/demo.min.js"></script>
+    <script src="~/js/apps.min.js"></script>
+    <script src="~/js/catalogs.js"></script>
+</environment>
+<script>
+
+
+    $(document).ready(function () {
+
+        App.init();
+        Demo.init();
+
+        $('#data-table thead tr').clone(true).appendTo('#data-table thead');
+        $('#data-table thead tr:eq(1) th').each(function (i) {
+
+            if (i === 0)
+                return;
+
+            var title = $(this).text();
+            $(this).html('<input type="text" placeholder="Buscar ' + title + '" />');
+
+            $('input', this).on('keyup change', function () {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw();
+                }
+            });
+        });
+
+
+        var table = $("#data-table").DataTable({
+            pageLength: 20,
+            orderCellsTop: true,
+            fixedHeader: true,
+            bLengthChange: false,
+            bFilter: true,
+            bAutoWidth: false,
+            searching: true,
+            sDom: 'lrtip',
+            "bInfo": false,
+            buttons: [
+                {
+                    extend: 'csv',
+                    charset: 'utf-8',
+                    bom: true
+                }
+            ],
+            "language": {
+                "search": '<a href="@Url.Action("Index", "home" )" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> @btnFilter</a> <br><div><i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                "searchPlaceholder": '@searchPlaceholder',
+                "emptyTable": "@emptyTable",
+                "lengthMenu": "@lengthMenu",
+                "info": "@info",
+                "paginate": {
+                    "first": "@paginatefirst",
+                    "last": "@paginatelast",
+                    "next": "@pageNext",
+                    "previous": "@pagePreviuos"
+                },
+                "loadingRecords": "@loadingRecords",
+                "processing": "@processing",
+                "zeroRecords": "@zeroRecords",
+                "infoEmpty": "@infoEmpty",
+                "infoFiltered": "@infoFiltered",
+            },
+            "order": [],
+            "columnDefs": [{
+                "targets": 'no-sort',
+                "orderable": false,
+            }]
+
+        });
+        $("#ExporttoExcel").on("click", function () {
+            table.button('.buttons-csv').trigger();
+        });
+        $('.selectpicker').selectpicker();
+    });
+</script>
+
+}

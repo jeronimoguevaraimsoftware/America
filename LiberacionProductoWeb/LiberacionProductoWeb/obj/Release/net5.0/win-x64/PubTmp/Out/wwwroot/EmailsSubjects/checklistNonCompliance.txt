@@ -1,0 +1,1 @@
+Check List de Verificación de Pipas {CaseTag:paramPipa}  de {CaseTag:paramFecha} no cumplio con los requerimientos solicitados.

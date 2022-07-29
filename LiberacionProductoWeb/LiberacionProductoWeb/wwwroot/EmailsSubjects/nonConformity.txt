@@ -1,0 +1,1 @@
+Orden de producción {CaseTag:paramLote}, pendiente de firma de rechazo del producto.

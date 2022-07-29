@@ -1,0 +1,834 @@
+﻿@using LiberacionProductoWeb.Helpers;
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@inject IStringLocalizer<Resource> resource;
+@model LiberacionProductoWeb.Models.RAPModels.ComplementoViewModel
+@{
+    ViewData["Title"] = "Complemento Tanques";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var select = resource.GetString("Select");
+    var startDate = resource.GetString("StartDate");
+    var endDate = resource.GetString("EndDate");
+    var plant = resource.GetString("Plant");
+    var tank = resource.GetString("Tank");
+    var product = resource.GetString("Product");
+    var state = resource.GetString("State");
+    var activitie = resource.GetString("Activitie");
+    var btnFind = resource.GetString("BtnFind");
+    var btnFilter = resource.GetString("BtnFilter");
+    var notInformation = resource.GetString("NoInformation");
+    var lengthMenu = resource.GetString("LengthMenu");
+    var searchPlaceholder = resource.GetString("SearchPlaceholder");
+    var info = resource.GetString("Info");
+    var emptyTable = resource.GetString("EmptyTable");
+    var paginatefirst = resource.GetString("Paginatefirst");
+    var paginatelast = resource.GetString("Paginatelast");
+    var pageNext = resource.GetString("PageNext");
+    var pagePreviuos = resource.GetString("PagePreviuos");
+    var loadingRecords = resource.GetString("LoadingRecords");
+    var processing = resource.GetString("Processing");
+    var zeroRecords = resource.GetString("ZeroRecords");
+    var infoEmpty = resource.GetString("InfoEmpty");
+    var infoFiltered = resource.GetString("InfoFiltered");
+    var validateStartDateEndDate = resource.GetString("ValidateStartDateEndDate");
+    var presentation = resource.GetString("Presentation");
+    var purity = resource.GetString("Purity");
+    var healthRegister = resource.GetString("HealthRegister");
+    var pharmaceuticalForm = resource.GetString("PharmaceuticalForm");
+}
+
+<!-- Navigation -->
+<div id="top-menu" class="top-menu">
+    <!-- begin sidebar scrollbar -->
+    <div class="container-fluid">
+        <!-- begin sidebar nav -->
+        <ul class="nav">
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                @* <li class="nav-header">Menú</li> *@
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        @* <i class="fa fa-clipboard-list"></i> *@
+                        <span>Mis tareas pendientes</span>
+                    </a>
+                </li>
+                <li>
+                    @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_EXPEDIENTE_DE_LOTE))
+                    {
+                        <a asp-controller="QuerysFiles" asp-action="Index">
+                            @* <i class="fa fa-file-alt"></i> *@
+                            <span>Consulta de expediente de lote</span>
+
+                        </a>
+                    }
+                </li>
+                <li>
+                    @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTA_GENERAL))
+                    {
+                        <a asp-controller="QuerysGeneral" asp-action="Index">
+                            @* <i class="fa fa-search"></i> *@
+                            <span>Consulta general</span>
+                        </a>
+                    }
+                </li>
+                <li class="has-sub active">
+                    <a href="javascript:;">
+                        @* <i class="fa fa-chart-line"></i> *@
+                        <span>Reportes</span>
+                    </a>
+                    <ul class="sub-menu">
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_RAP_TANQUES))
+                        {
+                            <li><a href="@Url.Action("Index", "RAPTanques")">RAP - Tanques</a></li>
+                        }
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_RAP_PIPAS))
+                        {
+                            <li><a href="@Url.Action("Index", "RAPPipas")">RAP - Pipas</a></li>
+                        }
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_REPORTE_AUDIT_TRAIL))
+                        {
+                            <li><a href="@Url.Action("Index", "ReportAuditTrail")">Reporte Audit Trail</a></li>
+                        }
+                    </ul>
+                </li>
+
+            }
+        </ul>
+        <!-- end sidebar nav -->
+    </div>
+    <!-- end sidebar scrollbar -->
+</div>
+
+<!-- ============================================================== -->
+<!-- Page wrapper  -->
+<!-- ============================================================== -->
+<div id="content" class="content">
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li class="breadcrumb-item"><a href="javascript:;">Reportes</a></li>
+        <li class="breadcrumb-item"><a href="javascript:history.back()">Revisión anual del producto - tanques</a></li>
+        <li class="breadcrumb-item active">Complemento revisión anual del producto - tanques</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Complemento revisión anual del producto - tanques</h1>
+    <!-- end page-header -->
+    <div class="section-container section-with-top-border p-b-10">
+        <div class="row">
+            <div class="btn-group pull-left">
+                <button class='btn btn' id="Editar" type="button" style="background-color:transparent" onclick="Edit()">
+                    <i class="fa fa-edit"></i> Editar
+                </button>
+
+                <button class='btn btn' id="Guardar" data-toggle="modal" data-target="#ModalSave" type="button"
+                    style="background-color:transparent" hidden>
+                    <i class="fa fa-save"></i> Guardar
+                </button>
+
+                <button class="btn btn" id="Cancelar" data-toggle="modal" data-target="#ModalCancel" type="button"
+                    style="background-color:transparent" hidden>
+                    <i class="fa fa-minus-circle"></i> Cancelar
+                </button>
+
+                <div class="btn-group pull-left">
+                    <a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel">
+                        <i class="fa fa-file-excel"></i> Exportar a excel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="section-container section-with-top-border p-b-10">
+
+        <div class="row">
+
+            <div class="col-lg-20">
+                <form id="formSearch">
+                    <div class="row">
+                        <div class="col-lg-2 m-b-15">
+                            <div class="m-b-5"><br></div>
+                            <div class="m-b-5"><b>@plant: <FONT size=3 style=color:red !important> * </FONT></b></div>
+                            <div class="input-group">
+                                <select asp-for="SelectedPlantFilter" class="selectpicker show-menu-arrow"
+                                    data-style="btn-inverse" data-live-search="true" title="@select"
+                                    onchange="getProducts(this)"> </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 m-b-15">
+                            <div class="m-b-5"><br></div>
+                            <div class="m-b-5"><b>@product: <FONT size=3 style=color:red !important> * </FONT></b></div>
+                            <div class="input-group">
+                                <select asp-for="SelectedProductFilter" class="selectpicker show-menu-arrow"
+                                    data-style="btn-inverse" data-live-search="true" title="@select"
+                                    onchange="getTanks(this)">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 m-b-15">
+                            <div class="m-b-5"><br></div>
+                            <div class="m-b-5"><b>@tank: <FONT size=3 style=color:red !important> * </FONT></b></div>
+                            <div class="input-group">
+                                <select asp-for="SelectedTankFilter" class="selectpicker show-menu-arrow"
+                                    data-style="btn-inverse" data-live-search="true" title="@select">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2 m-b-15">
+                            <div class="m-b-5"><b>Período de revisión:</b></div>
+                            <label for="StartDate" class="ml-md-2 mr-sm-2">@startDate: </label>
+                            <input id="StartDate" name="StartDate" onchange="checkDate()" value="@Model.StartDate"
+                                   class="form-control date-format" autocomplete=off placeholder="@select" />
+                            <label id="StartDate-error" class="error" for="StartDate"></label>
+                        </div>
+                        <div class="col-lg-2 m-b-15">
+                            <div class="m-b-5"><br></div>
+                            <label for="EndDate" class="ml-md-2 mr-sm-2">@endDate:</label>
+                            <input id="EndDate" name="EndDate" onchange="checkDate()" value="@Model.EndDate"
+                                   class="form-control date-format" autocomplete=off placeholder="@select" />
+                            <label id="EndDate-error" class="error" for="EndDate"></label>
+                        </div>
+
+                        <div class="col-lg-3 m-b-15" style="margin-top:10px">
+                            <div class="pull-right">
+
+                                <button type="button" class="btn btn-inverse" onclick="Search()">@btnFind</button>
+                                <a href="@Url.Action("Complemento", "RAPTanques" )" class="btn btn-white m-r-5">
+                                    <i class="fa fa-eraser"></i> Limpiar filtros
+                                </a>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-3 m-b-15" style="margin-top:5px">
+                        <div class="btn-left pull-left">
+                            <div class="alert alert-danger" style="background-color:#e6edf1 !important" >
+                                <FONT size=5 sstyle=color:red !important> * </FONT> <FONT size=3 sstyle=color:red !important> Deben ser obligatorios</FONT>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="modal fade" id="validaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div id="btnconfirm" class="modal-dialog" role="document"></div>
+                         </div>
+
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    @if (Model.ListTanqueComplemento != null && Model.ListTanqueComplemento.Any())
+    {
+        <div class="section-container section-with-top-border p-b-5">
+
+            <div class="row" id="rowData">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+
+
+                    </div>
+
+                    <!-- Mensaje de error -->
+                <div class="col-md-12" id="message"></div>
+                    <div class="panel-body">
+
+                        <table id="data-table" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th rowspan="3" hidden class="headcol">Id</th>
+                                    <th rowspan="3" class="headcol">Fecha</th>
+                                    <th rowspan="3" class="headcol">Hora</th>
+                                    <th rowspan="3" class="headcol">Lote de producción</th>
+                                    <th colspan="4">Aseguramiento de calidad en la fabricación</th>
+                                    <th colspan="2"></th>
+                                    @*<th rowspan="3">Observaciones</th>*@
+                                </tr>
+                                <tr>
+                                    <th rowspan="2">
+                                        Folio de trabajo no conforme (investigación para resultados fuera de
+                                        especificación)
+                                    </th>
+                                    <th colspan="3">Producto no conforme</th>
+                                    <th colspan="2"></th>
+                                    @*<th scope='col'>Folio de control de cambios</th>*@
+                                </tr>
+                                <tr>
+                                    <th scope='col'>Folio de PNC</th>
+                                    <th scope='col'>Disposición de PNC</th>
+                                    <th scope='col' hidden>Disposición de PNC</th>
+                                    <th scope='col'>Folio de control de cambios</th>
+                                    <th scope='col'>Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.ListTanqueComplemento != null)
+                                {
+                                    int index = 0;
+                                    @foreach (var entry in Model.ListTanqueComplemento)
+                                    {
+                                        <tr>
+                                            <td hidden>
+                                                <input asp-for="@entry.Id" id="TanqueComplementoId@(index)"  hidden/>
+                                                <input asp-for="@entry.ProductionOrderId"
+                                        id="TanqueComplementoProductionOrderId@(index)" hidden />
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.Fecha" id="TanqueComplementoFecha@(index)" hidden />
+                                                @(entry.Fecha.HasValue ? entry.Fecha.Value.ToString("yyyy/MM/dd") : string.Empty)
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.Hora" id="TanqueComplementoHora@(index)" hidden />
+                                                @entry.Hora
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.NumeroLoteProduccion"
+                                        id="TanqueComplementoNumeroLoteProduccion@(index)" hidden />
+                                                @entry.NumeroLoteProduccion
+                                            </td>
+                                            <td>
+                                                <input readonly="readonly" class="form-control"
+                                        id="TanqueComplementoFolioTrabajoNoConforme@(index)"
+                                        asp-for="@entry.FolioTrabajoNoConforme" />
+                                            </td>
+                                            <td>
+                                                <input id="TanqueComplementoFolioPNC@(index)" asp-for="@entry.FolioPNC" hidden />
+                                                @entry.FolioPNC
+                                            </td>
+                                            <td>
+                                                @* <input id="TanqueComplementoDisposicionPNC@(index)" readonly="readonly"
+                                                    class="form-control" value="@entry.DisposicionPNC" /> *@
+                                                <select asp-for="@entry.DisposicionPNC" asp-items="Model.ListDisposicionPNC"
+                                        class="selectpicker show-menu-arrow combobox" data-style="btn-inverse" onchange="getDropdownValue(@(index))"
+                                        data-live-search="true" title="@select"
+                                        id="TanqueComplementoDisposicionPNC@(index)" disabled>
+                                                </select>
+                                            </td>
+                                            <td hidden>
+                                                <input id="TanqueComplementoDisposicionPNCInput@(index)" asp-for="@entry.DisposicionPNCText" hidden/>
+                                            </td>
+                                            <td>
+                                                <input readonly="readonly" class="form-control"
+                                        id="TanqueComplementoFolioControlCambios@(index)"
+                                        asp-for="@entry.FolioControlCambios" />
+                                            </td>
+                                            <td>
+                                                <input readonly="readonly" class="form-control"
+                                        id="TanqueComplementoObservaciones@(index)" asp-for="@entry.Observaciones" />
+                                            </td>
+                                        </tr>
+                                        index++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="text-center">
+            <div class="text-center">
+                <div class="col-md-12" id="message">
+                    <div class="alert alert-danger">
+                        No se encontraron registros con los criterios proporcionados
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div>
+    <div class="modal fade" id="ModalSave" tabindex="-1" role="dialog" aria-labelledby="ModalSaveLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ModalSaveLabel">
+                        ¿Deseas guardar los cambios realizados?
+
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal" onclick="Save()">Si</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="ModalCancel" tabindex="-1" role="dialog" aria-labelledby="ModalCancelLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ModalCancelLabel">
+                        Al cancelar perderá los cambios realizados, ¿Desea continuar?
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal" onclick="Cancel()">Si</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+<link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+<link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+<link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+<link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+
+<link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+<link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+<link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+
+<link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+}
+
+@section scripts {
+
+    <environment names="Development,Staging,Production">
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+
+        <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+        <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+        <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+
+
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+
+
+        <script src="~/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.html5.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.print.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+
+        <script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+
+
+        <script src="~/js/demo.min.js"></script>
+        <script src="~/js/apps.min.js"></script>
+        <script src="~/js/catalogs.js"></script>
+        <script src="~/js/linde.js"></script>
+        <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    </environment>
+
+<script>
+    $(function () {
+        $("#StartDate").datepicker({
+            dateFormat: 'yy/mm/dd',
+            changeYear: true,
+            changeMonth: true,
+        });
+
+        $("#EndDate").datepicker({
+            dateFormat: 'yy/mm/dd',
+            changeMonth: true,
+            changeYear: true,
+        });
+        var dateStart = $("#StartDate").val()
+        if ($("#StartDate").val() != "") {
+            dateStart = dateStart.replace(" 0:00:00", "");
+            const myArr = dateStart.split("/");
+            $("#StartDate").val(myArr[2] + "/" + myArr[1] + "/" + myArr[0]);
+        }
+        var dateEnd = $("#EndDate").val()
+        if ($("#EndDate").val() != "") {
+            dateEnd = dateEnd.replace(" 0:00:00", "");
+            const myArr = dateEnd.split("/");
+            $("#EndDate").val(myArr[2] + "/" + myArr[1] + "/" + myArr[0]);
+        }
+
+        if ('@Model.MensajeError'.length > 1) {
+            $('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeError </div>');
+        }
+
+        if ('@Model.MensajeInfo'.length > 1) {
+            $('#message').append('<div class="alert alert-success"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeInfo </div>');
+        }
+    });
+
+    function checkDate() {
+        let startdateCheckString = $("#StartDate").val()
+        let startdateCheck = !isNullOrEmpty(startdateCheckString) ? new Date(startdateCheckString) : null
+
+        let enddateCheckString = $("#EndDate").val()
+        let enddateCheck = !isNullOrEmpty(enddateCheckString) ? new Date(enddateCheckString) : null
+        $("#formSearch").valid();
+        if (startdateCheck != null && enddateCheck != null) {
+            if (enddateCheck < startdateCheck) {
+                $('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>La fecha final no debe ser menor a la fecha inicial </div>');
+                $("#BtnFind").attr('disabled', true);
+            }
+            else {
+                $("#BtnFind").attr('disabled', false);
+                $('#message').empty();
+            }
+        }
+    }
+
+    $(document).ready(function () {
+
+        App.init();
+        Demo.init();
+        configValidations();
+        var table = $("#data-table").DataTable({
+
+                pageLength: 20,
+                orderCellsTop: true,
+                fixedHeader: true,
+                bLengthChange: false,
+                bFilter: true,
+                bAutoWidth: false,
+                searching: true,
+                dom: 'lrtip',
+                "bInfo": false,
+                buttons: [
+                    {
+                        className: 'hide',
+                        extend: 'csv',
+                        charset: 'utf-8',
+                        bom: true,
+                        title: "Complemento revisión anual del producto - tanques",
+                        exportOptions:
+                        {
+                            columns: [1,2,3,4,5,7,8,9],
+                            format: {
+                                body: function (data, row, column, node) {
+                                    if ($(node).children("input").length > 0) {
+                                        return $(node).children("input").first().val();
+                                    } else {
+                                        return data;
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                ],
+            "language": {
+                "search": '<a href="@Url.Action("Index", "home" )" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> @btnFilter</a> <br><div><i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                "searchPlaceholder": '@searchPlaceholder',
+                "emptyTable": "@emptyTable",
+                "lengthMenu": "@lengthMenu",
+                "info": "@info",
+                "paginate": {
+                    "first": "@paginatefirst",
+                    "last": "@paginatelast",
+                    "next": "@pageNext",
+                    "previous": "@pagePreviuos"
+                },
+                "loadingRecords": "@loadingRecords",
+                "processing": "@processing",
+                "zeroRecords": "@zeroRecords",
+                "infoEmpty": "@infoEmpty",
+                "infoFiltered": "@infoFiltered",
+            },
+            "order": [],
+            "columnDefs": [{
+                "targets": 'no-sort',
+                "orderable": false,
+            }]
+
+        });
+
+
+        $("#ExporttoExcel").on("click", function () {
+            table.button('.buttons-csv').trigger();
+        });
+
+        $('.selectpicker').selectpicker();
+
+        getPlans();
+    });
+
+    $("#ClearFilters").on("click", function () {
+        window.location.href = '@Url.Action("Complemento","RAPTanques")';
+    });
+
+
+    var Edit = function () {
+        editMode(false)
+
+        $("#Editar").prop("hidden", true);
+        $("#Guardar").prop("hidden", false);
+        $("#Cancelar").prop("hidden", false);
+    };
+
+    var Save = function () {
+        return $.ajax({
+            type: "POST",
+            url: "/RapTanques/Save/",
+            data: serializeRAPComplement(),
+            dataType: "json",
+            async: false,
+            success: function (response) {
+                console.log(response);
+                if (response.result === "Ok") {
+                    @* $.gritter.add({
+                        title: "Mensaje",
+                        text: response.message,
+                        class_name: "gritter-light gritter-center"
+                    }) *@
+
+                    editMode(true)
+
+                    $("#Editar").prop("hidden", false);
+                    $("#Guardar").prop("hidden", true);
+                    $("#Cancelar").prop("hidden", true);
+                }
+                else {
+                    $.gritter.add({
+                        title: "Ocurrió un error",
+                        text: response.message,
+                        class_name: "gritter-light"
+                    })
+                }
+            }
+        })
+    };
+
+    var Cancel = function () {
+        location.reload();
+    };
+
+    function serializeRAPComplement() {
+        let tankComplementList = [];
+        $("#data-table").find("tbody tr").each(function (index) {
+            tankComplementList.push({
+                "Id": $(this).find("#TanqueComplementoId" + index).val(),
+                "ProductionOrderId": $(this).find("#TanqueComplementoProductionOrderId" + index).val(),
+                "Fecha": $(this).find("#TanqueComplementoFecha" + index).val(),
+                "Hora": $(this).find("#TanqueComplementoHora" + index).val(),
+                "NumeroLoteProduccion": $(this).find("#TanqueComplementoNumeroLoteProduccion" + index).val(),
+                "FolioTrabajoNoConforme": $(this).find("#TanqueComplementoFolioTrabajoNoConforme" + index).val(),
+                "FolioPNC": $(this).find("#TanqueComplementoFolioPNC" + index).val(),
+                "DisposicionPNC": $(this).find("#TanqueComplementoDisposicionPNC" + index).val(),
+                "FolioControlCambios": $(this).find("#TanqueComplementoFolioControlCambios" + index).val(),
+                "Observaciones": $(this).find("#TanqueComplementoObservaciones" + index).val(),
+            })
+        })
+
+        return {
+            "model": tankComplementList
+        }
+    }
+
+    var editMode = function (disabled) {
+        $("#data-table").find("tbody tr").each(function (index) {
+            var folioPNC = isNullOrEmpty($(this).find("#TanqueComplementoFolioPNC" + index).val()) || $(this).find("#TanqueComplementoFolioPNC" + index).val() === 'NA';
+
+            $(this).find("#TanqueComplementoFolioTrabajoNoConforme" + index).prop("readonly", folioPNC ? false : disabled)
+            $(this).find("#TanqueComplementoFolioPNC" + index).prop("readonly", disabled)
+            $(this).find("#TanqueComplementoDisposicionPNC" + index).prop("readonly", folioPNC ? true : disabled)
+            $(this).find("#TanqueComplementoFolioControlCambios" + index).prop("readonly", disabled)
+            $(this).find("#TanqueComplementoObservaciones" + index).prop("readonly", disabled)
+
+            $(this).find("#TanqueComplementoDisposicionPNC" + index).prop("disabled", folioPNC ? true : disabled)
+            $('.selectpicker').selectpicker('refresh');
+        })
+    }
+
+    var getPlans = function () {
+        $.ajax({
+            type: "GET",
+            url: "/ProductionOrder/GetPlants",
+            success: function (response) {
+                $("#SelectedPlantFilter").empty()
+                $("#SelectedProductFilter").empty()
+                $("#SelectedTankFilter").empty()
+
+                $("#SelectedProductFilter").prop("disabled", true)
+                $("#SelectedTankFilter").prop("disabled", true)
+
+                response.data.forEach(function (item) {
+                    $("#SelectedPlantFilter").append($('<option>', {
+                        value: item.value,
+                        text: item.text
+                    }))
+                });
+
+                $('#SelectedPlantFilter').selectpicker('refresh');
+
+                if (!isNullOrEmpty('@Model.SelectedPlantFilter')) {
+                    $('#SelectedPlantFilter').val('@Model.SelectedPlantFilter')
+                    getProducts("#SelectedPlantFilter")
+                    $('#SelectedPlantFilter').selectpicker('refresh');
+                }
+            }
+        });
+    }
+
+    var getProducts = function (element) {
+        const plantId = $(element).val()
+
+        $.ajax({
+            type: "GET",
+            url: "/ProductionOrder/GetProduts?plantId=" + plantId,
+            success: function (response) {
+                $("#SelectedProductFilter").empty()
+                $("#SelectedTankFilter").empty()
+
+                $("#SelectedProductFilter").prop("disabled", false)
+                $("#SelectedTankFilter").prop("disabled", true)
+
+                response.data.forEach(function (item) {
+                    $("#SelectedProductFilter").append($('<option>', {
+                        value: item.value,
+                        text: item.text
+                    }))
+                });
+
+                $('#SelectedProductFilter').selectpicker('refresh');
+
+                if (!isNullOrEmpty('@Model.SelectedProductFilter')) {
+                    $('#SelectedProductFilter').val('@Model.SelectedProductFilter')
+                    getTanks("#SelectedProductFilter")
+                    $('#SelectedProductFilter').selectpicker('refresh');
+                }
+            }
+        });
+    }
+
+    var getTanks = function (element) {
+        const plantId = $("#SelectedPlantFilter").val()
+        const productId = $(element).val()
+
+        $.ajax({
+            type: "GET",
+            url: "/ProductionOrder/GetTanks?plantId=" + plantId + "&productId=" + productId,
+            success: function (response) {
+                $("#SelectedTankFilter").empty()
+
+                $("#SelectedTankFilter").prop("disabled", false)
+
+                response.data.forEach(function (item) {
+                    $("#SelectedTankFilter").append($('<option>', {
+                        value: item.value,
+                        text: item.text
+                    }))
+                });
+
+                $('#SelectedTankFilter').selectpicker('refresh');
+
+                if (!isNullOrEmpty('@Model.SelectedTankFilter')) {
+                    $('#SelectedTankFilter').val('@Model.SelectedTankFilter')
+                    $('#SelectedTankFilter').selectpicker('refresh');
+                }
+            }
+        });
+    }
+    function confirm() {
+
+            $('#btnconfirm').html('')
+            $('#btnconfirm').append(" <div  class='modal-content'> <div class='modal-header'><h5 style='color:#005591' class='modal-title' id='exampleModalLabel'>ALERTA</h5><button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button></div> <div class='modal-body'>Debes seleccionar una planta, producto y tanque</div><div class='modal-footer'><button id='btnclose' style='color:white' type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button></div> </div>")
+                                    
+                                    
+            
+        }
+    var Search = function () {
+        const plant = $("#SelectedPlantFilter").val()
+        const product = $("#SelectedProductFilter").val()
+        const tank = $("#SelectedTankFilter").val()
+        const start = $("#StartDate").val()
+        const end = $("#EndDate").val()
+        const presentation = $("#SelectedPresentationFilter").val()
+        const purity = $("#SelectedPurityFilter").val()
+        const health = $("#SelectedHealthRegisterFilter").val()
+        const formula = $("#SelectedPharmaceuticalFormFilter").val()
+        if(plant!="" && product!="" && tank!="")
+        {
+            const valid = $("#formSearch").valid();
+            if (!valid) {
+                $.gritter.add({
+                    title: "Error!",
+                    text: "Es necesario ingresar Fecha Inicial y Final.",
+                    class_name: "gritter-light"
+                });
+                return;
+            }
+            var url = '@Url.Action("Complemento", "RAPTanques" )';
+            window.location.href = `${url}?SelectedPlantFilter=${plant}&SelectedProductFilter=${product}&SelectedTankFilter=${tank}&StartDate=${start}&EndDate=${end}&SelectedPresentationFilter=${presentation}&SelectedPurityFilter=${purity}&SelectedHealthRegisterFilter=${health}&SelectedPharmaceuticalFormFilter=${formula}`;
+        }
+        else
+        {
+            $("#validaModal").modal('show');
+            //data-toggle='modal';
+            //data-target='#validaModal';
+            confirm();
+        }
+    }
+
+    var getDropdownValue = function (index) {
+        var value = $("#TanqueComplementoDisposicionPNC" + index + " option:selected")
+        $("#TanqueComplementoDisposicionPNCInput" + index).val(value.text())
+
+    }
+    function configValidations() {
+        $("#formSearch").validate({
+            rules: {
+                "StartDate": {
+                    required: function (element) {
+                        return !!$("#EndDate").val();
+                    }
+                },
+                "EndDate": {
+                    required: function (element) {
+                        return !!$("#StartDate").val();
+                    }
+                },
+            },
+            messages: {
+                "StartDate": {
+                    required: "Es requerido."
+                },
+                "EndDate": {
+                    required: "Es requerido."
+                },
+            },
+            highlight: function (element, errorClass) {
+                // Override the default behavior here
+            }
+        });
+    }
+</script>
+
+}
+<style>
+    .error {
+        position: unset !important;
+        margin-left: unset !important;
+        width: auto !important;
+        color: red;
+        background-color: pink;
+    }
+</style>

@@ -1,0 +1,1513 @@
+﻿@using System.Globalization;
+@using LiberacionProductoWeb.Helpers;
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@inject IStringLocalizer<Resource> resource;
+@model LiberacionProductoWeb.Models.RAPModels.TanqueViewModel;
+@{
+    ViewData["Title"] = "RAP Tanques";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var select = resource.GetString("Select");
+    var startDate = resource.GetString("StartDate");
+    var endDate = resource.GetString("EndDate");
+    var plant = resource.GetString("Plant");
+    var tank = resource.GetString("Tank");
+    var product = resource.GetString("Product");
+    var state = resource.GetString("State");
+    var activitie = resource.GetString("Activitie");
+    var btnFind = resource.GetString("BtnFind");
+    var btnFilter = resource.GetString("BtnFilter");
+    var notInformation = resource.GetString("NoInformation");
+    var lengthMenu = resource.GetString("LengthMenu");
+    var searchPlaceholder = resource.GetString("SearchPlaceholder");
+    var info = resource.GetString("Info");
+    var emptyTable = resource.GetString("EmptyTable");
+    var paginatefirst = resource.GetString("Paginatefirst");
+    var paginatelast = resource.GetString("Paginatelast");
+    var pageNext = resource.GetString("PageNext");
+    var pagePreviuos = resource.GetString("PagePreviuos");
+    var loadingRecords = resource.GetString("LoadingRecords");
+    var processing = resource.GetString("Processing");
+    var zeroRecords = resource.GetString("ZeroRecords");
+    var infoEmpty = resource.GetString("InfoEmpty");
+    var infoFiltered = resource.GetString("InfoFiltered");
+    var validateStartDateEndDate = resource.GetString("ValidateStartDateEndDate");
+    var presentation = resource.GetString("Presentation");
+    var purity = resource.GetString("Purity");
+    var healthRegister = resource.GetString("HealthRegister");
+    var pharmaceuticalForm = resource.GetString("PharmaceuticalForm");
+}
+
+<!-- Navigation -->
+<div id="top-menu" class="top-menu">
+    <!-- begin sidebar scrollbar -->
+    <div class="container-fluid">
+        <!-- begin sidebar nav -->
+        <ul class="nav">
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                @* <li class="nav-header">Menú</li> *@
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        @* <i class="fa fa-clipboard-list"></i> *@
+                        <span>Mis tareas pendientes</span>
+                    </a>
+                </li>
+                <li>
+                    @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_EXPEDIENTE_DE_LOTE))
+                    {
+                        <a asp-controller="QuerysFiles" asp-action="Index">
+                            @* <i class="fa fa-file-alt"></i> *@
+                            <span>Consulta de expediente de lote</span>
+
+                        </a>
+                    }
+                </li>
+                <li>
+                    @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTA_GENERAL))
+                    {
+                        <a asp-controller="QuerysGeneral" asp-action="Index">
+                            @* <i class="fa fa-search"></i> *@
+                            <span>Consulta general</span>
+                        </a>
+                    }
+                </li>
+                <li class="has-sub active">
+                    <a href="javascript:;">
+                        @* <i class="fa fa-chart-line"></i> *@
+                        <span>Reportes</span>
+                    </a>
+                    <ul class="sub-menu">
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_RAP_TANQUES))
+                        {
+                            <li><a href="@Url.Action("Index", "RAPTanques")">RAP - Tanques</a></li>
+                        }
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_RAP_PIPAS))
+                        {
+                            <li><a href="@Url.Action("Index", "RAPPipas")">RAP - Pipas</a></li>
+                        }
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_REPORTE_AUDIT_TRAIL))
+                        {
+                            <li><a href="@Url.Action("Index", "ReportAuditTrail")">Reporte Audit Trail</a></li>
+                        }
+                    </ul>
+                </li>
+
+            }
+        </ul>
+        <!-- end sidebar nav -->
+    </div>
+    <!-- end sidebar scrollbar -->
+</div>
+
+<!-- ============================================================== -->
+<!-- Page wrapper  -->
+<!-- ============================================================== -->
+<div id="content" class="content">
+
+
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li class="breadcrumb-item"><a href="javascript:;">Reportes</a></li>
+        <li class="breadcrumb-item active">Revisión anual del producto</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Revisión anual del producto - tanques</h1>
+    <!-- end page-header -->
+    <div class="section-container section-with-top-border p-b-10">
+        <div class="row">
+            <div class="btn-group pull-left">
+                @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.COMPLEMENTO_DE_RAP_TANQUES))
+                {
+                    <a class="waves-effect waves-light btn btn-white m-r-5" href="@Url.Action("Complemento", "RAPTanques")">
+                        <i class="fa fa-chart-bar"></i>&nbsp;&nbsp;&nbsp;
+                        Complemento RAP Tanques
+                    </a>
+                }
+                <div class="btn-group pull-left">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="section-container section-with-top-border p-b-10">
+
+        <div class="row">
+
+            <div class="col-lg-20">
+                <form autocomplete="off" id="formSearch">
+                    <div class="row">
+                        <div class="col-lg-2 m-b-15">
+                            <div class="m-b-5"><br></div>
+                            <label for="SelectedPlantFilter" style="display: block;" class="mr-sm-2">
+                                @plant: <FONT size=3 style=color:red !important> * </FONT>
+                            </label>
+                            <div class="input-group">
+                                <select id="SelectedPlantFilter" name="SelectedPlantFilter"
+                                        asp-for="SelectedPlantFilter" class="selectpicker show-menu-arrow"
+                                        data-style="btn-inverse" data-live-search="true" title="@select"
+                                        onchange="getProducts(this)"> </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 m-b-15">
+                            <div class="m-b-5"><br></div>
+                            <label for="SelectedProductFilter" style="display: block;" class="mr-sm-2">
+                                @product: <FONT size=3 style=color:red !important> * </FONT>
+                            </label>
+                            <div class="input-group">
+                                <select id="SelectedProductFilter" name="SelectedProductFilter"
+                                        asp-for="SelectedProductFilter" class="selectpicker show-menu-arrow"
+                                        data-style="btn-inverse" data-live-search="true" title="@select"
+                                        onchange="getTanks(this)">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 m-b-15">
+                            <div class="m-b-5"><br></div>
+                            <label for="SelectedTankFilter" style="display: block;" class="mr-sm-2">
+                                @tank: <FONT size=3
+                                             style=color:red !important> * </FONT>
+                            </label>
+                            <div class="input-group">
+                                <select id="SelectedTankFilter" name="SelectedTankFilter" asp-for="SelectedTankFilter"
+                                        class="selectpicker show-menu-arrow" data-style="btn-inverse"
+                                        data-live-search="true" title="@select">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2 m-b-15">
+                            <div class="m-b-5"><b>Período de revisión:</b></div>
+                            <label for="StartDate" style="display: block;" class="ml-md-2 mr-sm-2">@startDate: </label>
+                            <input id="StartDate" name="StartDate" onchange="checkDate()" value="@Model.StartDate"
+                                   class="form-control date-format" autocomplete=off placeholder="@select" />
+                            <label id="StartDate-error" class="error" for="StartDate"></label>
+                        </div>
+                        <div class="col-lg-2 m-b-15">
+                            <div class="m-b-5"><br></div>
+                            <label for="EndDate" style="display: block;" class="ml-md-2 mr-sm-2">@endDate:</label>
+                            <input id="EndDate" name="EndDate" onchange="checkDate()" value="@Model.EndDate"
+                                   class="form-control date-format" autocomplete=off placeholder="@select" />
+                            <label id="EndDate-error" class="error" for="EndDate"></label>
+                        </div>
+
+                        <div class="col-lg-2 m-b-15">
+                            <div class="m-b-5"><br></div>
+                            <label for="SelectedPresentationFilter" style="display: block;"
+                                   class="mr-sm-2">@presentation:</label>
+                                <select disabled name="SelectedPresentationFilter" asp-for="SelectedPresentationFilter"
+                                        class="selectpicker show-menu-arrow combobox" data-style="btn-inverse"
+                                        data-live-search="true" title="@select">
+                                </select>
+                            </div>
+
+                            <div class="col-lg-2 m-b-15">
+                                <div class="m-b-5"><br></div>
+                                <label for="SelectedPurityFilter" style="display: block;" class="mr-sm-2">@purity:</label>
+                                <select disabled name="SelectedPurityFilter" asp-for="SelectedPurityFilter"
+                                        class="selectpicker show-menu-arrow combobox" data-style="btn-inverse"
+                                        data-live-search="true" title="@select">
+                                </select>
+                            </div>
+
+                            <div class="col-lg-2 m-b-15">
+                                <div class="m-b-5"><br></div>
+                                <label for="SelectedHealthRegisterFilter" style="display: block;"
+                                       class="mr-sm-2">@healthRegister:</label>
+                                    <select disabled name="SelectedHealthRegisterFilter" asp-for="SelectedHealthRegisterFilter"
+                                            class="selectpicker show-menu-arrow combobox" data-style="btn-inverse"
+                                            data-live-search="true" title="@select">
+                                    </select>
+                                </div>
+
+                                <div class="col-lg-2 m-b-15">
+                                    <div class="m-b-5"><br></div>
+                                    <label for="SelectedPharmaceuticalFormFilter" style="display: block;"
+                                           class="mr-sm-2">@pharmaceuticalForm:</label>
+                                        <select disabled name="SelectedPharmaceuticalFormFilter"
+                                                asp-for="SelectedPharmaceuticalFormFilter" class="selectpicker show-menu-arrow combobox"
+                                                data-style="btn-inverse" data-live-search="true" title="@select">
+                                        </select>
+                                    </div>
+
+                                    <div class="col-lg-3 m-b-15" style="margin-top:95px">
+
+                                        <div class="btn-right pull-right">
+
+                                            <button type="button" class="btn btn-inverse" id="BtnFind"
+                                                    onclick="Search()">
+                                                Buscar
+                                            </button>
+                                            <a href="@pharmaceuticalForm" class="btn btn-white m-r-5">
+                                                <i class="fa fa-eraser"></i> Limpiar Filtros
+                                            </a>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 m-b-15" style="margin-top:75px">
+                                        <div class="btn-left pull-left">
+                                            <div class="alert alert-danger" style="background-color:#e6edf1 !important">
+                                                <FONT size=5 sstyle=color:red !important> * </FONT>
+                                                <FONT size=3 sstyle=color:red !important> Deben ser obligatorios</FONT>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal fade" id="validaModal" tabindex="-1" role="dialog"
+                                         aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div id="btnconfirm" class="modal-dialog" role="document"></div>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+
+                </div>
+                @if (Model.ListRAPTanques != null && Model.ListRAPTanques.Any())
+                {
+                    int maxControlVariables = Model.ListRAPTanques.Max(x => x.ControlVariables.Count);
+                    int maxCriticalParameters = Model.ListRAPTanques.Max(x => x.CriticalParameters.Count);
+                    int maxCriticalQuality = Model.ListRAPTanques.Max(x => x.CriticalQualityAttributes.Count);
+
+                    <div class="section-container section-with-top-border p-b-5" style="width: 100%;">
+
+                        <div class="row" id="rowData">
+                            <div class="table-responsive">
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">
+                                        <a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel">
+                                            <i class="fa fa-file-excel"></i> Exportar a excel
+                                        </a>
+                                    </div>
+
+                                    <!-- Mensaje de error -->
+                                    <div class="col-md-12" id="message"></div>
+                                    <div class="panel-body">
+                                        <table id="data-table" class="table table-bordered table-hover" cellspacing="0" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th rowspan="4" style="vertical-align: middle;">Fecha</th>
+                                                    <th rowspan="4" style="vertical-align: middle;">Hora</th>
+                                                    <th rowspan="4" style="vertical-align: middle;">Lote de producción</th>
+                                                    <th rowspan="2" style="vertical-align: middle;">Estado de calidad (Dictamen)</th>
+                                                    <th colspan="@(maxControlVariables + maxCriticalParameters + maxCriticalQuality)">
+                                                        Control del proceso de fabricación
+                                                    </th>
+                                                    <th colspan="5">Aseguramiento de calidad en la fabricación</th>
+                                                    <th rowspan="4" style="vertical-align: middle;">Observaciones</th>
+                                                </tr>
+
+                                                <tr>
+                                                    <th colspan="@maxControlVariables">
+                                                        Variables de
+                                                        control de proceso
+                                                    </th>
+                                                    <th colspan="@maxCriticalParameters">
+                                                        Parámetros
+                                                        críticos del proceso
+                                                    </th>
+                                                    <th colspan="@maxCriticalQuality">
+                                                        Atributos críticos de calidad (Tanque de almacenamiento en planta)
+                                                    </th>
+                                                    <th rowspan="3" style="vertical-align: middle;">
+                                                        Folio de trabajo no conforme (Investigación para resultados fuera de
+                                                        especificación)
+                                                    </th>
+                                                    <th rowspan="3" style="vertical-align: middle;">Folio del informe de desviación</th>
+                                                    <th rowspan="2" colspan="2" style="vertical-align: middle;">Producto no conforme</th>
+                                                    <th rowspan="3" style="vertical-align: middle;">Folio de control de cambios</th>
+                                                </tr>
+
+                                                <tr>
+                                                    <th rowspan="2" style="vertical-align: middle;">Aprobado (si/no)</th>
+
+                                                    @foreach (var entry in Model.ListRAPTanques.Where(x => x.ControlVariables.Count == maxControlVariables).Select(x => x.ControlVariables).FirstOrDefault())
+                                                    {
+                                                        <th style="vertical-align: middle;">@entry.DisplayName</th>
+                                                    }
+                                                    @foreach (var entry in Model.ListRAPTanques.Where(x => x.CriticalParameters.Count == maxCriticalParameters).Select(x => x.CriticalParameters).FirstOrDefault())
+                                                    {
+                                                        <th style="vertical-align: middle;">@entry.DisplayName</th>
+                                                    }
+                                                    @foreach (var entry in Model.ListRAPTanques.Where(x => x.CriticalQualityAttributes.Count == maxCriticalQuality).Select(x => x.CriticalQualityAttributes).FirstOrDefault())
+                                                    {
+                                                        <th style="vertical-align: middle;">@entry.DisplayName</th>
+                                                    }
+                                                </tr>
+                                                <tr>
+                                                    @foreach (var entry in Model.ListRAPTanques.Where(x => x.ControlVariables.Count == maxControlVariables).Select(x => x.ControlVariables).FirstOrDefault())
+                                                    {
+                                                        <th>@entry.Specification</th>
+                                                    }
+                                                    @foreach (var entry in Model.ListRAPTanques.Where(x => x.CriticalParameters.Count == maxCriticalParameters).Select(x => x.CriticalParameters).FirstOrDefault())
+                                                    {
+                                                        <th>@entry.Specification</th>
+                                                    }
+                                                    @foreach (var entry in Model.ListRAPTanques.Where(x => x.CriticalQualityAttributes.Count == maxCriticalQuality).Select(x => x.CriticalQualityAttributes).FirstOrDefault())
+                                                    {
+                                                        <th>@entry.Specification</th>
+                                                    }
+                                                    <th>Folio de PNC</th>
+                                                    <th>Disposición de PNC</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var entry in Model.ListRAPTanques)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            @entry.Fecha.ToString("yyyy/MM/dd")
+                                                        </td>
+                                                        <td>
+                                                            @entry.Hora
+                                                        </td>
+                                                        <td>
+                                                            <a href="/ProductionOrder/New?Id=@entry.Id">@entry.NumeroLoteProduccion</a>
+                                                        </td>
+                                                        <td>
+                                                            @entry.Dictamen
+                                                        </td>
+                                                        @for (var i = 0; i < maxControlVariables; i++)
+                                                        {
+                                                            if (i < entry.ControlVariables.Count)
+                                                            {
+                                                                <td>@entry.ControlVariables[i].AvgValue</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        }
+                                                        @for (int i = 0; i < maxCriticalParameters; i++)
+                                                        {
+                                                            if (i < entry.CriticalParameters.Count)
+                                                            {
+                                                                <td>@entry.CriticalParameters[i].AvgValue</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        }
+                                                        @for (int i = 0; i < maxCriticalQuality; i++)
+                                                        {
+                                                            if (i < entry.CriticalQualityAttributes.Count)
+                                                            {
+                                                                <td>@entry.CriticalQualityAttributes[i].AvgValue</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        }
+                                                        <td>@entry.FolioTrabajo</td>
+                                                        <td>@entry.FolioDesviacion</td>
+                                                        <td>@entry.FolioPNC</td>
+                                                        <td>@(string.IsNullOrEmpty(entry.DisposicionPNCText) ? "NA" : entry.DisposicionPNCText)</td>
+                                                        <td>@entry.FolioControl</td>
+                                                        <td>@entry.Observaciones</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-container section-with-top-border p-b-5" style="width: 40%; float:left">
+                        <!-- Mensaje de error -->
+                        <div class="col-md-12" id="message"></div>
+                        <div class="panel-heading">
+                            <a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcelLR">
+                                <i class="fa fa-file-excel"></i> Exportar a excel
+                            </a>
+                        </div>
+                        <div class="panel-body">
+
+                            <table id="data-table-lotes-revisados" class="table table-bordered table-hover"
+                                   style="width: 50%; float:left">
+                                <thead>
+                                    <tr>
+                                        <th>Total de lotes revisados</th>
+                                        <th>N°</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th>Aprobados</th>
+                                        <th>@Model.Aprobados</th>
+                                    <tr>
+                                        <th>Aprobados con desviación</th>
+                                        <th>@Model.ConDesviacion</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Rechazados</th>
+                                        <th>@Model.Rechazados</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Total</th>
+                                        <th>@Model.Total</th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Mensaje de error -->
+                        <div class="col-md-12" id="message"></div>
+                        <div class="panel-heading">
+                            <a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcelEst">
+                                <i class="fa fa-file-excel"></i> Exportar a excel
+                            </a>
+                        </div>
+                        <div class="panel-body">
+
+                            <table id="data-table-lotes-estudio-est" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th colspan="4">Estudio de estabilidad del producto</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Año del estudio</th>
+                                        <th>Estado</th>
+                                        <th>Código</th>
+                                        <th>Observaciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th style="vertical-align:middle">@Model.estudioEstabilidad.AnioEstudio</th>
+                                        <th style="vertical-align:middle">@Model.estudioEstabilidad.Estado</th>
+                                        <th style="vertical-align:middle">@Model.estudioEstabilidad.Codigo</th>
+                                        <th style="width:100px;">@Model.estudioEstabilidad.Observaciones</th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="section-container section-with-top-border p-b-5" style="width: 60%; float:right">
+                        <!-- Mensaje de error -->
+                        <div class="col-md-12" id="message"></div>
+                        <div class="panel-heading">
+                            <a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcelVar">
+                                <i class="fa fa-file-excel"></i> Exportar a excel
+                            </a>
+                        </div>
+                        <div class="panel-body">
+
+                            <table id="data-table-variables" class="table table-bordered table-hover" style="width: 100%; float:left">
+                                <thead>
+                                    <tr>
+                                        <th colspan="9">Variables de control en proceso</th>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            Etapa
+                                        </th>
+                                        <th>
+                                            Parámetro / Especificación
+                                        </th>
+                                        @* <th>
+                                            Especificación
+                                            </th> *@
+                                        <th>
+                                            Límite superior de control
+                                        </th>
+                                        <th>
+                                            Límite inferior de control
+                                        </th>
+                                        <th>
+                                            Valor máximo
+                                        </th>
+                                        <th>
+                                            Valor promedio
+                                        </th>
+                                        <th>
+                                            Valor mínimo
+                                        </th>
+                                        <th>
+                                            Desviación estándar
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    @if (Model.ListRAPTanques != null)
+                                    {
+                                        @foreach (var entry in Model.ListVariables)
+                                        {
+                                            <tr>
+                                                <th scope='col'>@entry.Etapa</th>
+                                                <th scope='col'>@entry.Parametro</th>
+                                                @* <th scope='col'>@entry.Especificacion</th> *@
+                                                <th scope='col'>@entry.LSC</th>
+                                                <th scope='col'>@entry.LIC</th>
+                                                <th scope='col'>@entry.ValorMax</th>
+                                                <th scope='col'>@entry.ValorProm</th>
+                                                <th scope='col'>@entry.ValorMin</th>
+                                                <th scope='col'>@entry.DesvEstandar</th>
+                                            </tr>
+                                        }
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                        <!-- Mensaje de error -->
+                        <div class="col-md-12" id="message"></div>
+                        <div class="panel-heading">
+                            <a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcelParam">
+                                <i class="fa fa-file-excel"></i> Exportar a excel
+                            </a>
+                        </div>
+                        <div class="panel-body">
+
+                            <table id="data-table-parametros" class="table table-bordered table-hover" style="width: 100%; float:left">
+                                <thead>
+                                    <tr>
+                                        <th colspan="9">Parámetros críticos de proceso</th>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            Etapa
+                                        </th>
+                                        <th>
+                                            Parámetro / Especificación
+                                        </th>
+                                        @* <th>
+                                            Especificación
+                                            </th> *@
+                                        <th>
+                                            Límite superior de control
+                                        </th>
+                                        <th>
+                                            Límite inferior de control
+                                        </th>
+                                        <th>
+                                            Valor máximo
+                                        </th>
+                                        <th>
+                                            Valor promedio
+                                        </th>
+                                        <th>
+                                            Valor mínimo
+                                        </th>
+                                        <th>
+                                            Desviación estándar
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    @if (Model.ListRAPTanques != null)
+                                    {
+                                        @foreach (var entry in Model.ListParametros)
+                                        {
+                                            <tr>
+                                                <th scope='col'>@entry.Etapa</th>
+                                                <th scope='col'>@entry.Parametro</th>
+                                                @* <th scope='col'>@entry.Especificacion</th> *@
+                                                <th scope='col'>@entry.LSC</th>
+                                                <th scope='col'>@entry.LIC</th>
+                                                <th scope='col'>@entry.ValorMax</th>
+                                                <th scope='col'>@entry.ValorProm</th>
+                                                <th scope='col'>@entry.ValorMin</th>
+                                                <th scope='col'>@entry.DesvEstandar</th>
+                                            </tr>
+
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Mensaje de error -->
+                        <div class="col-md-12" id="message"></div>
+                        <div class="panel-heading">
+                            <a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcelCri">
+                                <i class="fa fa-file-excel"></i> Exportar a excel
+                            </a>
+                        </div>
+                        <div class="panel-body">
+
+                            <table id="data-table-atributos" class="table table-bordered table-hover" style="width: 100%; float:left">
+                                <thead>
+                                    <tr>
+                                        <th colspan="8">Atributos críticos de calidad</th>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            Etapa
+                                        </th>
+                                        <th>
+                                            Parámetro / Especificación
+                                        </th>
+                                        <th>
+                                            Límite superior de control
+                                        </th>
+                                        <th>
+                                            Límite inferior de control
+                                        </th>
+                                        <th>
+                                            Valor máximo
+                                        </th>
+                                        <th>
+                                            Valor promedio
+                                        </th>
+                                        <th>
+                                            Valor mínimo
+                                        </th>
+                                        <th>
+                                            Desviación estándar
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.ListRAPTanques != null)
+                                    {
+                                        @foreach (var entry in Model.ListAtributos)
+                                        {
+                                            @if (!string.IsNullOrEmpty(entry.Parametro) && entry.Parametro.Contains("Identidad"))
+                                            {
+                                                <tr>
+                                                    <th>@entry.Etapa</th>
+                                                    <th>@entry.Parametro</th>
+                                                    <th>
+                                                        "@entry.Especificacion para todos los lotes de producción", excepto
+                                                        para los lotes, "@(entry.BatchesNotInCompliance != null ? string.Join(',', entry.BatchesNotInCompliance) : "")"
+                                                    </th>
+                                                    <th>
+                                                        "@entry.Especificacion para todos los lotes de producción", excepto
+                                                        para los lotes, "@(entry.BatchesNotInCompliance != null ? string.Join(',', entry.BatchesNotInCompliance) : "")"
+                                                    </th>
+                                                    <th>
+                                                        "@entry.Especificacion para todos los lotes de producción", excepto
+                                                        para los lotes, "@(entry.BatchesNotInCompliance != null ? string.Join(',', entry.BatchesNotInCompliance) : "")"
+                                                    </th>
+                                                    <th>
+                                                        "@entry.Especificacion para todos los lotes de producción", excepto
+                                                        para los lotes, "@(entry.BatchesNotInCompliance != null ? string.Join(',', entry.BatchesNotInCompliance) : "")"
+                                                    </th>
+                                                    <th>
+                                                        "@entry.Especificacion para todos los lotes de producción", excepto
+                                                        para los lotes, "@(entry.BatchesNotInCompliance != null ? string.Join(',', entry.BatchesNotInCompliance) : "")"
+                                                    </th>
+                                                    <th>
+                                                        "@entry.Especificacion para todos los lotes de producción", excepto
+                                                        para los lotes, "@(entry.BatchesNotInCompliance != null ? string.Join(',', entry.BatchesNotInCompliance) : "")"
+                                                    </th>
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <th>@entry.Etapa</th>
+                                                    <th>@entry.Parametro</th>
+                                                    <th>@entry.LSC</th>
+                                                    <th>@entry.LIC</th>
+                                                    <th>@entry.ValorMax</th>
+                                                    <th>@entry.ValorProm</th>
+                                                    <th>@entry.ValorMin</th>
+                                                    <th>@entry.DesvEstandar</th>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center">
+                        <div class="text-center">
+                            <div class="col-md-12" id="message">
+                                <div class="alert alert-danger">
+                                    No se encontraron registros con los criterios proporcionados
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+
+@section Styles {
+
+
+    <link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+    <link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+
+
+    <link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+    <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+
+    <style>
+        th,
+        td {
+            white-space: normal;
+        }
+
+        div.dataTables_wrapper {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .table.table-bordered > thead > tr > th:last-child {
+            border-right-width: 1 !important;
+        }
+    </style>
+
+}
+
+@section scripts {
+
+    <environment names="Development,Staging,Production">
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+
+        <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+        <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+        <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+
+
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+
+
+        <script src="~/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.html5.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.print.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+
+        <script type="text/javascript"
+                src="https://cdn.datatables.net/fixedcolumns/3.2.2/js/dataTables.fixedColumns.min.js"></script>
+        <link href="https://cdn.datatables.net/fixedcolumns/3.2.2/css/fixedColumns.bootstrap.min.css" rel="stylesheet">
+
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+
+        <script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+
+
+        <script src="~/js/demo.min.js"></script>
+        <script src="~/js/apps.min.js"></script>
+        <script src="~/js/catalogs.js"></script>
+        <script src="~/js/linde.js"></script>
+        <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    </environment>
+
+
+<script>
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const params = Object.fromEntries(urlSearchParams.entries());
+
+    function checkDate() {
+        let startdateCheckString = $("#StartDate").val()
+        let startdateCheck = !isNullOrEmpty(startdateCheckString) ? new Date(startdateCheckString) : null
+
+        let enddateCheckString = $("#EndDate").val()
+        let enddateCheck = !isNullOrEmpty(enddateCheckString) ? new Date(enddateCheckString) : null
+        $("#formSearch").valid();
+        if (startdateCheck != null && enddateCheck != null) {
+            if (enddateCheck < startdateCheck) {
+                $('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>La fecha final no debe ser menor a la fecha inicial </div>');
+                $("#BtnFind").attr('disabled', true);
+            }
+            else {
+                $("#BtnFind").attr('disabled', false);
+                $('#message').empty();
+            }
+        }
+    }
+
+
+    $(function () {
+        $("#StartDate").datepicker({
+            dateFormat: 'yy/mm/dd',
+            changeYear: true,
+            changeMonth: true,
+        });
+
+        $("#EndDate").datepicker({
+            dateFormat: 'yy/mm/dd',
+            changeMonth: true,
+            changeYear: true,
+        });
+        var dateStart = $("#StartDate").val()
+        if ($("#StartDate").val() != "") {
+            dateStart = dateStart.replace(" 0:00:00", "");
+            const myArr = dateStart.split("/");
+            $("#StartDate").val(myArr[2] + "/" + myArr[1] + "/" + myArr[0]);
+        }
+        var dateEnd = $("#EndDate").val()
+        if ($("#EndDate").val() != "") {
+            dateEnd = dateEnd.replace(" 0:00:00", "");
+            const myArr = dateEnd.split("/");
+            $("#EndDate").val(myArr[2] + "/" + myArr[1] + "/" + myArr[0]);
+        }
+
+        if ('@Model.MensajeError'.length > 1) {
+            $('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeError </div>');
+        }
+
+        if ('@Model.MensajeInfo'.length > 1) {
+            $('#message').append('<div class="alert alert-success"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeInfo </div>');
+        }
+    });
+
+    $(document).ready(function () {
+
+        App.init();
+        Demo.init();
+        configValidations();
+        try {
+            var table = $("#data-table").DataTable({
+                pageLength: 32,
+                orderCellsTop: true,
+                fixedHeader: true,
+                bLengthChange: false,
+                bFilter: true,
+                bAutoWidth: false,
+                searching: true,
+                "bSort": true,
+                sDom: 'lrtip',
+                "bInfo": false,
+                buttons: [
+                    {
+                        extend: 'csv',
+                        charset: 'utf-8',
+                        bom: true,
+                        title: "Revisión anual del producto - tanques Control del proceso de fabricación",
+                        exportOptions:
+                        {
+                            columns: function (i, d, n) {
+                                return (n.textContent === "Id" && $(n).is(":hidden")) ? false : true;
+                            }
+                        }
+                    }
+                ],
+                "language": {
+                    "search": '<a href="@Url.Action("Index", "home" )" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> @btnFilter</a> <br><div><i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                    "searchPlaceholder": '@searchPlaceholder',
+                    "emptyTable": "@emptyTable",
+                    "lengthMenu": "@lengthMenu",
+                    "info": "@info",
+                    "paginate": {
+                        "first": "@paginatefirst",
+                        "last": "@paginatelast",
+                        "next": "@pageNext",
+                        "previous": "@pagePreviuos"
+                    },
+                    "loadingRecords": "@loadingRecords",
+                    "processing": "@processing",
+                    "zeroRecords": "@zeroRecords",
+                    "infoEmpty": "@infoEmpty",
+                    "infoFiltered": "@infoFiltered",
+                },
+                "order": [],
+                "columnDefs": [{
+                    "targets": 'no-sort',
+                    "orderable": false,
+                }]
+            });
+
+            $("#ExporttoExcel").on("click", function () {
+                table.button('.buttons-csv').trigger();
+            });
+        } catch (ex) {
+            console.error(ex);
+            console.log("Error cargando #data-table")
+        }
+        try {
+            var tableLR = $("#data-table-lotes-revisados").DataTable({
+                pageLength: 20,
+                orderCellsTop: true,
+                fixedHeader: true,
+                bLengthChange: false,
+                bFilter: true,
+                bAutoWidth: false,
+                searching: true,
+                "bSort": true,
+                sDom: 'lrtip',
+                "bInfo": false,
+                buttons: [
+                    {
+                        extend: 'csv',
+                        charset: 'utf-8',
+                        bom: true,
+                        title: "Control del proceso de fabricación 'Total'",
+                        exportOptions:
+                        {
+                            columns: function (i, d, n) {
+                                return (n.textContent === "Id" && $(n).is(":hidden")) ? false : true;
+                            }
+                        }
+                    }
+                ],
+                "language": {
+                    "search": '<a href="@Url.Action("Index", "home" )" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> @btnFilter</a> <br><div><i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                    "searchPlaceholder": '@searchPlaceholder',
+                    "emptyTable": "@emptyTable",
+                    "lengthMenu": "@lengthMenu",
+                    "info": "@info",
+                    "paginate": {
+                        "first": "@paginatefirst",
+                        "last": "@paginatelast",
+                        "next": "@pageNext",
+                        "previous": "@pagePreviuos"
+                    },
+                    "loadingRecords": "@loadingRecords",
+                    "processing": "@processing",
+                    "zeroRecords": "@zeroRecords",
+                    "infoEmpty": "@infoEmpty",
+                    "infoFiltered": "@infoFiltered",
+                },
+                "order": [],
+                "columnDefs": [{
+                    "targets": 'no-sort',
+                    "orderable": false
+                }]
+            });
+            $("#ExporttoExcelLR").on("click", function () {
+                tableLR.button('.buttons-csv').trigger();
+            });
+        } catch {
+            console.log("Error cargando #data-table-lotes-revisados")
+        }
+
+        try {
+            var tableEst = $("#data-table-lotes-estudio-est").DataTable({
+                pageLength: 20,
+                orderCellsTop: true,
+                fixedHeader: true,
+                bLengthChange: false,
+                bFilter: true,
+                bAutoWidth: false,
+                searching: true,
+                "bSort": true,
+                sDom: 'lrtip',
+                paging: false,
+                "bInfo": false,
+                buttons: [
+                    {
+                        extend: 'csv',
+                        charset: 'utf-8',
+                        bom: true,
+                        title: "Estudio de estabilidad del producto",
+                        exportOptions:
+                        {
+                            columns: function (i, d, n) {
+                                return (n.textContent === "Id" && $(n).is(":hidden")) ? false : true;
+                            }
+                        }
+                    }
+                ],
+                "language": {
+                    "search": '<a href="@Url.Action("Index", "home" )" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> @btnFilter</a> <br><div><i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                    "searchPlaceholder": '@searchPlaceholder',
+                    "emptyTable": "@emptyTable",
+                    "lengthMenu": "@lengthMenu",
+                    "info": "@info",
+                    "paginate": {
+                        "first": "@paginatefirst",
+                        "last": "@paginatelast",
+                        "next": "@pageNext",
+                        "previous": "@pagePreviuos"
+                    },
+                    "loadingRecords": "@loadingRecords",
+                    "processing": "@processing",
+                    "zeroRecords": "@zeroRecords",
+                    "infoEmpty": "@infoEmpty",
+                    "infoFiltered": "@infoFiltered",
+                },
+                "order": [],
+                "columnDefs": [{
+                    "targets": 'no-sort',
+                    "orderable": false
+                }]
+            });
+            $("#ExporttoExcelEst").on("click", function () {
+                tableEst.button('.buttons-csv').trigger();
+            });
+        } catch {
+            console.log("Error cargando #data-table-lotes-estudio-est")
+        }
+
+        try {
+            var tableVar = $("#data-table-variables").DataTable({
+                pageLength: 20,
+                orderCellsTop: true,
+                fixedHeader: true,
+                bLengthChange: false,
+                bFilter: true,
+                bAutoWidth: false,
+                searching: true,
+                "bSort": true,
+                sDom: 'lrtip',
+                "bInfo": false,
+                paging: false,
+                buttons: [
+                    {
+                        extend: 'csv',
+                        charset: 'utf-8',
+                        bom: true,
+                        title: "Variables de control en proceso",
+                        exportOptions:
+                        {
+                            columns: function (i, d, n) {
+                                return (n.textContent === "Id" && $(n).is(":hidden")) ? false : true;
+                            }
+                        }
+                    }
+                ],
+                "language": {
+                    "search": '<a href="@Url.Action("Index", "home" )" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> @btnFilter</a> <br><div><i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                    "searchPlaceholder": '@searchPlaceholder',
+                    "emptyTable": "@emptyTable",
+                    "lengthMenu": "@lengthMenu",
+                    "info": "@info",
+                    "paginate": {
+                        "first": "@paginatefirst",
+                        "last": "@paginatelast",
+                        "next": "@pageNext",
+                        "previous": "@pagePreviuos"
+                    },
+                    "loadingRecords": "@loadingRecords",
+                    "processing": "@processing",
+                    "zeroRecords": "@zeroRecords",
+                    "infoEmpty": "@infoEmpty",
+                    "infoFiltered": "@infoFiltered",
+                },
+                "order": [],
+                "columnDefs": [{
+                    "targets": 'no-sort',
+                    "orderable": false
+                }]
+            });
+            $("#ExporttoExcelVar").on("click", function () {
+                tableVar.button('.buttons-csv').trigger();
+            });
+        } catch {
+            console.log("Error cargando #data-table-variables")
+        }
+
+        try {
+            var tableParam = $("#data-table-parametros").DataTable({
+                pageLength: 20,
+                orderCellsTop: true,
+                fixedHeader: true,
+                bLengthChange: false,
+                bFilter: true,
+                bAutoWidth: false,
+                searching: true,
+                "bSort": true,
+                sDom: 'lrtip',
+                "bInfo": false,
+                paging: false,
+                buttons: [
+                    {
+                        extend: 'csv',
+                        charset: 'utf-8',
+                        bom: true,
+                        title: "Parámetros críticos de proceso",
+                        exportOptions:
+                        {
+                            columns: function (i, d, n) {
+                                return (n.textContent === "Id" && $(n).is(":hidden")) ? false : true;
+                            }
+                        }
+                    }
+                ],
+                "language": {
+                    "search": '<a href="@Url.Action("Index", "home" )" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> @btnFilter</a> <br><div><i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                    "searchPlaceholder": '@searchPlaceholder',
+                    "emptyTable": "@emptyTable",
+                    "lengthMenu": "@lengthMenu",
+                    "info": "@info",
+                    "paginate": {
+                        "first": "@paginatefirst",
+                        "last": "@paginatelast",
+                        "next": "@pageNext",
+                        "previous": "@pagePreviuos"
+                    },
+                    "loadingRecords": "@loadingRecords",
+                    "processing": "@processing",
+                    "zeroRecords": "@zeroRecords",
+                    "infoEmpty": "@infoEmpty",
+                    "infoFiltered": "@infoFiltered",
+                },
+                "order": [],
+                "columnDefs": [{
+                    "targets": 'no-sort',
+                    "orderable": false
+                }]
+            });
+            $("#ExporttoExcelParam").on("click", function () {
+                tableParam.button('.buttons-csv').trigger();
+            });
+        } catch {
+            console.log("Error cargando #data-table-parametros")
+        }
+
+        try {
+            var tableCri = $("#data-table-atributos").DataTable({
+                pageLength: 20,
+                orderCellsTop: true,
+                fixedHeader: true,
+                bLengthChange: false,
+                bFilter: true,
+                bAutoWidth: false,
+                searching: true,
+                "bSort": true,
+                sDom: 'lrtip',
+                "bInfo": false,
+                paging: false,
+                buttons: [
+                    {
+                        extend: 'csv',
+                        charset: 'utf-8',
+                        bom: true,
+                        title: "Atributos críticos de calidad",
+                        exportOptions:
+                        {
+                            columns: function (i, d, n) {
+                                return (n.textContent === "Id" && $(n).is(":hidden")) ? false : true;
+                            }
+                        }
+                    }
+                ],
+                "language": {
+                    "search": '<a href="@Url.Action("Index", "home" )" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> @btnFilter</a> <br><div><i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                    "searchPlaceholder": '@searchPlaceholder',
+                    "emptyTable": "@emptyTable",
+                    "lengthMenu": "@lengthMenu",
+                    "info": "@info",
+                    "paginate": {
+                        "first": "@paginatefirst",
+                        "last": "@paginatelast",
+                        "next": "@pageNext",
+                        "previous": "@pagePreviuos"
+                    },
+                    "loadingRecords": "@loadingRecords",
+                    "processing": "@processing",
+                    "zeroRecords": "@zeroRecords",
+                    "infoEmpty": "@infoEmpty",
+                    "infoFiltered": "@infoFiltered",
+                },
+                "order": [],
+                "columnDefs": [{
+                    "targets": 'no-sort',
+                    "orderable": false
+                }]
+            });
+            $("#ExporttoExcelCri").on("click", function () {
+                tableCri.button('.buttons-csv').trigger();
+            });
+        } catch (ex) {
+            console.error(ex);
+            console.log("Error cargando #data-table-atributos")
+        }
+
+        $('.selectpicker').selectpicker();
+
+        getPlans();
+    });
+
+    $("#ClearFilters").on("click", function () {
+        window.location.href = '@Url.Action("New","RAPTanques")';
+    });
+
+    var getPlans = function () {
+        $.ajax({
+            type: "GET",
+            url: "/RAPTanques/GetPlants",
+            success: function (response) {
+                $("#SelectedPlantFilter").empty()
+                $("#SelectedProductFilter").empty()
+                $("#SelectedTankFilter").empty()
+
+                $("#SelectedProductFilter").prop("disabled", true)
+                $("#SelectedTankFilter").prop("disabled", true)
+
+                response.data.forEach(function (item) {
+                    $("#SelectedPlantFilter").append($('<option>', {
+                        value: item.value,
+                        text: item.text
+                    }))
+                });
+
+                $('#SelectedPlantFilter').selectpicker('refresh');
+
+                if (!isNullOrEmpty(params['SelectedPlantFilter'])) {
+                    $('#SelectedPlantFilter').val(params['SelectedPlantFilter'].split(','))
+                    getProducts("#SelectedPlantFilter")
+                    $('#SelectedPlantFilter').selectpicker('refresh');
+                }
+            }
+        });
+    }
+
+    var getProducts = function (element) {
+        const plantId = $(element).val()
+
+        $.ajax({
+            type: "GET",
+            url: "/RAPTanques/GetProduts?plantId=" + plantId,
+            success: function (response) {
+                $("#SelectedProductFilter").empty()
+                $("#SelectedTankFilter").empty()
+
+                $("#SelectedProductFilter").prop("disabled", false)
+                $("#SelectedTankFilter").prop("disabled", true)
+
+                response.data.forEach(function (item) {
+                    $("#SelectedProductFilter").append($('<option>', {
+                        value: item.value,
+                        text: item.text
+                    }))
+                });
+
+                $('#SelectedProductFilter').selectpicker('refresh');
+
+                if (!isNullOrEmpty(params['SelectedProductFilter'])) {
+                    $('#SelectedProductFilter').val(params['SelectedProductFilter'].split(','))
+
+                    getTanks("#SelectedProductFilter")
+                    getPresentaciones("#SelectedProductFilter")
+                    getPurezas("#SelectedProductFilter")
+                    getRegistrosSan("#SelectedProductFilter")
+                    getFormFarmGetFormFarm("#SelectedProductFilter")
+
+                    $('#SelectedProductFilter').selectpicker('refresh');
+                }
+            }
+        });
+    }
+
+    var getTanks = function (element) {
+        const plantId = $("#SelectedPlantFilter").val()
+        const productId = $(element).val()
+
+        $.ajax({
+            type: "GET",
+            url: "/RAPTanques/GetTanks?plantId=" + plantId + "&productId=" + productId,
+            success: function (response) {
+                $("#SelectedTankFilter").empty()
+
+                $("#SelectedTankFilter").prop("disabled", false)
+
+                response.data.forEach(function (item) {
+                    $("#SelectedTankFilter").append($('<option>', {
+                        value: item.value,
+                        text: item.text
+                    }))
+                });
+
+                $('#SelectedTankFilter').selectpicker('refresh');
+
+                if (!isNullOrEmpty(params['SelectedTankFilter'])) {
+                    $('#SelectedTankFilter').val(params['SelectedTankFilter'].split(','))
+                    $('#SelectedTankFilter').selectpicker('refresh');
+                }
+            }
+        });
+    }
+
+    var getPresentaciones = function (element) {
+        const plantId = $("#SelectedPlantFilter").val()
+        const productId = $(element).val()
+
+        $.ajax({
+            type: "GET",
+            url: "/RAPTanques/GetPresentaciones?plantId=" + plantId + "&productId=" + productId,
+            success: function (response) {
+                $("#SelectedPresentationFilter").empty()
+
+                response.data.forEach(function (item) {
+                    $("#SelectedPresentationFilter").append($('<option>', {
+                        value: item.value,
+                        text: item.text
+                    }))
+                });
+
+                $('#SelectedPresentationFilter').selectpicker('refresh');
+
+                const count = $('#SelectedPresentationFilter option').length;
+                $('#SelectedPresentationFilter').prop('selectedIndex', count > 0 ? 1 : 0)
+                $('#SelectedPresentationFilter').selectpicker('refresh');
+            }
+        });
+    }
+
+    var getPurezas = function (element) {
+        const plantId = $("#SelectedPlantFilter").val()
+        const productId = $(element).val()
+
+        $.ajax({
+            type: "GET",
+            url: "/RAPTanques/GetPurezas?plantId=" + plantId + "&productId=" + productId,
+            success: function (response) {
+                $("#SelectedPurityFilter").empty()
+
+                response.data.forEach(function (item) {
+                    $("#SelectedPurityFilter").append($('<option>', {
+                        value: item.value,
+                        text: item.text
+                    }))
+                });
+
+                $('#SelectedPurityFilter').selectpicker('refresh');
+
+                const count = $('#SelectedPurityFilter option').length;
+                $('#SelectedPurityFilter').prop('selectedIndex', count > 0 ? 1 : 0)
+                $('#SelectedPurityFilter').selectpicker('refresh');
+            }
+        });
+    }
+
+    var getRegistrosSan = function (element) {
+        const plantId = $("#SelectedPlantFilter").val()
+        const productId = $(element).val()
+
+        $.ajax({
+            type: "GET",
+            url: "/RAPTanques/GetRegistrosSan?plantId=" + plantId + "&productId=" + productId,
+            success: function (response) {
+                $("#SelectedHealthRegisterFilter").empty()
+
+                response.data.forEach(function (item) {
+                    $("#SelectedHealthRegisterFilter").append($('<option>', {
+                        value: item.value,
+                        text: item.text
+                    }))
+                });
+
+                $('#SelectedHealthRegisterFilter').selectpicker('refresh');
+
+                const count = $('#SelectedHealthRegisterFilter option').length;
+                $('#SelectedHealthRegisterFilter').prop('selectedIndex', count > 0 ? 1 : 0)
+                $('#SelectedHealthRegisterFilter').selectpicker('refresh');
+            }
+        });
+    }
+
+    var getFormFarmGetFormFarm = function (element) {
+        const plantId = $("#SelectedPlantFilter").val()
+        const productId = $(element).val()
+
+        $.ajax({
+            type: "GET",
+            url: "/RAPTanques/GetFormFarmGetFormFarm?plantId=" + plantId + "&productId=" + productId,
+            success: function (response) {
+                $("#SelectedPharmaceuticalFormFilter").empty()
+
+                response.data.forEach(function (item) {
+                    $("#SelectedPharmaceuticalFormFilter").append($('<option>', {
+                        value: item.value,
+                        text: item.text
+                    }))
+                });
+
+                $('#SelectedPharmaceuticalFormFilter').selectpicker('refresh');
+
+                const count = $('#SelectedPharmaceuticalFormFilter option').length;
+                $('#SelectedPharmaceuticalFormFilter').prop('selectedIndex', count > 0 ? 1 : 0)
+                $('#SelectedPharmaceuticalFormFilter').selectpicker('refresh');
+            }
+        });
+    }
+
+    function confirm() {
+        $('#btnconfirm').html('')
+        $('#btnconfirm').append(" <div  class='modal-content'> <div class='modal-header'><h5 style='color:#005591' class='modal-title' id='exampleModalLabel'>ALERTA</h5><button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button></div> <div class='modal-body'>Debes seleccionar una planta, producto y tanque</div><div class='modal-footer'><button id='btnclose' style='color:white' type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button></div> </div>")
+    }
+
+    var Search = function () {
+        const plant = $("#SelectedPlantFilter").val()
+        const product = $("#SelectedProductFilter").val()
+        const tank = $("#SelectedTankFilter").val()
+        const start = $("#StartDate").val()
+        const end = $("#EndDate").val()
+        const presentation = $("#SelectedPresentationFilter").val()
+        const purity = $("#SelectedPurityFilter").val()
+        const health = $("#SelectedHealthRegisterFilter").val()
+        const formula = $("#SelectedPharmaceuticalFormFilter").val()
+        if (plant != "" && product != "" && tank != "") {
+            const valid = $("#formSearch").valid();
+            if (!valid) {
+                $.gritter.add({
+                    title: "Error!",
+                    text: "Es necesario ingresar Fecha Inicial y Final.",
+                    class_name: "gritter-light"
+                });
+                return;
+            }
+            var url = '@Url.Action("Index", "RAPTanques" )';
+            window.location.href = `${url}?SelectedPlantFilter=${plant}&SelectedProductFilter=${product}&SelectedTankFilter=${tank}&StartDate=${start}&EndDate=${end}&SelectedPresentationFilter=${presentation}&SelectedPurityFilter=${purity}&SelectedHealthRegisterFilter=${health}&SelectedPharmaceuticalFormFilter=${formula}`;
+        }
+        else {
+            $("#validaModal").modal('show');
+            //data-toggle='modal';
+            //data-target='#validaModal';
+            confirm();
+        }
+    };
+    function configValidations() {
+        $("#formSearch").validate({
+            rules: {
+                "StartDate": {
+                    required: function (element) {
+                        return !!$("#EndDate").val();
+                    }
+                },
+                "EndDate": {
+                    required: function (element) {
+                        return !!$("#StartDate").val();
+                    }
+                },
+            },
+            messages: {
+                "StartDate": {
+                    required: "Es requerido."
+                },
+                "EndDate": {
+                    required: "Es requerido."
+                },
+            },
+            highlight: function (element, errorClass) {
+                // Override the default behavior here
+            }
+        });
+    }
+
+</script>
+
+}
+
+<style>
+    .error {
+        position: unset !important;
+        margin-left: unset !important;
+        width: auto !important;
+        color: red;
+        background-color: pink;
+    }
+</style>

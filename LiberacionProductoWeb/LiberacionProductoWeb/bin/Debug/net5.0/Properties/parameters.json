@@ -1,0 +1,388 @@
+[
+  {
+    "PlantName": "Monterrey",
+    "PlantCode": "MTR",
+    "PlantKey": "5",
+    "DirectoryPath": "C:\\Variables\\Monterrey\\",
+    "SheetName": "Hoja2",
+    "Products": [
+      {
+        "ProductName": "Nitrogeno",
+        "ProductCode": "NIT",
+        "ProductKey": "NI",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "PDI-500"
+              },
+              {
+                "Name": "TI-510"
+              },
+              {
+                "Name": "PDI-570"
+              },
+              {
+                "Name": "PIC-422"
+              },
+              {
+                "Name": "TI-221"
+              },
+              {
+                "Name": "PIC-305"
+              },
+              {
+                "Name": "LIC-315"
+              }
+
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AE-12A"
+              },
+              {
+                "Name": "AE-2"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "QAAE-3"
+              },
+              {
+                "Name": "QAAE-5"
+              },
+              {
+                "Name": "QAAE-16A"
+              },
+              {
+                "Name": "QAAE-16B"
+              }
+
+            ]
+          }
+
+        ]
+      },
+      {
+        "ProductName": "Nitrogeno",
+        "ProductCode": "NO",
+        "ProductKey": "2",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              }
+
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              }
+
+            ]
+          }
+
+        ]
+      }
+    ]
+  },
+  {
+    "PlantName": "Coatzacoalcos",
+    "PlantCode": "CO",
+    "PlantKey": "20",
+    "DirectoryPath": "C:\\files\\CO\\",
+    "SheetName": "Hoja1",
+    "Products": [
+      {
+        "ProductName": "Oxigeno",
+        "ProductCode": "OC",
+        "ProductKey": "1",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              }
+
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              }
+
+            ]
+          }
+
+        ]
+      },
+      {
+        "ProductName": "Nitrogeno",
+        "ProductCode": "NO",
+        "ProductKey": "2",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              }
+
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              }
+
+            ]
+          }
+
+        ]
+      }
+    ]
+  },
+  {
+    "PlantName": "Morelos",
+    "PlantCode": "MRL",
+    "PlantKey": "13",
+    "DirectoryPath": "C:\\Variables\\Morelos\\",
+    "SheetName" :  "Hoja1",
+    "Products": [
+      {
+        "ProductName": "CO2",
+        "ProductCode": "CO2",
+        "ProductKey": "CD",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "PI-400"
+              },
+              {
+                "Name": "TI-400"
+              },
+              {
+                "Name": "TI-240"
+              },
+              {
+                "Name": "PIC-301"
+              },
+              {
+                "Name": "PIC-321"
+              },
+              {
+                "Name": "PIC-501"
+              },
+              {
+                "Name": "PIC-521"
+              },
+              {
+                "Name": "PIC-801"
+              },
+              {
+                "Name": "PIC-823"
+              },
+              {
+                "Name": "PIC-901"
+              },
+              {
+                "Name": "PIC-923"
+              },
+              {
+                "Name": "TIC-1215"
+              },
+              {
+                "Name": "TIC-1221"
+              },
+              {
+                "Name": "TIC-1230"
+              },
+              {
+                "Name": "AIC-1230"
+              }
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AI-20A"
+              },
+              {
+                "Name": "AI-10A"
+              },
+              {
+                "Name": "AI-30A"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "AE-12"
+              },
+              {
+                "Name": "AE-13"
+              },
+              {
+                "Name": "AE-20B"
+              }
+
+            ]
+          }
+
+        ]
+      },
+      {
+        "ProductName": "Nitrogeno",
+        "ProductCode": "NO",
+        "ProductKey": "3",
+        "Variables": [
+          {
+            "Type": "VARIABLE_CONTROL_PROCESO",
+            "Values": [
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              }
+
+            ]
+          },
+          {
+            "Type": "PARAMETRO_CRITICO_PROCESO",
+            "Values": [
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              }
+            ]
+          },
+          {
+            "Type": "ATRIBUTO_CRITICO_CALIDAD",
+            "Values": [
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              },
+              {
+                "Name": "AI10B"
+              }
+
+            ]
+          }
+
+        ]
+      }
+    ]
+  }
+]

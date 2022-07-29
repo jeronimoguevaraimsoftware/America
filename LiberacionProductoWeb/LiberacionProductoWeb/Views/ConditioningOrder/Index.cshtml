@@ -1,0 +1,888 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Identity;
+@using LiberacionProductoWeb.Localize;
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Helpers;
+@model LiberacionProductoWeb.Models.ConditioningOrderViewModels.ConditioningOrderViewModel;
+@inject IStringLocalizer<Resource> resource;
+@inject IViewLocalizer Localizer
+@inject UserManager<LiberacionProductoWeb.Models.IndentityModels.ApplicationUser> UserManager
+@{
+    ViewData["Title"] = "Orden de acondicionamiento";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var notInformation = resource.GetString("NoInformation");
+    var lengthMenu = resource.GetString("LengthMenu");
+    var searchPlaceholder = resource.GetString("SearchPlaceholder");
+    var info = resource.GetString("Info");
+    var emptyTable = resource.GetString("EmptyTable");
+    var loadingRecords = resource.GetString("LoadingRecords");
+    var processing = resource.GetString("Processing");
+    var zeroRecords = resource.GetString("ZeroRecords");
+    var infoEmpty = resource.GetString("InfoEmpty");
+    var infoFiltered = resource.GetString("InfoFiltered");
+    var claimsIdentity = User.Identity as System.Security.Claims.ClaimsIdentity;
+    var userFirstName = "";
+    if (claimsIdentity != null)
+    {
+        var name = claimsIdentity.Name;
+        if (name != null)
+        {
+            var FullName = UserManager.FindByNameAsync(name);
+            userFirstName = FullName.Result.NombreUsuario;
+        }
+    }
+}
+
+@await Html.PartialAsync("~/Views/Shared/_Navigation.cshtml")
+
+<!-- ============================================================== -->
+<!-- Page wrapper  -->
+<!-- ============================================================== -->
+<div id="content" class="content">
+
+    <div class="row">
+
+        <div class="col-6">
+            <label style="font-size:x-large;color: #005591">
+                Información de orden de acondicionamiento
+            </label>
+        </div>
+
+
+        @if (Model.Id > 0)
+        {
+            <div class="col-6" style="font-size: large; padding: 10px;">
+                <label style="font-size:large">
+                Fecha y hora de creación:
+                </label>
+                <label>
+                    @(Model.CreatedDate.HasValue ? Model.CreatedDate.Value.ToString("yyyy-MM-dd HH:mm") : string.Empty)
+                </label>
+                <label>Estado:</label>
+                <label>@Model.State</label>
+            </div>
+        }
+    </div>
+
+    <div class="section-container p-b-10">
+        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.EXPORTAR_OA))
+        {
+            <a href="/ConditioningOrder/ExportToPDF?IdOP=@Model.ProductionOrderId" class="btn btn-white m-r-5" type="button" style="background-color: transparent;">
+                <i class="fa fa-file-pdf"></i>Exportara PDF
+            </a>
+        }
+        <a href="/ProductionOrder/Index?Id=@Model.ProductionOrderId" class="btn btn-white m-r-5">
+            <i class="fa fa-eraser"></i>Consultar Orden de producción
+        </a>
+
+        <a href="/ConditioningOrder/New?IdOP=@Model.ProductionOrderId" class="btn btn-white m-r-5">
+            <i class="fa fa-edit"></i> Editar
+        </a>
+    </div>
+
+    <div>
+        <div>
+            <input hidden="hidden" asp-for="@Model.Id" id="Id" value="@Model.Id" />
+            <input hidden="hidden" asp-for="@Model.StepSaved" value="@Model.StepSaved" id="StepSaved" />
+
+            <div id="step1">
+                <fieldset>
+                    @{
+                        Html.RenderPartial("_Step1Text", Model);
+                    }
+
+                    <div class="form-group-sm" style="margin-top:30px;margin-bottom: 20px; padding: 0 20px;">
+                        <div class="form-inline col-md-14">
+                            <div class="row">
+                                <div class="col-lg-3 m-b-15">
+                                    <div class="m-b-5"><label for="Plant" class="mr-sm-1">Planta: </label></b></div>
+                                    <div class="input-group"> <input id="Plant" name="Plant" value="@Model.Plant" disabled="disabled" class="form-control" /></div>
+                                </div>
+                                <div class="col-lg-3 m-b-15">
+                                    <div class="m-b-5"><label for="Product" class="mr-sm-1">Producto: </label></div>
+                                    <div class="input-group"><input id="Product" name="Product" value="@Model.Product" disabled="disabled" class="form-control" /></div>
+                                </div>
+                                <div class="col-lg-3 m-b-15">
+                                    <div class="m-b-5"><label for="Tank" class="mr-sm-1">No. de tanque: </label></div>
+                                    <div class="input-group"><input id="Tank" name="Tank" value="@Model.Tank" class="form-control" disabled="disabled" /></div>
+                                </div>
+                                <div class="col-lg-3 m-b-15">
+                                    <div class="m-b-5"><label for="EnvasePrimario" class="mr-sm-1">Envase primario: </label></div>
+                                    <div class="input-group"><input id="EnvasePrimario" value="@Model.ContainerPrimary" name="EnvasePrimario" class="form-control" disabled="disabled" /></div>
+                                </div>
+                                <div class="col-lg-3 m-b-15">
+                                    <div class="m-b-5"> <label for="Batch" class="mr-sm-2">Lote de producción: </label></div>
+                                    <div class="input-group"> <input id="Batch" name="Batch" value="@Model.LotProd" class="form-control" disabled="disabled" /></div>
+                                </div>
+                                <div class="col-lg-3 m-b-15">
+                                    <div class="m-b-5"><label for="Presentacion" class="mr-sm-2">Presentación: </label></div>
+                                    <div class="input-group"><input id="Presentacion" name="Presentacion" value="@Model.Presentation" class="form-control" disabled="disabled" /></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @{
+                        Html.RenderPartial("_Step2Text", Model);
+                    }
+                    <div class="table-responsive">
+                        <table id="table-1" class="table table-striped table-bordered"
+                               style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th colspan="5">Tabla 1: Equipos analíticos</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col">Código del equipo</th>
+                                    <th scope="col">Descripción del equipo</th>
+                                    <th scope="col">Estado de calibración</th>
+                                    <th scope="col">Observaciones</th>
+                                    <th scope="col">Revisado por</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int analyticEquipmenIndex = 0;
+                                }
+                                @foreach (var item in Model.AnalyticEquipmentList)
+                                {
+                                    <tr>
+                                        <td hidden="hidden" id="AnalyticEquipmenId@(analyticEquipmenIndex)">@item.Id</td>
+                                        <td>
+                                            <label asp-for="@item.Code" id="AnalyticEquipmentCode@(analyticEquipmenIndex)">@item.Code</label>
+                                        </td>
+                                        <td>
+                                            <label asp-for="@item.Description" id="AnalyticEquipmentDescription@(analyticEquipmenIndex)">@item.Description</label>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="yes-no-analytic-equipment" id="AnalyticEquipmentCheckTrue@(analyticEquipmenIndex)"
+                                                   form-control-lg
+                                                   data-linde-control-value="true"
+                                                   data-linde-control-group="AnalyticEquipment"
+                                                   data-linde-control-id="@(analyticEquipmenIndex)" />
+                                            <label>Calibrado</label>
+                                            <input type="checkbox" class="yes-no-analytic-equipment" id="AnalyticEquipmentCheckFalse@(analyticEquipmenIndex)"
+                                                   form-control-lg
+                                                   data-linde-control-value="false"
+                                                   data-linde-control-group="AnalyticEquipment"
+                                                   data-linde-control-id="@(analyticEquipmenIndex)" />
+                                            <label>No calibrado</label>
+                                            <input asp-for="@item.IsCalibrated" id="AnalyticEquipmentIsCalibrated@(analyticEquipmenIndex)" hidden class="form-control" />
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" disabled value="@item.Notes" id="AnalyticEquipmentNotes@(analyticEquipmenIndex)" />
+                                        </td>
+                                        <td>
+                                            <input class="form-control text-center" asp-for="@item.ReviewedBy" id="AnalyticEquipmentReviewedBy@(analyticEquipmenIndex)" hidden="hidden" />
+                                            <input class="form-control text-center" asp-for="@item.ReviewedDate" id="AnalyticEquipmentReviewedDate@(analyticEquipmenIndex)" hidden="hidden" />
+                                            <div id="AnalyticEquipmentReviewedSignature@(analyticEquipmenIndex)"></div>
+                                        </td>
+                                    </tr>
+                                    analyticEquipmenIndex++;
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div id="step2">
+                <fieldset>
+                    @{
+                        Html.RenderPartial("_Step3Text", Model);
+                    }
+                    <div class="form-group-sm" style="margin-bottom: 20px; padding: 0 20px;">
+                        <div class="table-responsive">
+                            <table id="table-2" class="table table-striped table-bordered center"
+                                   style="width:60%;">
+                                <thead>
+                                    <tr>
+                                        <th colspan="3">Tabla 2: Básculas y flujometros</th>
+                                    </tr>
+                                    <tr>
+                                        <th scope="col">Calibración de la báscula / flujometro</th>
+                                        <th scope="col">Estado de calibración</th>
+                                        <th scope="col">Revisado por</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int scalesflowsIndex = 0;
+                                    }
+                                    @foreach (var item in Model.ScalesflowsList)
+                                    {
+                                        <tr>
+                                            <td hidden="hidden" id="ScalesflowsId@(scalesflowsIndex)">@item.Id</td>
+                                            <td>
+                                                <input asp-for="@item.State" id="ScalesflowsState@(scalesflowsIndex)" hidden />
+                                                <input asp-for="@item.Description" id="ScalesflowsDescription@(scalesflowsIndex)" hidden />
+                                                @item.Description
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" class="yes-no-scalesflows" id="ScalesflowsCheckTrue@(scalesflowsIndex)"
+                                                       form-control-lg
+                                                       data-linde-control-value="true"
+                                                       data-linde-control-group="Scalesflows"
+                                                       data-linde-control-id="@(scalesflowsIndex)" />
+                                                <label>Calibrado</label>
+                                                <input type="checkbox" class="yes-no-scalesflows" id="ScalesflowsCheckFalse@(scalesflowsIndex)"
+                                                       form-control-lg
+                                                       data-linde-control-value="false"
+                                                       data-linde-control-group="Scalesflows"
+                                                       data-linde-control-id="@(scalesflowsIndex)" />
+                                                <label>No calibrado</label>
+                                                <input asp-for="@item.IsCalibrated" id="ScalesflowsIsCalibrated@(scalesflowsIndex)" hidden />
+                                            </td>
+                                            <td>
+                                                <input asp-for="@item.ReviewedBy" id="ScalesflowsReviewedBy@(scalesflowsIndex)" hidden="hidden" />
+                                                <input asp-for="@item.ReviewedDate" id="ScalesflowsReviewedDate@(scalesflowsIndex)" hidden="hidden" />
+                                                <div id="ScalesflowsReviewedSignature@(scalesflowsIndex)"></div>
+                                            </td>
+                                        </tr>
+                                        scalesflowsIndex++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <input id="tournumber" hidden="hidden" />
+                        <table id="table-4" class="table table-striped table-bordered" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th colspan="8">
+                                        Tabla 4: Equipos (accesorios) empleados en el proceso de acondicionamiento
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="col">Tour number</th>
+                                    <th scope="col">Número de pipa</th>
+                                    <th scope="col">Bahía (área)</th>
+                                    <th scope="col">Bomba de llenado</th>
+                                    <th scope="col">Manguera de llenado</th>
+                                    <th scope="col">Manguera de descarga</th>
+                                    <th scope="col">Revisado por</th>
+                                    <th scope="col">Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int equipamentProcessesIndex = 0;
+                                }
+                                @foreach (var item in Model.EquipamentProcessesList)
+                                {
+                                    <tr>
+                                        <td hidden="hidden" id="EquipamentProcessesId@(equipamentProcessesIndex)">@item.Id</td>
+                                        <td>
+                                            <input asp-for="@item.TourNumber" id="EquipamentProcessesTour@(equipamentProcessesIndex)"
+                                                   hidden="hidden" />
+                                            @item.TourNumber
+                                        </td>
+                                        <td>
+                                            <input asp-for="@item.PipeNumber" id="EquipamentProcessesNumberPipe@(equipamentProcessesIndex)"
+                                                   hidden="hidden" />
+                                            @item.PipeNumber
+                                        </td>
+                                        <td>
+                                            <input asp-for="@item.Bay" id="EquipamentProcessesBay@(equipamentProcessesIndex)" readonly />
+                                        </td>
+                                        <td>
+                                            <input asp-for="@item.Bomb" id="EquipamentProcessesBomb@(equipamentProcessesIndex)" disabled />
+                                        </td>
+                                        <td>
+                                            <input asp-for="@item.Hosefill" id="EquipamentProcessesHosefill@(equipamentProcessesIndex)" disabled />
+                                        </td>
+                                        <td>
+                                            <input asp-for="@item.HoseDownload" id="EquipamentProcessesHoseDownload@(equipamentProcessesIndex)" />
+                                        </td>
+                                        <td>
+                                            @if (string.IsNullOrEmpty(item.ReviewedBy) || !item.ReviewedDate.HasValue)
+                                            {
+                                                <button id="btnEquipamentProcessesReviewedSignature@(equipamentProcessesIndex)" type="button"
+                                                        class="btn btn-success sign-equipment-process"
+                                                        onclick="signEquipamentProcessesRecord(@(equipamentProcessesIndex))">
+                                                    Firma
+                                                </button>
+                                            }
+                                            <input asp-for="@item.ReviewedBy" id="EquipamentProcessesReviewedBy@(equipamentProcessesIndex)"
+                                                   hidden="hidden" />
+                                            <input asp-for="@item.ReviewedDate" id="EquipamentProcessesReviewedDate@(equipamentProcessesIndex)"
+                                                   hidden="hidden" />
+                                            <div id="EquipamentProcessesReviewedSignature@(equipamentProcessesIndex)"></div>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" asp-for="@item.Notes"
+                                                   id="EquipamentProcessesNotes@(equipamentProcessesIndex)" />
+                                        </td>
+                                    </tr>
+                                    equipamentProcessesIndex++;
+                                }
+                            </tbody>
+                        </table>
+
+                    </div>
+                </fieldset>
+            </div>
+
+            <div id="step3">
+                <fieldset>
+                    @{
+                        Html.RenderPartial("_Step4Text", Model);
+                    }
+
+                    <div class="form-group-sm" style="margin-bottom: 20px; padding: 0 20px;">
+                        <div class="table-responsive">
+                            <table id="table-3" class="table table-striped table-bordered" style="width:95%;">
+                                <thead>
+                                    <tr>
+                                        <th colspan="5">Tabla 3: Despeje de línea</th>
+                                    </tr>
+                                    <tr>
+                                        <th scope="col">Actividad</th>
+                                        <th scope="col" style="width: 200px;">Cumple</th>
+                                        <th scope="col">Revisado por</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <p id="Activitie">
+                                                @* <a href='javascript:void(0)' onclick='Save(this,2);return false;' id='editData' class='btn btn-default btn-xs' data-id='2'><i class='fa fa-save'></i></a> *@
+                                                Se lleva a cabo el despeje de línea de acuerdo a los puntos anteriores "@(Model.Product)" de la planta "@(Model.Plant)"
+                                            </p>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" id="PipelineClearanceCheckTrue" form-control-lg />
+                                            <label>Cumple</label>
+                                            <input type="checkbox" id="PipelineClearanceCheckFalse" form-control-lg />
+                                            <label>No cumple</label>
+                                            <input asp-for="@Model.PipelineClearanceOA.InCompliance" id="PipelineClearanceInCompliance" name="PipelineClearanceInCompliance" hidden class="form-control" />
+                                        </td>
+                                        <td>
+                                            <input class="form-control text-center" asp-for="@Model.PipelineClearanceOA.ReviewedBy" value="@Model.PipelineClearanceOA.ReviewedBy" id="PipelineClearanceReviewedBy" hidden="hidden" />
+                                            <input class="form-control text-center" asp-for="@Model.PipelineClearanceOA.ReviewedDate" id="PipelineClearanceReviewedDate" hidden="hidden" />
+                                            <div id="PipelineClearanceReviewedSignature"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="right" style="color: #005591; cursor: pointer;" id="ShowDetail">
+                                <label onclick="showPipelineClearanceHistoryOA()">Ver evaluaciones anteriores</label>/
+                                <label id="HiddeDetail" onclick="hidePipelineClearanceHistoryOA()">Ocultar evaluaciones anteriores</label>
+                            </div>
+                            <div id="table3-detailInfo"></div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div id="step4">
+                <fieldset>
+                    @{
+                        Html.RenderPartial("_Step5Text", Model);
+                    }
+
+                    <div id="table5">
+                        @{
+                            Html.RenderPartial("_PipeFillingControl", Model);
+                        }
+                    </div>
+
+                    @{
+                        Html.RenderPartial("_Step6Text", Model);
+                    }
+                </fieldset>
+            </div>
+
+            <div id="step5">
+                <fieldset>
+                    @{
+                        Html.RenderPartial("_Step7Text", Model);
+                    }
+
+                    @{
+                        Html.RenderPartial("_Step8Text", Model);
+                    }
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table id="table-6" class="table table-striped table-bordered"
+                                   style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th colspan="7">
+                                            Tabla 6: Rendimiento del proceso de acondicionamiento
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th scope="col">Tamaño del lote (Kg)</th>
+                                        <th scope="col">
+                                            Cantidad total de producto de grado medicinal llenado en unidades de distribución (Kg)
+                                        </th>
+                                        <th scope="col">
+                                            Diferencia contra el tamaño del lote (Kg)
+                                        </th>
+                                        <th scope="col">Revisado por</th>
+                                        <th scope="col">Observaciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int performanceListIndex = 0;
+                                    }
+                                    @foreach (var item in Model.PerformanceList)
+                                    {
+                                        <tr>
+                                            <td hidden="hidden" id="PerformanceListId@(performanceListIndex)">@item.Id</td>
+                                            <td hidden="hidden">
+                                                <input asp-for="@item.TourNumber" id="PerformanceListTourNumber@(performanceListIndex)" hidden="hidden" />
+                                                @item.TourNumber
+                                                <input asp-for="@item.PipeNumber" id="PerformanceListPipeNumber@(performanceListIndex)" hidden="hidden" />
+                                                @item.PipeNumber
+                                            </td>
+                                            <td>
+                                                <input asp-for="@item.SizeLote" id="PerformanceListSizeLote@(performanceListIndex)" hidden="hidden" />
+                                                @item.SizeLote.Replace(",", ".")
+                                            </td>
+                                            <td>
+                                                <input asp-for="@item.TotalTons" id="PerformanceListTotalTons@(performanceListIndex)" hidden="hidden" />
+                                                @item.TotalTons
+                                            </td>
+                                            <td>
+                                                <input asp-for="@item.DifTons" id="PerformanceListDifTons@(performanceListIndex)" hidden="hidden" />
+                                                @item.DifTons
+                                            </td>
+                                            <td>
+                                                <input asp-for="@item.ReviewedBy" id="PerformanceListReviewedBy@(performanceListIndex)" hidden="hidden" />
+                                                <input asp-for="@item.ReviewedDate" id="PerformanceListReviewedDate@(performanceListIndex)" hidden="hidden" />
+                                                <div id="PerformanceListReviewedSignature@(performanceListIndex)"></div>
+                                            </td>
+                                            <td>
+                                                <input class="form-control text-center" asp-for="@item.Notes" id="PerformanceListNotes@(performanceListIndex)" />
+                                            </td>
+                                        </tr>
+                                        performanceListIndex++;
+                                    }
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div id="step6">
+                <fieldset>
+                    @{
+                        Html.RenderPartial("_Step9Text", Model);
+                    }
+                    <div class="table-responsive">
+                        <table id="table-7" class="table table-striped table-bordered center"
+                               style="width:50%;">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">
+                                        Tabla 7: Cierre del expediente de Lote
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="col">Firma del responsable sanitario</th>
+                                    <th scope="col">Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <input class="form-control text-center" asp-for="@Model.ReleasedBy" id="ReleasedBy" hidden="hidden" />
+                                        <input class="form-control text-center" asp-for="@Model.ReleasedDate" id="ReleasedDate" hidden="hidden" />
+                                        <div id="ReleasedSignature"></div>
+                                    </td>
+                                    <td>
+                                        <input class="form-control text-center" asp-for="@Model.ReleasedNotes" id="ReleasedNotes" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <input asp-for="@Model.IsReleased" id="IsReleased" class="form-control" hidden />
+
+                    <div class="table-responsive">
+                        <table id="table-estatus" class="table table-striped table-bordered center"
+                               style="width:50%;">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">
+                                        Historial de cierre/abierto de la orden de acondicionamiento
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="col">Estatus</th>
+                                    <th scope="col">Firma del responsable sanitario</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.StatesList != null)
+                                {
+                                    @foreach (var entry in Model.StatesList)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @entry.State
+                                            </td>
+                                            <td>
+                                                @entry.User
+                                                <br />
+                                                @entry.Date.ToString("yyyy-MM-dd")
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        @*historyNotes*@
+
+        <div class="right" style="color: #005591; cursor: pointer;" id="ShowDetail">
+            <label onclick="ShowHistory(this); return false;">Ver observaciones</label>/
+            <label id="HiddeHistory" onclick="HiddeHistory(this); return false;">Ocultar observaciones</label>
+        </div>
+        <div id="detailInfo">
+            <table id="table-HistoryNotes" hidden="hidden" class="table table-striped table-bordered" style="width:95%;">
+                <thead>
+                    <tr>
+                        <th colspan="8">Historial de observaciones</th>
+                    </tr>
+                    <tr>
+                        <th scope="col">Observaciones</th>
+                        <th scope="col">Fuente</th>
+                        <th scope="col">Usuario</th>
+                        <th scope="col">Fecha y hora</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+        @*historyStates*@
+        <div class="right" style="color: #005591; cursor: pointer;" id="ShowDetailState">
+            <label onclick="ShowHistoryState(this); return false;">Ver estados</label>/
+            <label id="HiddeState" onclick="HiddeStateHistory(this); return false;">Ocultar estados</label>
+        </div>
+        <div id="detailInfoState">
+            <table id="table-HistoryState" hidden="hidden" class="table table-striped table-bordered" style="width:95%;">
+                <thead>
+                    <tr>
+                        <th colspan="8">Historial de estados</th>
+                    </tr>
+                    <tr>
+                        <th scope="col">Usuario</th>
+                        <th scope="col">Fecha y hora</th>
+                        <th scope="col">Estado</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-wizard/css/bwizard.min.css" rel="stylesheet" />
+
+    <link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/font-awesome/5.1/css/all.css" rel="stylesheet" />
+
+    <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+    <link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+
+    <link href="~/css/conditioning-order.css" rel="stylesheet" />
+
+    <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+}
+
+@section scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+        <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+        <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+        <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+
+        <script src="~/plugins/bootstrap-wizard/js/bwizard.min.js"></script>
+        <script src="~/js/conditioning-order/conditioning-order-form-wizards.js"></script>
+
+        <script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+
+        <script src="~/js/demo.min.js"></script>
+        <script src="~/js/apps.min.js"></script>
+        <script src="~/js/linde.js"></script>
+        <script src="~/js/conditioning-order/conditioning-order-index.js"></script>
+        <script src="~/plugins/DataTables/media/js/datetime.js"></script>
+        <script src="~/plugins/DataTables/media/js/moment.min.js"></script>
+    </environment>
+
+    <script>
+        $(function () {
+            $(document).ready(function () {
+                App.init();
+                Demo.init();
+                PageDemo.init();
+
+                $(".date-format").datepicker({
+                    dateFormat: 'yy/mm/dd'
+                });
+                $('#step-1-collapseOA-three').addClass('show');
+                $('#step-1-collapseOA-three').removeClass('collapsed');
+                $('#step-2-collapseOA-three').addClass('show');
+                $('#step-3-collapseOA-three').addClass('show');
+                $('#step-4-collapseOA-three').addClass('show');
+                $('#step-5-collapseOA-three').addClass('show');
+                $('#step-6-collapseOA-three').addClass('show');
+                $('#step-7-collapseOA-three').addClass('show');
+                $('#step-8-collapseOA-three').addClass('show');
+                $('#step-9-collapseOA-three').addClass('show');
+                $('#icon-1').removeClass('fa-plus-circle');
+                $('#icon-1').addClass('fa-minus-circle');
+                $('#icon-2').removeClass('fa-plus-circle');
+                $('#icon-2').addClass('fa-minus-circle');
+                $('#icon-3').removeClass('fa-plus-circle');
+                $('#icon-3').addClass('fa-minus-circle');
+                $('#icon-4').removeClass('fa-plus-circle');
+                $('#icon-4').addClass('fa-minus-circle');
+                $('#icon-5').removeClass('fa-plus-circle');
+                $('#icon-5').addClass('fa-minus-circle');
+                $('#icon-6').removeClass('fa-plus-circle');
+                $('#icon-6').addClass('fa-minus-circle');
+                $('#icon-7').removeClass('fa-plus-circle');
+                $('#icon-7').addClass('fa-minus-circle');
+                $('#icon-8').removeClass('fa-plus-circle');
+                $('#icon-8').addClass('fa-minus-circle');
+                $('#icon-9').removeClass('fa-plus-circle');
+                $('#icon-9').addClass('fa-minus-circle');
+            });
+
+            loadSavedDataOA();
+        });
+
+        $(".accordion-toggle").click(function () {
+            if ($(this).find("i").hasClass("fa-minus-circle")) {
+                $(this).find("i").removeClass("fa-minus-circle").addClass("fa-plus-circle");
+            } else {
+                $(this).find("i").removeClass("fa-plus-circle").addClass("fa-minus-circle");
+
+            }
+
+        });
+
+
+        var ShowHistoryState = function (event) {
+            $('#table-HistoryState').prop('hidden', false);
+            //Despeje de línea historial
+            var tableDLhistorial = $("#table-HistoryState").DataTable({
+                "ajax": {
+                    "url": "/ConditioningOrder/GetHistoryStateDetail/?Id=@Model.Id",
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "user" },
+                    { "data": "date", "render": function ( data, type, row ) {
+                        return getDate(new Date(data)) + ' ' + getDateTime(new Date(data))
+                    }},
+                    { "data": "state" },
+                ],
+                destroy: true,
+                pageLength: 20,
+                orderCellsTop: true,
+                fixedHeader: true,
+                bLengthChange: false,
+                bFilter: true,
+                bAutoWidth: false,
+                bPaginate: false,
+                searching: false,
+                dom: 'Bfrtip',
+                "bInfo": false,
+                buttons: [
+                    {
+                        extend: 'pdf',
+                        className: 'hide',
+                        charset: 'utf-8',
+                        bom: true
+                    }
+                ],
+                "language": {
+                    "search": '<i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                    "searchPlaceholder": '@searchPlaceholder',
+                    "emptyTable": "@emptyTable",
+                    "lengthMenu": "@lengthMenu",
+                    "info": "@info",
+                    "loadingRecords": "@loadingRecords",
+                    "processing": "@processing",
+                    "zeroRecords": "@zeroRecords",
+                    "infoEmpty": "@infoEmpty",
+                    "infoFiltered": "@infoFiltered",
+                },
+                "order": [],
+                "columnDefs": [{
+                    "targets": 'no-sort',
+                    "orderable": false,
+                }]
+
+            });
+
+        }
+
+        var HiddeStateHistory = function (event) {
+            $('#table-HistoryState').prop('hidden', true);
+        };
+
+        var ShowHistory = function (event) {
+            $('#table-HistoryNotes').prop('hidden', false);
+            //Despeje de línea historial
+            var tableDLhistorial = $("#table-HistoryNotes").DataTable({
+                "ajax": {
+                    "url": "/ConditioningOrder/GetHistoryDetail/?Id=" + @Model.ProductionOrderId,
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "note" },
+                    { "data": "source" },
+                    {
+                        "data": "date", "render": function (data, type, row) {
+                            return getDate(new Date(data)) + ' ' + getDateTime(new Date(data))
+                        }
+                    },
+                    { "data": "user" },
+                ],
+                destroy: true,
+                pageLength: 20,
+                orderCellsTop: true,
+                fixedHeader: true,
+                bLengthChange: false,
+                bFilter: true,
+                bAutoWidth: false,
+                bPaginate: false,
+                searching: false,
+                dom: 'Bfrtip',
+                "bInfo": false,
+                buttons: [
+                    {
+                        extend: 'pdf',
+                        className: 'hide',
+                        charset: 'utf-8',
+                        bom: true
+                    }
+                ],
+                "language": {
+                    "search": '<i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                    "searchPlaceholder": '@searchPlaceholder',
+                    "emptyTable": "@emptyTable",
+                    "lengthMenu": "@lengthMenu",
+                    "info": "@info",
+                    "loadingRecords": "@loadingRecords",
+                    "processing": "@processing",
+                    "zeroRecords": "@zeroRecords",
+                    "infoEmpty": "@infoEmpty",
+                    "infoFiltered": "@infoFiltered",
+                },
+                "order": [],
+                "columnDefs": [{
+                    "targets": 'no-sort',
+                    "orderable": false,
+                }]
+
+            });
+
+        };
+
+        var HiddeHistory = function (event) {
+            $('#table-HistoryNotes').prop('hidden', true);
+        };
+        function pipeFillingShowHistory(idOA, tourNumber, pipe, distributionBatch, tourIndex, pipeIndex) {
+            $('#table-HistoryChecklist-' + tourIndex + '-' + pipeIndex).prop('hidden', false);
+            //Despeje de línea historial
+            var tableDLhistorial = $('#table-HistoryChecklist-' + tourIndex + '-' + pipeIndex).DataTable({
+                    "ajax": {
+                        "url": "/ConditioningOrder/GetHistoryChecklist?tourNumber=" + tourNumber + "&idOA=" + idOA + "&distributionBatch=" + distributionBatch,
+                        "type": "GET",
+                        "datatype": "json"
+                    },
+                    "columns": [
+                        { "data": "createdBy" },
+                        { "data": "date", "render": function ( data, type, row ) {
+                            return getDate(new Date(data)) + ' ' + getDateTime(new Date(data))
+                        } },
+                        {
+                            "data": {
+                                id: "id", numOA: "numOA", tourNumber: "tourNumber",
+                                distributionBatch: "distributionBatch", file: "file", source: "source", checkListId: "checkListId"
+                            },
+                            "render": function (data, type, full) {
+                                 if (data.source === false) {
+                                    if (data.file === null) {
+                                        return `<i class='fas fa-exclamation-circle'></i>Sin archivo`;
+                                    } else {
+                                        return `<a href='${window.location.protocol}//${window.location.host}/@resource.GetString("PathCheckListFrontEnd")/${data.file}' target="popup"><i class='fas fa-file-download'></i>Descargar</a>`;
+                                    }
+                                } else {
+                                     console.log(data)
+                                   return `<a href='${window.location.protocol}//${window.location.host}/CheckListQuestions/QuestionsTwo?idOA=${data.numOA}&tournumber=${data.tourNumber}&distributionBatch=${data.distributionBatch}&checkListId=${data.id}' target="popup"> <i class='fas fa-file'></i>Consultar ${data.pipeNumber}</a>`;
+                                }
+                            }, "width": "30%"
+                        },
+                        { "data": "statusTwo" },
+                    ],
+                    columnDefs: [{
+                        targets: 1,
+                        render: $.fn.dataTable.render.moment('DD/MM/YYYY')
+                    }],
+                    destroy: true,
+                    pageLength: 20,
+                    orderCellsTop: true,
+                    fixedHeader: true,
+                    bLengthChange: false,
+                    bFilter: true,
+                    bAutoWidth: false,
+                    bPaginate: false,
+                    searching: false,
+                    dom: 'Bfrtip',
+                    "bInfo": false,
+                    buttons: [
+                        {
+                            extend: 'pdf',
+                            className: 'hide',
+                            charset: 'utf-8',
+                            bom: true
+                        }
+                    ],
+                    "language": {
+                        "search": '<i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                        "searchPlaceholder": '@searchPlaceholder',
+                        "emptyTable": "@emptyTable",
+                        "lengthMenu": "@lengthMenu",
+                        "info": "@info",
+                        "loadingRecords": "@loadingRecords",
+                        "processing": "@processing",
+                        "zeroRecords": "@zeroRecords",
+                        "infoEmpty": "@infoEmpty",
+                        "infoFiltered": "@infoFiltered",
+                    },
+                    "order": [],
+                    "columnDefs": [{
+                        "targets": 'no-sort',
+                        "orderable": false,
+                    }]
+
+                });
+        }
+
+    </script>
+}

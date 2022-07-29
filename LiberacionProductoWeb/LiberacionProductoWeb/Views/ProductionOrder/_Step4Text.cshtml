@@ -1,0 +1,49 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model LiberacionProductoWeb.Models.ProductionOrderViewModels.ProductionOrderViewModel;
+@inject IViewLocalizer Localizer
+
+<div class="panel-group" id="step-4-accordion">
+    <div class="panel panel-primary overflow-hidden">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                   data-parent="#step-4-accordion" href="#step-4-collapse-three" aria-expanded="true">
+                    <i id="icon-4" class="fa fa-plus-circle pull-right"></i>
+                    4. Monitoreo de los atributos críticos de calidad del proceso de producción
+                </a>
+            </h3>
+        </div>
+        <div id="step-4-collapse-three" class="@Model.ShowPanelSteps" style="">
+            <div class="panel-body">
+                <p>
+                    Los atributos críticos de calidad se monitorean directamente en el
+                    sistema computarizado de control de planta iFIX, durante la fabricación del lote de
+                    @(Model.ProductName) medicinal, verificando que los parámetros se
+                    encuentren dentro del rango especificado. En caso de incumplimiento, se
+                    notifica al Superintendente de planta y/o al Gerente regional de
+                    producción, se documenta el "Informe de desviación, CC/R-01-028 - 30" y
+                    se aplica lo establecido en el procedimiento "Control de desviaciones,
+                    CC/P-01-009-30".
+                </p>
+
+                <p>
+                    En la Tabla 7- Atributos críticos de calidad, se registra el resultado
+                    del monitoreo de los atributos críticos de calidad durante la fabricación del lote. Cuando alguno
+                    de los atributos críticos de calidad, está fuera de los rangos
+                    establecidos, se documentará el número de folio del "Reporte de producto
+                    no conformeO/R-02-011 - 10" correspondiente y se aplicará lo establecido
+                    en el procedimiento "Control de producto no conforme, OO/P-02-001 - 10".
+                </p>
+
+                <p>
+                    Los valores históricos promedio, máximo y mínimo del monitoreo de los
+                    atributos críticos de calidad de los lotes previos, se muestran en la
+                    Tabla 7- Atributos críticos de calidad como referencia para identificar
+                    los cambios en la variabilidad del proceso, a fin de poder corregirlos y
+                    llevarlos nuevamente a sus condiciones validadas de operación.
+                </p>
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,194 @@
+﻿<html lang="en">
+<head>
+    <title>Cancelacion rechazada</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" />
+    <meta name="viewport" content="width=600,initial-scale = 2.3,user-scalable=no">
+    <style type="text/css">
+
+        .ReadMsgBody {
+            width: 100%;
+            background-color: #ffffff;
+        }
+
+        .ExternalClass {
+            width: 100%;
+            background-color: #ffffff;
+        }
+
+        body {
+            width: 100%;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            font-family: 'Roboto', Arial, Helvetica, sans-serif;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        /* Remove ios blue links */
+
+        a[x-apple-data-detectors] {
+            color: inherit !important;
+            text-decoration: none !important;
+            font-size: inherit !important;
+            font-family: inherit !important;
+            font-weight: inherit !important;
+            line-height: inherit !important;
+        }
+
+        @media only screen and (max-width: 640px) {
+            body[yahoo] .deviceWidth {
+                width: 440px !important;
+                padding: 0;
+            }
+
+            body[yahoo] .center {
+                text-align: center !important;
+            }
+        }
+
+        @media only screen and (max-width: 479px) {
+            body[yahoo] .deviceWidth {
+                width: 280px !important;
+                padding: 0;
+            }
+
+            body[yahoo] .center {
+                text-align: center !important;
+            }
+        }
+    </style>
+</head>
+<body topmargin="0" leftmargin="0" yahoo="fix" marginheight="0" marginwidth="0">
+    <!-- hidden preheader text - Remember to change it! -->
+    <div style='color: rgb(254, 254, 254); line-height: 1px; overflow: hidden; font-family: "Roboto", Helvetica, Arial, sans-serif; font-size: 1px; display: none; max-height: 0px; max-width: 0px; opacity: 0; mso-hide: all;'> Material Style - Responsive Email Template </div>
+    <!-- Wrapper -->
+    <table width="100%" align="center" border="0" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td width="100%" valign="top" style="padding-top: 20px;" bgcolor="#ffffff">
+
+                    <!-- divider -->
+                    <!--Start Discount -->
+                    <table width="700" align="center" class="deviceWidth" border="0" cellspacing="0" cellpadding="0">
+                        <tbody>
+                            <tr>
+                                <td width="100%" bgcolor="#005591">
+                                    <!-- Left Box  -->
+                                    <table width="70%" align="center" class="deviceWidth" border="0" cellspacing="0" cellpadding="0">
+                                        <tbody>
+                                            <tr>
+                                                <td class="center">
+                                                    <table align="center" border="0" cellspacing="0" cellpadding="0">
+                                                        <tbody>
+															<tr>
+																<td width="100%">
+																	<div align="center">
+																		<a href="" style="display: block; width: 400px; border-style: none !important; border: 0 !important;margin-bottom:0px!important;"><img width="250" height="70" border="0" src="https://www.linde.mx/-/media/corporate/praxair-mexico/images/linde_plc_logo-spanish.png" alt="" /></a>
+																	</div>                                                    
+																</td>
+															</tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <br />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!--End Discount -->
+                    <!--Start Three Blocks-->
+                    <table width="700" align="center" class="deviceWidth" border="0" cellspacing="0" cellpadding="0">
+                        <tbody>
+                            <tr>
+                                <td width="100%" bgcolor="#FFFFFF">
+                                    <!-- Top  -->
+                                    <table width="70%" align="center" border="0" cellspacing="0" cellpadding="0">
+                                        <tbody>
+                                            <tr>
+                                                <td class="center" style='padding: 20px 50px 0px; text-align: center; color: rgb(38, 50, 56); line-height: 25px; font-family: "Roboto", Helvetica, Arial, sans-serif; font-size: 14px; font-weight: bold; vertical-align: middle;'>  Estimado Usuario: </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="50%" class="center" style='padding: 20px 10px; text-align: center; color: rgb(104, 112, 116); line-height: 25px; font-family: "Roboto", Helvetica, Arial, sans-serif; font-size: 14px; font-weight: bold; vertical-align: middle;'>
+                                                    <br />                                                    
+													Se le comunica que se rechazo la cancelación de la orden de acondicionamiento {CaseTag:paramLote} por los siguientes motivos:
+                                                    <br />
+													<br />
+													<span style="font-style:oblique!important;font-weight:bolder!important;">{CaseTag:paramObservaciones}</span>.
+													<br />
+													<br />
+                                                    <a href={CaseTag:paramPathLink}>aquí</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <!--End Top-->
+                                </td>
+                            </tr>
+                            <!--Start 3 Images Row 1 -->
+                            <tr></tr>
+                        </tbody>
+                        <table width="700" align="center" class="deviceWidth" border="0" cellspacing="0" cellpadding="0">
+                            <tbody>
+                                <tr>
+                                    <td width="100%" bgcolor="#cfd8dc">
+                                        <!-- Start Image 1-->
+                                        <table width="33%" align="left" class="deviceWidth" border="0" cellspacing="0" cellpadding="0">
+                                            <tbody></tbody>
+                                        </table>
+                                        <!--End Image 1-->
+                                        <div></div>
+                                        <div></div>
+                                        <div></div>
+                                        <div></div>
+                                        <div></div>
+
+                                        <!--End Three Blocks -->
+                                        <!--Start Weekly Prize-->
+                                        <table width="700" align="center" class="deviceWidth" border="0" cellspacing="0" cellpadding="0">
+                                            <tbody>
+                                                <tr>
+                                                    <td width="100%" class="center" bgcolor="#005591">
+                                                        <table align="center" border="0" cellspacing="0" cellpadding="0">
+                                                            <tbody></tbody>
+                                                        </table>
+                                                        <table align="center" border="0" cellspacing="0" cellpadding="0">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td class="center" style='padding: 20px 10px; text-align: center; color: rgb(255, 255, 255); line-height: 25px; font-family: "Roboto", Helvetica, Arial, sans-serif; font-size: 10px; font-weight: bold; vertical-align: middle;'> El usuario acepta y reconoce que el nombre y clave de acceso otorgados para el uso del portal Linde, es de uso personal e intransferible, por lo que su uso, y cualquier informacion ingresada, modificacion o manipulacion en el sitio por medio de su usuario seran su unica y exclusiva responsabilidad. </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <!--Weekly Prize-->
+                                        <!-- Footer -->
+                                        <table width="700" align="center" class="deviceWidth" border="0" cellspacing="0" cellpadding="0">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="center" style='padding: 20px 0px 0px; text-align: center; color: rgb(104, 112, 116); line-height: 25px; font-family: "Roboto", Helvetica, Arial, sans-serif; font-size: 12px; font-weight: bold; vertical-align: middle;' bgcolor="#ffffff">                                  </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+									</td>
+								</tr>
+                                        <!--End Footer-->
+                                        <!-- End Wrapper -->
+								</tbody>
+							</table>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</body>
+</html>

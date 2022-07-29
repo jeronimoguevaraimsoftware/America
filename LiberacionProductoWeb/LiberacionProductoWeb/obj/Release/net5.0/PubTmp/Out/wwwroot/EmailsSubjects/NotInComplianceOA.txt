@@ -1,0 +1,1 @@
+Lote de distribución {CaseTag:paramLote} en la Orden de acondicionamiento pendiente de firma de rechazo del producto.

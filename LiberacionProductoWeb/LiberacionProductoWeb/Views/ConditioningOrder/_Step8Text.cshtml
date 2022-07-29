@@ -1,0 +1,88 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model LiberacionProductoWeb.Models.ConditioningOrderViewModels.ConditioningOrderViewModel;
+@inject IViewLocalizer Localizer
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel-group" id="step-8-accordionOA">
+            <div class="panel panel-primary overflow-hidden">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                            data-parent="#step-8-accordionOA" href="#step-8-collapseOA-three" aria-expanded="true">
+                            <i id="icon-8" class="fa fa-plus-circle pull-right"></i>
+                            Rendimiento del proceso de acondicionamiento.
+                        </a>
+                    </h3>
+                </div>
+                <div id="step-8-collapseOA-three" class="@Model.ShowPanelSteps" style="">
+                    <div class="panel-body">
+                        <p>
+                            @*El técnico de producción o el llenador de pipas, reporta el nivel del
+            tanque
+            de almacenamiento, tomando el valor registrado en la Tabla 8 de la orden
+            de
+            producción.*@
+                        </p>
+                        @if (Model.Product != "CO2")
+                        {
+                            <p>
+                                El tamaño del lote de producción en toneladas, es determinado por la
+                                multiplicación del nivel del tanque reportado en porcentaje (%), el cual
+                                se
+                                observa en la pantalla del sistema computarizado iFix, por el factor
+                                de ingeniería que aplica al tanque de almacenaminento.
+                            </p>
+                        }
+                        else
+                        {
+                    <p>
+                        Las toneladas de producto en los tanques de almacenamiento de planta se calculan
+                        capturando el nivel del tanque (In H2O) en la hoja electrónica "Calculo de masa en
+                        tanques de Morelos 2019-05-05 1000 am" disponible en la computadora de cuarto de control;
+                        de acuerdo con lo establecido en el procedimiento "Manual de usuario de la hoja “Cálculo de
+                        masa en tanques de almacenamiento de producto de planta CO2 Morelos”, OO /P-02-017 – 806".
+                    </p>
+                        }
+
+
+                        <p>
+                            El producto contenido en el tanque de almacenamiento de la localidad, es
+                            llenado (acondicionamiento) en unidades de distribución dedicadas a un
+                            solo
+                            tipo de producto, las cuales se registran en la Tabla 5 - Control de
+                            llenado
+                            de pipas.
+                        </p>
+
+                        <p>
+                            En la Tabla 6 - Rendimiento del proceso de acondicionamiento, se reportan
+                            la
+                            cantidad de producto medicinal fabricado en el lote y, la cantidad de
+                            producto acondicionado en las unidades de distribución.
+                        </p>
+
+                        <p>
+                            El tamaño de los lotes de producto terminado varía en función de la
+                            demanda
+                            de producto en el mercado y, el inventario existente del producto en la
+                            instalación. En todos los casos existirá una diferencia del producto
+                            acondicionado vs el tamaño del lote de producción, debido a que el
+                            contenido
+                            del tanque de almacenamiento de producto en planta, se utiliza para
+                            suministrar producto medicinal y otros grados diferentes al medicinal a
+                            los
+                            clientes.
+                        </p>
+
+                        <p>
+                            El rendimiento no influye en el cumplimiento de especificaciones por ser
+                            un
+                            proceso cerrado y planta dedicada.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

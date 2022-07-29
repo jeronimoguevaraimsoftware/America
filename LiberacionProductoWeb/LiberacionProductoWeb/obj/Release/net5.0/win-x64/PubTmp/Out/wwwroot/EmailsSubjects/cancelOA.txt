@@ -1,0 +1,1 @@
+Orden de acondicionamiento {CaseTag:paramLote} pendiente de cancelar.

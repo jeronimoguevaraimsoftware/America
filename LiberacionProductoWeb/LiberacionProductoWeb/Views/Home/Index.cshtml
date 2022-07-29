@@ -1,0 +1,669 @@
+﻿@model LiberacionProductoWeb.Models.ConfigViewModels.ConfiguracionUsuarioVM;
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@using LiberacionProductoWeb.Helpers;
+@using System.Globalization;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IStringLocalizer<Resource> resource;
+@{ ViewData["Title"] = "Principal";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var selectPlant = resource.GetString("SelectPlant");
+    var selectProduct = resource.GetString("SelectProduct");
+    var selectTank = resource.GetString("SelectTank");
+    var selectState = resource.GetString("SelectState");
+    var startDate = resource.GetString("StartDate");
+    var endDate = resource.GetString("EndDate");
+    var plant = resource.GetString("Plant");
+    var tank = resource.GetString("Tank");
+    var product = resource.GetString("Product");
+    var state = resource.GetString("State");
+    var activitie = resource.GetString("Activitie");
+    var btnFind = resource.GetString("BtnFind");
+    var btnFilter = resource.GetString("BtnFilter");
+    var notInformation = resource.GetString("NoInformation");
+    var lengthMenu = resource.GetString("LengthMenu");
+    var searchPlaceholder = resource.GetString("SearchPlaceholder");
+    var info = resource.GetString("Info");
+    var emptyTable = resource.GetString("EmptyTable");
+    var paginatefirst = resource.GetString("Paginatefirst");
+    var paginatelast = resource.GetString("Paginatelast");
+    var pageNext = resource.GetString("PageNext");
+    var pagePreviuos = resource.GetString("PagePreviuos");
+    var loadingRecords = resource.GetString("LoadingRecords");
+    var processing = resource.GetString("Processing");
+    var zeroRecords = resource.GetString("ZeroRecords");
+    var infoEmpty = resource.GetString("InfoEmpty");
+    var infoFiltered = resource.GetString("InfoFiltered");
+    var validateStartDateEndDate = resource.GetString("ValidateStartDateEndDate");
+    var selectActivitie = resource.GetString("SelectActivitie");
+    DateTimeFormatInfo usDtfi = new CultureInfo("en-US", true).DateTimeFormat;
+    //var startdate = Convert.ToDateTime(Model.StartDate.ToString("yyyy/MM/dd"), usDtfi);
+    //var enddate = Convert.ToDateTime(Model.EndDate.ToString("yyyy/MM/dd"), usDtfi);
+} <!-- ============================================================== -->
+<!-- Navigation -->
+<div id="top-menu" class="top-menu">
+    <!-- begin sidebar scrollbar -->
+    <div class="container-fluid">
+        <!-- begin sidebar nav -->
+        <ul class="nav">
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                @* <li class="nav-header">Menú</li> *@
+                <li class="active">
+                    <a asp-controller="Home" asp-action="Index">
+                        @* <i class="fa fa-clipboard-list"></i> *@
+                        <span>Mis tareas pendientes</span>
+                    </a>
+                </li>
+                <li>
+                    @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_EXPEDIENTE_DE_LOTE))
+                    {
+                        <a asp-controller="QuerysFiles" asp-action="Index">
+                            @* <i class="fa fa-file-alt"></i> *@
+                            <span>Consulta de expediente de lote</span>
+
+                        </a>
+                    }
+                </li>
+                <li>
+                    @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTA_GENERAL))
+                    {
+                        <a asp-controller="QuerysGeneral" asp-action="Index">
+                            @* <i class="fa fa-search"></i> *@
+                            <span>Consulta general</span>
+                        </a>
+                    }
+                </li>
+                <li class="has-sub">
+                    <a href="javascript:;">
+                        @* <i class="fa fa-chart-line"></i> *@
+                        <span>Reportes</span>
+                    </a>
+                    <ul class="sub-menu">
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_RAP_TANQUES))
+                        {
+                            <li><a href="@Url.Action("Index", "RAPTanques")">RAP - Tanques</a></li>
+                        }
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_RAP_PIPAS))
+                        {
+                            <li><a href="@Url.Action("Index", "RAPPipas")">RAP - Pipas</a></li>
+                        }
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_REPORTE_AUDIT_TRAIL))
+                        {
+                            <li><a href="@Url.Action("Index", "ReportAuditTrail")">Reporte Audit Trail</a></li>
+                        }
+                    </ul>
+                </li>
+
+            }
+        </ul>
+        <!-- end sidebar nav -->
+    </div>
+    <!-- end sidebar scrollbar -->
+</div>
+
+<!-- Page wrapper  --> <!-- ============================================================== -->
+<div id="content" class="content">
+
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li class="breadcrumb-item"><a href="javascript:;">Inicio</a></li>
+        <li class="breadcrumb-item active">Mis Tareas</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Mis tareas pendientes</h1>
+    <!-- end page-header -->
+    <div class="break"></div>
+    <a href="@Url.Action("New", "ProductionOrder")" class="btn btn-white m-r-5">
+        <i class="fa fa-plus"></i> Crear
+        orden de
+        producción
+    </a>
+
+    <div class="section-container PantallaPrincipalContenedor section-with-top-border p-b-10">
+        <form autocomplete="off" id="formSearch">
+            <div class="col-lg-20">
+                <div class="input-group">
+                    <div class="col-lg-2 m-b-15">
+                        <label for="SelectedPlantsFilter" style="display: block;" class="mr-sm-2">@plant:</label>
+                        <div class="input-group">
+                            <select multiple id="SelectedPlantsFilter" name="SelectedPlantsFilter"
+                                    asp-for="SelectedPlantsFilter" class="selectpicker show-menu-arrow"
+                                    data-style="btn-inverse" data-live-search="true" title="Selecciona"
+                                    onchange="getProducts(this)"> </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 m-b-15">
+                        <label for="SelectedProductsFilter" style="display: block;" class="mr-sm-2">@product:</label>
+                        <div class="input-group">
+                            <select multiple id="SelectedProductsFilter" name="SelectedProductsFilter"
+                                    asp-for="SelectedProductsFilter" class="selectpicker show-menu-arrow"
+                                    data-style="btn-inverse" data-live-search="true" title="Selecciona"
+                                    onchange="getTanks(this)">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 m-b-15">
+                        <label for="SelectedTanksFilter" style="display: block;" class="mr-sm-2">@tank:</label>
+                        <div class="input-group">
+                            <select multiple id="SelectedTanksFilter" name="SelectedTanksFilter" asp-for="SelectedTanksFilter"
+                                    class="selectpicker show-menu-arrow" data-style="btn-inverse"
+                                    data-live-search="true" title="Selecciona">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+
+            <div class="col-lg-12" style="padding-left: 0px !important;">
+                <div class="input-group">
+                    <div class="input-group">
+                        <div class="col-lg-2 m-b-15">
+                            <label for="FechaInicial" class="ml-md-2 mr-sm-2">@startDate: </label>
+                            <input id="StartDate" name="StartDate" onchange="checkDate()"
+                                   value="@Model.StartDate" class="form-control col-12" placeholder="Selecciona" />
+                            <label id="StartDate-error" class="error" for="StartDate"></label>
+                        </div>
+                        <div class="col-lg-2 m-b-15">
+                            <label for="FechaFinal" class="ml-md-2 mr-sm-2">@endDate:</label>
+                            <input id="EndDate" name="EndDate" onchange="checkDate()" value="@Model.EndDate"
+                                   class="form-control col-12" placeholder="Selecciona" />
+                            <label id="EndDate-error" class="error" for="EndDate"></label>
+                        </div>
+
+                        <div class="col-lg-2 m-b-15">
+                            <label for="Actividad" class="ml-sm-2 mr-sm-2">@activitie: </label>
+                            <div></div>
+                            <select multiple asp-for="SelectedActivitiesFilter" asp-items="Model.ListActivities"
+                                    class="selectpicker show-menu-arrow combobox" data-style="btn-inverse" data-live-search="true"
+                                    title="@selectActivitie">
+                            </select>
+                        </div>
+
+                        <div class="col-lg-2 m-b-15">
+                            <label for="State" class="ml-sm-2 mr-sm-2">@state:</label>
+                            <div></div>
+                            <select multiple asp-for="SelectedStatesFilter" asp-items="Model.ListStates"
+                                    class="selectpicker show-menu-arrow combobox" data-style="btn-inverse" data-live-search="true"
+                                    title="@selectState">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pull-right" style="margin-top:-10px;">
+                <button type="button" class="btn btn-inverse" id="BtnFind" onclick="Search()">Buscar</button>
+                <a href="@Url.Action("Index", "Home" )" class="btn btn-white m-r-5">
+                    <i class="fa fa-eraser"></i>
+                    @btnFilter
+                </a>
+            </div>
+        </form>
+        <div class="text-center">
+            <div class="text-center">
+                @Html.ValidationMessage("Error", new { @class = "text-danger" })
+                <!-- Mensaje de error -->
+                <div class="col-md-12" id="message"></div>
+            </div>
+        </div>
+    </div>
+    <div class="section-container section-with-top-border p-b-5">
+        <div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="btn-group pull-left">
+                        <a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel">
+                            <i class="fa fa-file-excel"></i> Exportar a excel
+                        </a>
+                    </div>
+                    <div class="btn-group pull-right">
+                        <a href="javascript:;" class="btn btn-white m-r-5" id="ClearFilters">
+                            <i class="fa fa-eraser"></i>Limpiar filtros
+                        </a>
+                    </div>
+                    <h4 class="panel-title">
+                        &nbsp;
+                    </h4>
+                </div>
+
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table id="data-table" class="table table-striped table-bordered dataTable display">
+                            <thead>
+                                <tr>
+                                    <th scope="col" hidden="hidden">Id</th>
+                                    <th scope="col">Fecha de creación</th>
+                                    <th scope="col">Lote de producción</th>
+                                    <th scope="col">Planta</th>
+                                    <th scope="col">Producto</th>
+                                    <th scope="col">Tanque</th>
+                                    <th scope="col">Actividad a completar</th>
+                                    <th scope="col">Estado</th>
+                                    <th scope="col">Motivo cancelación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.ListpenddingTasks != null)
+                                {
+                                    @foreach (var entry in Model.ListpenddingTasks)
+                                    {
+                                        <tr>
+                                            <td hidden="hidden">
+                                                @entry.Id
+                                            </td>
+                                            <td>
+                                                @entry.FechaDeCreacion.ToString("yyyy/MM/dd")
+                                            </td>
+                                            <td>
+                                                <a href="/ProductionOrder/New?Id=@entry.ProductionOrderId">
+                                                    @entry.NumeroLoteProduccion
+                                                </a>
+                                            </td>
+
+                                            <td>
+                                                @entry.Planta
+                                            </td>
+                                            <td>
+                                                @entry.Producto
+                                            </td>
+                                            <td>
+                                                @entry.Tanque
+                                            </td>
+                                            <td>
+                                                @entry.ActividadACompletar
+                                            </td>
+                                            <td>
+                                                @if (entry.Estado.Contains("OA"))
+                                                {
+                                                    <a href="/ConditioningOrder/New?IdOP=@entry.ProductionOrderId">@entry.Estado</a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="/ProductionOrder/New?Id=@entry.ProductionOrderId">@entry.Estado</a>
+                                                }
+                                            </td>
+                                            <td>
+                                                @entry.MotivoCancelacion
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+
+    <link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+    <link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/FixedHeader/css/fixedHeader.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+    <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+
+
+
+
+}
+
+@section scripts {
+
+    <environment names="Development,Staging,Production">
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+        <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+        <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+        <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+        <script src="~/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.html5.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.print.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+        <script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+        <script src="~/js/demo.min.js"></script>
+        <script src="~/js/apps.min.js"></script>
+        <script src="~/js/catalogs.js"></script>
+        <script src="~/js/linde.js"></script>
+        <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    </environment>
+
+    <script>
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const params = Object.fromEntries(urlSearchParams.entries());
+
+    $(function () {
+
+        $("#StartDate").datepicker({
+            dateFormat: 'yy/mm/dd',
+            changeYear: true,
+            changeMonth: true,
+        });
+
+        $("#EndDate").datepicker({
+            dateFormat: 'yy/mm/dd',
+            changeMonth: true,
+            changeYear: true,
+        });
+        var dateStart = $("#StartDate").val()
+        if ($("#StartDate").val() != "") {
+            dateStart = dateStart.replace(" 0:00:00", "");
+            const myArr = dateStart.split("/");
+            $("#StartDate").val(myArr[2] + "/" + myArr[1] + "/" + myArr[0]);
+        }
+        var dateEnd = $("#EndDate").val()
+        if ($("#EndDate").val() != "") {
+            dateEnd = dateEnd.replace(" 0:00:00", "");
+            const myArr = dateEnd.split("/");
+            $("#EndDate").val(myArr[2] + "/" + myArr[1] + "/" + myArr[0]);
+        }
+
+        $('.selectpicker').selectpicker();
+
+        getPlans();
+
+        if (!isNullOrEmpty(params['SelectedStatesFilter'])) {
+            $('#SelectedStatesFilter').val(params['SelectedStatesFilter'].split(','))
+            $('#SelectedStatesFilter').selectpicker('refresh');
+        }
+
+        if (!isNullOrEmpty(params['SelectedActivitiesFilter'])) {
+            $('#SelectedActivitiesFilter').val(params['SelectedActivitiesFilter'].split(','))
+            $('#SelectedActivitiesFilter').selectpicker('refresh');
+        }
+    });
+
+    var getPlans = function () {
+        $.ajax({
+            type: "GET",
+            url: "/Home/GetPlants",
+            success: function (response) {
+                $("#SelectedPlantsFilter").empty()
+                $("#SelectedProductsFilter").empty()
+                $("#SelectedTanksFilter").empty()
+
+                $("#SelectedProductsFilter").prop("disabled", true)
+                $("#SelectedTanksFilter").prop("disabled", true)
+
+                response.data.forEach(function (item) {
+                    $("#SelectedPlantsFilter").append($('<option>', {
+                        value: item.value,
+                        text: item.text
+                    }))
+                });
+
+                $('#SelectedPlantsFilter').selectpicker('refresh');
+
+                if (!isNullOrEmpty(params['SelectedPlantsFilter'])) {
+                    $('#SelectedPlantsFilter').val(params['SelectedPlantsFilter'].split(','))
+                    getProducts("#SelectedPlantsFilter")
+                    $('#SelectedPlantsFilter').selectpicker('refresh');
+                }
+            }
+        });
+    }
+
+    var getProducts = function (element) {
+        const plantId = $(element).val()
+
+        $.ajax({
+            type: "GET",
+            url: "/Home/GetProduts?plantId=" + plantId,
+            success: function (response) {
+                $("#SelectedProductsFilter").empty()
+                $("#SelectedTanksFilter").empty()
+
+                $("#SelectedProductsFilter").prop("disabled", false)
+                $("#SelectedTanksFilter").prop("disabled", true)
+
+                response.data.forEach(function (item) {
+                    $("#SelectedProductsFilter").append($('<option>', {
+                        value: item.value,
+                        text: item.text
+                    }))
+                });
+
+                $('#SelectedProductsFilter').selectpicker('refresh');
+
+                if (!isNullOrEmpty(params['SelectedProductsFilter'])) {
+                    $('#SelectedProductsFilter').val(params['SelectedProductsFilter'].split(','))
+                    getTanks("#SelectedProductsFilter")
+                    $('#SelectedProductsFilter').selectpicker('refresh');
+                }
+            }
+        });
+    }
+
+    var getTanks = function (element) {
+        const plantId = $("#SelectedPlantsFilter").val()
+        const productId = $(element).val()
+
+        $.ajax({
+            type: "GET",
+            url: "/Home/GetTanks?plantId=" + plantId + "&productId=" + productId,
+            success: function (response) {
+                $("#SelectedTanksFilter").empty()
+
+                $("#SelectedTanksFilter").prop("disabled", false)
+
+                response.data.forEach(function (item) {
+                    $("#SelectedTanksFilter").append($('<option>', {
+                        value: item.value,
+                        text: item.text
+                    }))
+                });
+
+                $('#SelectedTanksFilter').selectpicker('refresh');
+
+                if (!isNullOrEmpty(params['SelectedTanksFilter'])) {
+                    $('#SelectedTanksFilter').val(params['SelectedTanksFilter'].split(','))
+                    $('#SelectedTanksFilter').selectpicker('refresh');
+                }
+            }
+        });
+    }
+
+    function checkDate() {
+
+        var startdateCheck = $("#StartDate").datepicker("getDate");
+        var enddateCheck = $("#EndDate").datepicker("getDate");
+        $("#formSearch").valid();
+        if (startdateCheck != null && enddateCheck != null) {
+            if (enddateCheck < startdateCheck) {
+                $('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>La fecha final no debe ser menor a la fecha inicial </div>');
+                $("#BtnFind").attr('disabled', true);
+            }
+            else {
+                $("#BtnFind").attr('disabled', false);
+                $('#message').empty();
+            }
+        }
+    }
+
+    $(function () {
+
+        if ('@Model.MensajeError'.length > 1) {
+            $('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeError </div>');
+        }
+    });
+
+    $(function () {
+
+        if ('@Model.MensajeInfo'.length > 1) {
+            $('#message').append('<div class="alert alert-success"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeInfo </div>');
+        }
+    });
+
+
+
+    $(document).ready(function () {
+
+        App.init();
+        Demo.init();
+        configValidations();
+        $('ul li a').click(function () {
+            $('li a').removeClass("active");
+            $(this).addClass("active");
+        });
+
+        $('#data-table thead tr').clone(true).appendTo('#data-table thead');
+        $('#data-table thead tr:eq(1) th').each(function (i) {
+
+            if (i === 0)
+                return;
+
+            var title = $(this).text();
+            $(this).html('<input type="text" placeholder="Buscar" />');
+
+            $('input', this).on('keyup change', function () {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw();
+                }
+            });
+        });
+
+
+        var table = $("#data-table").DataTable({
+            pageLength: 20,
+            orderCellsTop: true,
+            fixedHeader: true,
+            bLengthChange: false,
+            bFilter: true,
+            bAutoWidth: false,
+            searching: true,
+            "bSort": true,
+            sDom: 'lrtip',
+            "bInfo": false,
+            buttons: [
+                {
+                    extend: 'csv',
+                    charset: 'utf-8',
+                    bom: true,
+                    title: "Mis tareas pendientes",
+                    exportOptions:
+                    {
+                        columns: function (i, d, n) {
+                            return (n.textContent === "Id" && $(n).is(":hidden")) ? false : true;
+                        }
+                    }
+                }
+            ],
+            "language": {
+                "search": '<a href="@Url.Action("Index", "home" )" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> @btnFilter</a> <br><div><i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                "searchPlaceholder": '@searchPlaceholder',
+                "emptyTable": "@emptyTable",
+                "lengthMenu": "@lengthMenu",
+                "info": "@info",
+                "paginate": {
+                    "first": "@paginatefirst",
+                    "last": "@paginatelast",
+                    "next": "@pageNext",
+                    "previous": "@pagePreviuos"
+                },
+                "loadingRecords": "@loadingRecords",
+                "processing": "@processing",
+                "zeroRecords": "@zeroRecords",
+                "infoEmpty": "@infoEmpty",
+                "infoFiltered": "@infoFiltered",
+            },
+            "order": [],
+            "columnDefs": [{
+                "targets": 'no-sort',
+                "orderable": false
+            }]
+        });
+
+
+        $("#ExporttoExcel").on("click", function () {
+            table.button('.buttons-csv').trigger();
+        });
+        $('.selectpicker').selectpicker();
+    });
+
+    $("#ClearFilters").on("click", function () {
+        $('#data-table thead tr:eq(1) th').each(function (i) {
+            if (i === 0)
+                return;
+            $('input', this).val("").change();
+        });
+    });
+
+    var Search = function () {
+        const plants = $("#SelectedPlantsFilter").val()
+        const products = $("#SelectedProductsFilter").val()
+        const tanks = $("#SelectedTanksFilter").val()
+        const start = $("#StartDate").val()
+        const end = $("#EndDate").val()
+        const states = $("#SelectedStatesFilter").val()
+        const activities = $("#SelectedActivitiesFilter").val()
+        const valid = $("#formSearch").valid();
+        if (!valid) {
+            $.gritter.add({
+                title: "Error!",
+                text: "Es necesario ingresar Fecha Inicial y Final.",
+                class_name: "gritter-light"
+            });
+            return;
+        }
+
+        var url = '@Url.Action("Index", "Home" )';
+        window.location.href = `${url}?SelectedPlantsFilter=${plants}&SelectedProductsFilter=${products}&SelectedTanksFilter=${tanks}&StartDate=${start}&EndDate=${end}&SelectedStatesFilter=${states}&SelectedActivitiesFilter=${activities}`;
+    };
+    function configValidations() {
+        $("#formSearch").validate({
+            rules: {
+                "StartDate": {
+                    required: function (element) {
+                        return !!$("#EndDate").val();
+                    }
+                },
+                "EndDate": {
+                    required: function (element) {
+                        return !!$("#StartDate").val();
+                    }
+                },
+            },
+            messages: {
+                "StartDate": {
+                    required: "Es requerido."
+                },
+                "EndDate": {
+                    required: "Es requerido."
+                },
+            },
+            highlight: function (element, errorClass) {
+                // Override the default behavior here
+            }
+        });
+    }
+    </script>
+}
+
+<style>
+    .error {
+        position: unset !important;
+        margin-left: unset !important;
+        width: auto !important;
+        color: red;
+        background-color: pink;
+    }
+</style>

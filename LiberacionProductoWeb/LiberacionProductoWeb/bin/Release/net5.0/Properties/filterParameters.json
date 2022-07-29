@@ -1,0 +1,25 @@
+[
+  {
+    "ProductKey": "OX",
+    "Variables": [
+      "Olor"
+    ]
+  },
+  {
+    "ProductKey": "CD",
+    "Variables": [
+      "Acetaldehido",
+      "Óxido de Etileno",
+      "Olor",
+      "Sabor",
+      "Monóxido de Carbono",
+      "Residuos No Volatiles",
+      "Hidrocarburos Totales - HCT",
+      "Hidrocarburos Aromáticos (Benceno)",
+      "Cloruro de Vinilo",
+      "Azúfre total",
+      "Apariencia",
+      "Amoniaco (ppm)"
+    ]
+  }
+]

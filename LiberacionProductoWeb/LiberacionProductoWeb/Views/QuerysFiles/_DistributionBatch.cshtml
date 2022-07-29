@@ -1,0 +1,136 @@
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@model List<LiberacionProductoWeb.Models.Principal.DetailDistributionBatch>
+@inject IStringLocalizer<Resource> resource;
+<div id="distribution-batch-container" class="row">
+    <h1 class="page-header">Información de los Lotes de distribución</h1>
+    <div class="panel panel-primary" style="width: 100%;">
+        <div class="panel-heading">
+            </div>
+        <div class="panel-body">
+            @if (Model == null || Model.Count == 0)
+            {
+                <p>NA</p>
+            }
+            else
+            {
+                <a href="/QuerysFiles/ExportDistribuitionBatchClients?Id=@Model.Select(x => x.ProductionOrderId).FirstOrDefault()" class="btn btn-white m-r-5" type="button"
+                   style="background-color: transparent;">
+                    <i class="fa fa-file-pdf" style="background-color: transparent;"></i>Exportar a PDF
+                </a>
+                <ul class="nav nav-tabs">
+
+                    @{
+                        int index = 0;
+                    }
+                    @foreach (var item in Model)
+                    {
+                        <li>
+                            <a data-toggle="tab" id="distributionBatch-tab-@index" href="#distributionBatch-tabs-@index"
+                               style="color: #007ab9;">
+                                @item.DistributionBatch
+                            </a>
+                        </li>
+                        index++;
+                    }
+                </ul>
+
+                <div class="tab-content">
+                    @{
+                        index = 0;
+                    }
+                    @foreach (var item in Model)
+                    {
+                        <div class="tab-pane fade" id="distributionBatch-tabs-@index">
+                            <table id="tableDB" class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Tour number</th>
+                                        <th scope="col">No. de orden</th>
+                                        <th scope="col">Pipa</th>
+                                        <th scope="col">Check list</th>
+                                        <th scope="col">Análisis inicial</th>
+                                        <th scope="col">Cromatograma inicial</th>
+                                        <th scope="col">Análisis final</th>
+                                        <th scope="col">Cromatograma final</th>
+                                        <th scope="col">No. de tanque de cliente</th>
+                                        <th scope="col">Nombre del cliente</th>
+                                        <th scope="col">Certificado de análisis COC-4</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var itemDetail in item.Items)
+                                    {
+                                        <tr>
+                                            <td>@itemDetail.TourNumber</td>
+                                            <td>@itemDetail.OrderNumber</td>
+                                            <td>@itemDetail.PipeNumber</td>
+
+                                            <td>
+                                                @if (@itemDetail.ChecklistStatus != resource.GetString("Pendding").Value)
+                                                {
+                                                    <a href="/CheckListQuestions/QuestionsTwo?idOA=@item.ConditioningOrderId&tournumber=@itemDetail.TourNumber&distributionBatch=@item.DistributionBatch&checkListId=@itemDetail.CheckListId">@itemDetail.ChecklistStatus</a>
+                                                }
+                                                else
+                                                {
+                                                    @itemDetail.ChecklistStatus
+                                                }
+                                            </td>
+                                            <td>@itemDetail.InitialAnalysis</td>
+                                            <td>
+                                                @if (string.IsNullOrEmpty(@itemDetail.InitialChromatogram) && item.ProductId == "NI")
+                                                {
+                                                    <span>Archivo no disponible</span>
+                                                }
+                                                else if (string.IsNullOrEmpty(@itemDetail.InitialChromatogram))
+                                                {
+                                                    <span>NA</span>
+                                                }
+                                                else
+                                                {
+                                                    <a href="/QuerysFiles/DownloadFileOA?Id=@item.ConditioningOrderId&Analisis=Initial" target="_blank">Ver archivo</a>
+                                                }
+                                            </td>
+                                            <td>@itemDetail.FinalAnalysis</td>
+                                            <td>
+                                                @if (string.IsNullOrEmpty(@itemDetail.FinalChromatogram) && item.ProductId == "NI")
+                                                {
+                                                    <span>Archivo no disponible</span>
+                                                }
+                                                else if (string.IsNullOrEmpty(@itemDetail.FinalChromatogram))
+                                                {
+                                                    <span>NA</span>
+                                                }
+                                                else
+                                                {
+                                                    <a href="/QuerysFiles/DownloadFileOA?Id=@item.ConditioningOrderId&Analisis=Final" target="_blank">Ver archivo</a>
+                                                }
+
+                                            </td>
+                                            <td>@itemDetail.CustomerTank</td>
+                                            <td>@itemDetail.CustomerName</td>
+
+                                            <td>
+                                                @if (itemDetail.AnalysisReport != resource.GetString("Pendding").Value && itemDetail.ReviewedDate.HasValue)
+                                                {
+                                                    <a href="/ConditioningOrder/ExportCertificateToPDF?IdOP=@item.ProductionOrderId&Id=@item.ConditioningOrderId&tourNumber=@itemDetail.TourNumber&pipeNumber=@itemDetail.PipeNumber&tank=@itemDetail.CustomerTank&distributionBatch=@itemDetail.DistributionBatch">
+                                                        @(itemDetail.AnalysisReport + itemDetail.ReviewedDate.Value.ToString("yy"))
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    @itemDetail.AnalysisReport
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        index++;
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

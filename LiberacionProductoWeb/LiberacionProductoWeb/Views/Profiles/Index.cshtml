@@ -1,0 +1,516 @@
+﻿@using  LiberacionProductoWeb.Helpers;
+@model LiberacionProductoWeb.Models.ConfigViewModels.PerfilesViewModel;
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@using System.Globalization;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IStringLocalizer<Resource> resource;
+@{ ViewData["Title"] = "Perfiles";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var btnFind = resource.GetString("BtnFind");
+    var btnFilter = resource.GetString("BtnFilter");
+    var notInformation = resource.GetString("NoInformation");
+    var lengthMenu = resource.GetString("LengthMenu");
+    var searchPlaceholder = resource.GetString("SearchPlaceholder");
+    var info = resource.GetString("Info");
+    var emptyTable = resource.GetString("EmptyTable");
+    var paginatefirst = resource.GetString("Paginatefirst");
+    var paginatelast = resource.GetString("Paginatelast");
+    var pageNext = resource.GetString("PageNext");
+    var pagePreviuos = resource.GetString("PagePreviuos");
+    var loadingRecords = resource.GetString("LoadingRecords");
+    var processing = resource.GetString("Processing");
+    var zeroRecords = resource.GetString("ZeroRecords");
+    var infoEmpty = resource.GetString("InfoEmpty");
+    var infoFiltered = resource.GetString("InfoFiltered");
+}
+
+@await Html.PartialAsync("~/Views/Shared/_Navigation.cshtml")
+
+<!-- ============================================================== -->
+<!-- Page wrapper  -->
+<!-- ============================================================== -->
+<div id="content" class="content">
+
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li class="breadcrumb-item"><a href="javascript:;">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="javascript:;">Catálogos</a></li>
+        <li class="breadcrumb-item active">Roles</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Catálogo de roles</h1>
+    <!-- end page-header -->
+    <div class="section-container section-with-top-border p-b-10">
+
+        <div class="row">
+
+            <div class="col-lg-20">
+                <form>
+                    <div class="row">
+                        <div class="col-lg-4 m-b-15">
+                            <div class="m-b-4"><b>Rol: </b></div>
+                            <div class="input-group">
+                                <select multiple asp-for="SelectedRoleFilter" asp-items="Model.RoleFilterControl" class="selectpicker show-menu-arrow" data-style="btn-inverse" data-live-search="true" title="Selecciona"> </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 m-b-15">
+                            <div class="m-b-5"><b>Fucionalidad: </b></div>
+
+                            <select multiple asp-for="SelectedFunctionsFilter" asp-items="Model.FunctionsFilterControl" class="selectpicker show-menu-arrow combobox" data-style="btn-inverse" data-live-search="true" title="Selecciona">
+                            </select>
+                        </div>
+                        <div class="col-lg-4 m-b-15">
+                            <div class="m-b-5"> &nbsp; </div>
+                            <div class="input-group">
+
+                                <button type="submit" class="btn btn-inverse">Buscar</button>
+                                <a href="@Url.Action("ClearFilters", "Profiles")" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> Limpiar filtros</a>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                </form>
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <div class="section-container section-with-top-border p-b-10">
+
+        <div class="row">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+
+                    <div class="btn-group pull-left">
+                        <a href="javascript:;" class="waves-effect waves-light btn btn-white m-r-5" id="add-profile"><i class="fa fa-plus"></i> Agregar rol</a>
+                        <a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel"><i class="fa fa-file-excel"></i> Exportar a excel</a>
+
+                    </div>
+
+
+                    <h4 class="panel-title">
+                        &nbsp;
+                    </h4>
+                </div>
+
+                <!-- Mensaje de error -->
+                <div class="col-md-12" id="message"></div>
+                <div class="panel-body">
+
+                    <div>
+                        <table id="data-table" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th rowspan="3" class="no-sort">Funcionalidad</th>
+                                    <th colspan="@Model.RoleList.Count">Roles</th>
+
+                                </tr>
+
+                                <tr>
+                                    @foreach (var role in Model.RoleList)
+                                    {
+                                        <th>
+                                            @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.ELIMINAR_ROL_DEL_CATALOGO_DE_ROLES))
+                                            {
+                                                <a href="javascript:void(0)" class="delete-profile btn btn-default btn-xs" data-id="@role.Id" data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash-alt"></i></a>
+                                            }
+                                            @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.EDITAR_CATALOGO_DE_ROLES))
+                                            {
+                                                <a href="javascript:void(0)" class="edit-profile btn btn-default btn-xs" data-id="@role.Id" data-toggle="tooltip" title="Editar"><i class="fa fa-edit"></i></a>
+                                            }
+                                        </th>
+                                    }
+                                </tr>
+                                <tr>
+                                    @foreach (var role in Model.RoleList)
+                                    {
+                                        <th class="no-sort">
+
+                                            @role.Name
+                                        </th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var s in Model.Sections)
+                                {
+                                    foreach (var p in s.Permissions)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @p.Text
+                                            </td>
+                                            @foreach (var role in Model.RoleList)
+                                            {
+                                                <td>
+                                                    @{ var code = role.Id + "," + p.Key;
+                                                        if (role.ListaPermisos != null && role.ListaPermisos.Contains(p.Key))
+                                                        {
+                                                            @:<input id="@code" type="checkbox" data-render="switchery" onchange="dissableOnChange(this, '@code');" checked data-theme="primary" data-size="xs" data-height="50" @(User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.EDITAR_CATALOGO_DE_ROLES) ? null : "disabled") />
+                                                        }
+                                                        else
+                                                        {
+                                                            @:<input id="@code" type="checkbox" data-render="switchery" onchange="dissableOnChange(this, '@code');" data-theme="primary" data-size="xs" data-height="50" @(User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.EDITAR_CATALOGO_DE_ROLES) ? null : "disabled") />
+                                                        }
+                                                    }
+
+                                                </td>
+                                            }
+
+                                        </tr>
+                                    }
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="addNewProfile" tabindex="-1" role="dialog" aria-labelledby="addUserModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <form method="post" asp-controller="Profiles" id="form" asp-action="Index" class="form-horizontal">
+
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            <div class="row">
+                                <div class="pull-right">
+                                    <button class="btn btn-danger" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Cancelar</button>
+                                    <button type="submit" class="btn btn-info add-prof">Agregar perfil</button>
+                                    <button class="btn btn-success edit-prof">Guardar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-body">
+                            <input type="hidden" asp-for="Id" id="Id">
+                            <div class="form-group form-group-lg m-b-10">
+                                <label class="col-lg-3 col-form-label">Nombre perfil</label>
+                                <div class="col-lg-7">
+                                    <input type="text" asp-for="Name" class="form-control" id="NombrePerfil" placeholder="Perfil">
+                                    <span class="validation-text"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+@section Styles {
+
+    <link href="~/plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+    <link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+
+    <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+
+
+}
+
+@section scripts {
+
+    <environment names="Development,Staging,Production">
+
+        <script src="~/plugins/jquery.confirm/jquery.confirm.min.js"></script>
+        <script src="~/plugins/switchery/switchery.min.js"></script>
+        <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+        <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+        <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+        <script src="~/js/page-form-slider-switcher.demo.min.js"></script>
+        <script src="~/js/demo.min.js"></script>
+        <script src="~/js/apps.min.js"></script>
+
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.html5.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.print.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+
+        <script src="~/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+    </environment>
+
+
+    <script>
+
+                $('.delete-profile').on('click', function (event) {
+
+                    $('#Id').val($(this).data("id"));
+                });
+
+
+
+                $(document).ready(function () {
+
+
+
+
+                    App.init();
+                    Demo.init();
+                    PageDemo.init();
+
+
+
+                    var table = $("#data-table").DataTable(
+                        {
+                            lengthMenu: [
+                                [10, 25, 50, 75, -1],
+                                ['10 registros', '25 registros', '50 registros', '75 registros' ,'Mostrar todos']
+                            ],
+                            pageLength: 20,
+                            orderCellsTop: false,
+                            fixedHeader: true,
+                           /* bLengthChange: false,*/
+                            bFilter: false,
+                            bAutoWidth: false,
+                            searching: false,
+                            sDom: 'lrtip',
+                            "bInfo": false,
+
+                            buttons: [
+                                {
+                                    extend: 'csv',
+
+                                    exportOptions: {
+                                        columns: ':visible:not(.not-exported)',
+                                        rows: ':visible',
+                                        format: {
+                                            body: function (data, row, column, node) {
+                                                if (data.indexOf('data-switchery=') !== -1){
+
+                                                    if (data.indexOf('checked=') !== -1) {
+                                                        data = "asignado";
+                                                    }
+                                                    else {
+                                                        data = "sin asignar";
+                                                    }
+
+                                                }
+                                                return data;
+                                            }
+                                        }
+                                    },
+                                    charset: 'utf-8',
+                                    bom: true
+                                }
+                            ],
+                            "dom": 'rtp',
+                                "language": {
+                                "search": '<a href="@Url.Action("Index", "home" )" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> @btnFilter</a> <br><div><i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                                "searchPlaceholder": '@searchPlaceholder',
+                                "emptyTable": "@emptyTable",
+                                "lengthMenu": "@lengthMenu",
+                                "info": "@info",
+                                "paginate": {
+                                    "first": "@paginatefirst",
+                                    "last": "@paginatelast",
+                                    "next": "@pageNext",
+                                    "previous": "@pagePreviuos"
+                                },
+                                "loadingRecords": "@loadingRecords",
+                                "processing": "@processing",
+                                "zeroRecords": "@zeroRecords",
+                                "infoEmpty": "@infoEmpty",
+                                "infoFiltered": "@infoFiltered",
+                            },
+                            "order": [],
+                            "columnDefs": [{
+                                "targets": 'no-sort',
+                                "orderable": false
+                            }]
+                        });
+
+                    $("#ExporttoExcel").on("click", function () {
+                        table.button('.buttons-csv').trigger();
+                    });
+
+
+                    function renderColumn(value, column, row, iDataIndex) {
+
+                        alert(value);
+                        if (column != sortColumn && $(value).find('input.onoffswitch-checkbox').length > 0) {
+                            return $(value).find('input.onoffswitch-checkbox').prop('checked');
+                        }
+                        return value;
+                    }
+
+                    $('.selectpicker').selectpicker();
+
+                    $(".delete-profile").confirm(
+                        {
+
+                            text: "¿Esta seguro que desea eliminar el perfil seleccionado?",
+
+                            confirm: function (button) {
+                             $.ajax({
+                                    type: "GET",
+                                    url: "/Profiles/DeleteProfile/"  + $('#Id').val(),
+                                    success: function (response) {
+                                     if (response.result === "Fail") {
+                                            $.gritter.add({
+                                                title: "",
+                                                text: response.message,
+                                                class_name: "gritter-light"
+                                            })
+                                        } else {
+                                            window.location.href = '@Url.Action("Index","Profiles")';
+                                        }
+                                    },
+                                })
+                                $('#Id').val("");
+
+                            },
+                            cancel: function (button) {
+                                $('#Id').val("");
+                            },
+                            confirmButton: "Sí",
+                            cancelButton: "No",
+                            post: true,
+                            confirmButtonClass: "btn-danger",
+                            cancelButtonClass: "btn-default",
+                            dialogClass: "modal-dialog modal-m" // Bootstrap classes for large modal
+
+
+
+
+                        }
+
+
+                    );
+
+
+
+
+                });
+
+
+
+
+
+        function _displayItems(data) {
+
+            $("#NombrePerfil").val(data['name']);
+
+            //data['sections'].forEach(element => {
+            //    element['permissions'].forEach(per => {
+            //        document.getElementById(`${data.id},${per['key']}`).checked = (data['selectedPermissions'].indexOf(per['key']) > -1);
+            //    });
+            //});
+        }
+
+
+        $('.edit-profile').on('click', function (event) {
+            event.preventDefault();
+            $('.add-prof').hide();
+            $('.edit-prof').show();
+            $('#Id').val($(this).data("id"));
+
+            fetch('/Profiles/GetProfile/' + $(this).data("id"), {
+                method: 'GET'
+            })
+                .then(response => response.json())
+                .then(data => _displayItems(data))
+                .catch(error => console.error('Error al obtener el perfil', error));
+
+            $('#addNewProfile').modal('show');
+        });
+
+                $('#add-profile').on('click', function (event) {
+
+                    event.preventDefault();
+                    $('.add-prof').show();
+                    $('.edit-prof').hide();
+                    $('#addNewProfile').modal('show');
+                });
+
+
+         $(function () {
+
+            if ('@Model.MensajeError'.length > 1) {
+                $('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeError </div>');
+            }
+        });
+
+        $(function () {
+
+            if ('@Model.MensajeInfo'.length > 1) {
+                $('#message').append('<div class="alert alert-success"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeInfo </div>');
+            }
+        });
+
+
+
+
+        function dissableOnChange(e, id) {
+
+
+            fetch('/Profiles/SetPermission/' + id, {
+                method: 'GET'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Estatus modificado');
+
+                    } else if (response.status === 404) {
+                        return Promise.reject('error 404')
+                    } else {
+                        return Promise.reject('error: ' + response.status)
+                    }
+                })
+                .then(data => console.log('datos ', data))
+                .catch(error => {
+
+                    alert("Ocurrio un error al modificar el estatus del rol " + error)
+
+                });
+
+        };
+
+    </script>
+
+}
+

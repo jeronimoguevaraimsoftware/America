@@ -1,0 +1,35 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@using Microsoft.AspNetCore.Mvc.Localization
+@using LiberacionProductoWeb.Helpers;
+@model LiberacionProductoWeb.Models.ConditioningOrderViewModels.ConditioningOrderViewModel;
+@inject IViewLocalizer Localizer
+@inject UserManager<LiberacionProductoWeb.Models.IndentityModels.ApplicationUser> UserManager
+@{
+    var claimsIdentity = User.Identity as System.Security.Claims.ClaimsIdentity;
+    var userFirstName = "";
+    var name = claimsIdentity.Name;
+    var rolesUsr = "";
+    if (name != null)
+    {
+        var FullName = UserManager.FindByNameAsync(name);
+        userFirstName = FullName.Result.NombreUsuario;
+        rolesUsr = FullName.Result.Rol;
+
+    }
+}
+
+<div class="form-group" name="DivUpload" id="DivUpload">
+    <div class="col-md-10">
+     
+        <label id="LblFileUpload">Subir archivo:</label>
+        <input type="file" class="form-control" name="fileUpload" id="fileUpload" accept="application/pdf, application/.png, .jpg, .jpeg" />
+        <br />
+        <input asp-for="checkListFile.ConditioningOrderId" id="ConditioningOrderModal" value="checkListFile.ConditioningOrderId" readonly hidden />
+        <input asp-for="checkListFile.TourNumber" id="TourNumberModal" value="checkListFile.TourNumber" readonly hidden />
+        <input asp-for="checkListFile.DistributionBatch" id="DistributionBatchModal" value="checkListFile.DistributionBatch" readonly hidden />
+        <input asp-for="checkListFile.CheckListIncompliance" id="CheckListModal" value="checkListFile.CheckListIncompliance" readonly hidden />
+        <input id="IndexCheckListModal" value="checkListFile.CheckListIncompliance" hidden />
+        @*<button type="button" onclick="return SaveChecklistManual();"  class="btn btn-primary col-md-5"> Subir</button>*@
+    </div>
+</div>
+

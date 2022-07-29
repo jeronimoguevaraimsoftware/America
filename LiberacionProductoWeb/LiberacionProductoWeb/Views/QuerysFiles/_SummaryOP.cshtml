@@ -1,0 +1,846 @@
+@using LiberacionProductoWeb.Helpers;
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization;
+@model LiberacionProductoWeb.Models.ProductionOrderViewModels.ProductionOrderViewModel
+@inject IViewLocalizer Localizer
+@inject UserManager<LiberacionProductoWeb.Models.IndentityModels.ApplicationUser> UserManager
+
+<div>
+    <h2>Orden de Producción</h2>
+
+    <input hidden="hidden" asp-for="@Model.Id" id="IdOP" value="@Model.Id" />
+    <input hidden="hidden" asp-for="@Model.StepSaved" value="@Model.StepSaved" id="StepSaved" />
+
+    <div id="op-step1">
+        <fieldset>
+            <div class="row">
+                <div style="width:100%;">
+                    @{
+                        Html.RenderPartial("~/Views/ProductionOrder/_Step1Text.cshtml", Model);
+                    }
+
+                    <div class="table-responsive">
+                        <table id="table-1" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">Tabla 1: Equipos de producción</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col">Equipos de proceso</th>
+                                    <th scope="col">Revisado por</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" id="ProductionEquipmentCheckTrue" form-control-lg />
+                                        <label>Disponible</label>
+                                        <input type="checkbox" id="ProductionEquipmentCheckFalse" form-control-lg />
+                                        <label>No disponible</label>
+                                        <input asp-for="@Model.ProductionEquipment.IsAvailable" id="ProductionEquipmentIsAvailable" hidden class="form-control" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control text-center" asp-for="@Model.ProductionEquipment.ReviewedBy" id="ProductionEquipmentReviewedBy" hidden="hidden" />
+                                        <input class="form-control text-center" asp-for="@Model.ProductionEquipment.ReviewedDate" id="ProductionEquipmentReviewedDate" hidden="hidden" />
+                                        <div id="ProductionEquipmentReviewedSignature"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="table-2" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th colspan="5">Tabla 2: Equipos de monitoreo</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col">Código del equipo</th>
+                                    <th scope="col">Descripción del equipo</th>
+                                    <th scope="col">Estado de calibraciones</th>
+                                    <th scope="col">Observaciones</th>
+                                    <th scope="col">Revisado por</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.MonitoringEquipmentList != null)
+                                {
+                                    @foreach (var entry in Model.MonitoringEquipmentList)
+                                    {
+                                        <tr>
+                                            <td hidden="hidden" id="MonitoringEquipmenId@(entry.Id)">@entry.Id</td>
+                                            <td>
+                                                <label asp-for="@entry.Code" id="MonitoringEquipmentCode@(entry.Id)">@entry.Code</label>
+                                            </td>
+                                            <td>
+                                                <label asp-for="@entry.Description" id="MonitoringEquipmentDescription@(entry.Id)">@entry.Description</label>
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" class="yes-no-monitoring-equipment" id="MonitoringEquipmentCheckTrue@(entry.Id)"
+                                                       form-control-lg
+                                                       data-linde-control-value="true"
+                                                       data-linde-control-group="MonitoringEquipment"
+                                                       data-linde-control-id="@(entry.Id)" />
+                                                <label>Calibrado</label>
+                                                <input type="checkbox" class="yes-no-monitoring-equipment" id="MonitoringEquipmentCheckFalse@(entry.Id)"
+                                                       form-control-lg
+                                                       data-linde-control-value="false"
+                                                       data-linde-control-group="MonitoringEquipment"
+                                                       data-linde-control-id="@(entry.Id)" />
+                                                <label>No calibrado</label>
+                                                <input asp-for="@entry.IsCalibrated" id="MonitoringEquipmentIsCalibrated@(entry.Id)" hidden class="form-control" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" disabled value="@entry.Notes" id="MonitoringEquipmentNotes@(entry.Id)" />
+                                            </td>
+                                            <td>
+                                                <input class="form-control text-center" asp-for="@entry.ReviewedBy" id="MonitoringEquipmentReviewedBy@(entry.Id)" hidden="hidden" />
+                                                <input class="form-control text-center" asp-for="@entry.ReviewedDate" id="MonitoringEquipmentReviewedDate@(entry.Id)" hidden="hidden" />
+                                                <div id="MonitoringEquipmentReviewedSignature@(entry.Id)"></div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div id="op-step2">
+        <fieldset>
+            <div class="row">
+                <div style="width:100%;">
+                    @{
+                        Html.RenderPartial("~/Views/ProductionOrder/_Step2Text.cshtml", Model);
+                    }
+
+                    <div class="table-responsive">
+                        <table id="table-3" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th colspan="5">Tabla 3: Despeje de línea</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col">Actividad</th>
+                                    <th scope="col" style="width: 200px;">Cumple</th>
+                                    <th scope="col">Revisado por</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <p>
+                                            Se lleva a cabo el despeje de línea de acuerdo a los puntos
+                                            anteriores "@(Model.ProductName)" de la planta
+                                            "@(Model.Location)"
+                                        </p>
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" id="PipelineClearanceCheckTrue" form-control-lg />
+                                        <label>Cumple</label>
+                                        <input type="checkbox" id="PipelineClearanceCheckFalse" form-control-lg />
+                                        <label>No cumple</label>
+                                        <input asp-for="@Model.PipelineClearance.InCompliance" id="PipelineClearanceInCompliance" hidden class="form-control" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control text-center" asp-for="@Model.PipelineClearance.ReviewedBy" value="@Model.PipelineClearance.ReviewedBy" id="PipelineClearanceReviewedBy" hidden="hidden" />
+                                        <input class="form-control text-center" asp-for="@Model.PipelineClearance.ReviewedDate" id="PipelineClearanceReviewedDate" hidden="hidden" />
+                                        <div id="PipelineClearanceReviewedSignature"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="right" style="color: #005591; cursor: pointer;" id="ShowDetail">
+                            <label onclick="showPipelineClearanceHistoryOP()">Ver evaluaciones anteriores</label>/
+                            <label id="HiddeDetail" onclick="hidePipelineClearanceHistoryOP()">Ocultar evaluaciones anteriores</label>
+                        </div>
+                        <div id="table3-detailInfo"></div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="table-4" class="table table-striped table-bordered center" style="width:50%;">
+                            <thead>
+                                <tr>
+                                    <th colspan="4">Tabla 4: Inicio y fin de lote de producción</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col">Fecha de inicio de producción</th>
+                                    <th scope="col">Hora de inicio de producción</th>
+                                    <th scope="col">Fecha de fin de producción</th>
+                                    <th scope="col">Hora de fin de producción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <input asp-for="@Model.PipelineClearance.ProductionStartedDate" id="PipelineClearanceProductionStartedDate" hidden="hidden" />
+                                        <input class="form-control date-format" Id="TxtDateProduccionLot" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control time-format" Id="TxtDateHProduccionLot" />
+                                    </td>
+                                    <td>
+                                        <input asp-for="@Model.PipelineClearance.ProductionEndDate" id="PipelineClearanceProductionEndDate" hidden="hidden" />
+                                        <input class="form-control date-format" Id="TxtDateProduccionLotEnd" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control time-format" Id="TxtDateHProduccionLotEnd" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div id="op-step3">
+        <fieldset>
+            <div class="row">
+                <div style="width:100%;">
+                    @{
+                        Html.RenderPartial("~/Views/ProductionOrder/_Step3Text.cshtml", Model);
+                    }
+
+                    <div class="table-responsive">
+                        <table id="table-5" class="table table-striped table-bordered" style="width:140%;">
+                            <thead>
+                                <tr>
+                                    <th colspan="12">Tabla 5: Variables de control en proceso</th>
+                                </tr>
+                                <tr>
+                                    <th rowspan="2" scope="col" width="200px">Área</th>
+                                    <th rowspan="2" scope="col" width="200px">Etapa de proceso / Equipo utilizado</th>
+                                    <th rowspan="2" scope="col" width="200px">Variable de control de proceso / Rango operacional establecido</th>
+                                    <th rowspan="2" scope="col" width="150px">Gráficas de la variable de control de proceso</th>
+                                    <th rowspan="2" scope="col" width="100px">Valor máximo</th>
+                                    <th rowspan="2" scope="col" width="100px">Valor mínimo</th>
+                                    <th rowspan="2" scope="col" width="100px">Valor promedio</th>
+                                    <th rowspan="2" scope="col" width="150px">Cumple</th>
+                                    <th colspan="2" scope="col" width="250px">Informe de desviación</th>
+                                    <th rowspan="2" scope="col" width="200px">Revisado por</th>
+                                    <th rowspan="2" scope="col" width="200px">Observaciones</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col" width="100px">Folio</th>
+                                    <th scope="col" width="150px">Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.ControlVariables != null)
+                                {
+                                    @foreach (var entry in Model.ControlVariables)
+                                    {
+                                        <tr>
+                                            <td hidden="hidden" id="ControlVariablesId@(entry.Id)">@entry.Id</td>
+                                            <td>
+                                                <input asp-for="@entry.Area" id="ControlVariablesArea@(entry.Id)" hidden />
+                                                <label>@entry.Area</label>
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.Description" id="ControlVariablesDescription@(entry.Id)" hidden />
+                                                <label>@entry.Description</label>
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.Variable" id="ControlVariablesVariable@(entry.Id)" hidden />
+                                                <label>@entry.Variable</label>
+                                            </td>
+                                            <td>
+                                                @{
+                                                    var tittle = "'Variable de control de proceso: " + entry.Variable + "'";
+                                                }
+
+                                                @if (!String.IsNullOrEmpty(entry.Historical))
+                                                {
+
+                                                    <button id="BtnVariables@(entry.Id)" class='btn btn' type="button" style="background-color:transparent; margin: 20px auto;" onclick="showHistoricalGraph(@entry.Historical,@entry.LowLimit,@entry.TopLimit, @tittle);return false;">
+                                                        <i class="fa fa-chart-bar"></i> Histórico
+                                                    </button>
+
+                                                }
+                                                else
+                                                {
+                                                    <label>Histórico No disponible</label>
+
+                                                }
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.MaxValue" readonly="readonly"
+                                                       class="form-control" />
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.MinValue" readonly="readonly"
+                                                       class="form-control" />
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.AvgValue" readonly="readonly"
+                                                       class="form-control" />
+                                            </td>
+                                            <td align="justify">
+                                                <input type="checkbox" class="yes-no-variable-selector" id="ControlVariablesCheckTrue@(entry.Id)"
+                                                       form-control-lg
+                                                       data-linde-control-value="true"
+                                                       data-linde-control-group="ControlVariables"
+                                                       data-linde-control-id="@(entry.Id)" />
+                                                <label>Cumple</label><br />
+                                                <input type="checkbox" class="yes-no-variable-selector" id="ControlVariablesCheckFalse@(entry.Id)"
+                                                       form-control-lg
+                                                       data-linde-control-value="false"
+                                                       data-linde-control-group="ControlVariables"
+                                                       data-linde-control-id="@(entry.Id)" />
+                                                <label>No cumple</label>
+                                                <input asp-for="@entry.InCompliance" id="ControlVariablesInCompliance@(entry.Id)" hidden class="form-control" />
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.DeviationReport.Folio" readonly="readonly"
+                                                       class="form-control" />
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.DeviationReport.Notes" readonly="readonly"
+                                                       class="form-control" />
+                                            </td>
+                                            <td>
+                                                <input class="form-control text-center" asp-for="@entry.ReviewedBy" id="ControlVariablesReviewedBy@(entry.Id)" hidden="hidden" />
+                                                <input class="form-control text-center" asp-for="@entry.ReviewedDate" id="ControlVariablesReviewedDate@(entry.Id)" hidden="hidden" />
+                                                <div id="ControlVariablesReviewedSignature@(entry.Id)"></div>
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.Notes" readonly="readonly"
+                                                       class="form-control" />
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="table-6" class="table table-striped table-bordered" style="width:140%;">
+                            <thead>
+                                <tr>
+                                    <th colspan="12">Tabla 6: Parámetros críticos de proceso</th>
+                                </tr>
+                                <tr>
+                                    <th rowspan="2" scope="col" width="200px">Área</th>
+                                    <th rowspan="2" scope="col" width="200px">Etapa de proceso / Equipo utilizado</th>
+                                    <th rowspan="2" scope="col" width="200px">Parámetro crítico de proceso / Rango operacional establecido</th>
+                                    <th rowspan="2" scope="col" width="150px">Gráficas del parámetro crítico de proceso</th>
+                                    <th rowspan="2" scope="col" width="100px">Valor máximo</th>
+                                    <th rowspan="2" scope="col" width="100px">Valor mínimo</th>
+                                    <th rowspan="2" scope="col" width="100px">Valor promedio</th>
+                                    <th rowspan="2" scope="col" width="150px">Cumple</th>
+                                    <th colspan="2" scope="col" width="250px">Informe de desviación</th>
+                                    <th rowspan="2" scope="col" width="200px">Revisado por</th>
+                                    <th rowspan="2" scope="col" width="300px">Observaciones</th>
+
+                                </tr>
+                                <tr>
+                                    <th scope="col" width="100px">Folio</th>
+                                    <th scope="col" width="150px">Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.CriticalParameters != null)
+                                {
+                                    @foreach (var entry in Model.CriticalParameters)
+                                    {
+                                        <tr>
+                                            <td hidden="hidden" id="CriticalParametersId@(entry.Id)">@entry.Id</td>
+                                            <td>
+                                                <input asp-for="@entry.Area" id="CriticalParametersArea@(entry.Id)" hidden />
+                                                <label>@entry.Area</label>
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.Description" id="CriticalParametersDescription@(entry.Id)" hidden />
+                                                <label>@entry.Description</label>
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.Parameter" id="CriticalParametersParameter@(entry.Id)" hidden />
+                                                <label>@entry.Parameter</label>
+                                            </td>
+                                            <td>
+                                                @{
+                                                    var tittle = "'Parámetro critico de proceso: " + entry.Parameter + "'";
+                                                }
+                                                @if (!String.IsNullOrEmpty(entry.Historical))
+                                                {
+
+                                                    <button class='btn btn' type="button" style="background-color:transparent; margin: 20px auto;" onclick="showHistoricalGraph(@entry.Historical,@entry.LowLimit,@entry.TopLimit, @tittle);return false;">
+                                                        <i class="fa fa-chart-bar"></i> Histórico
+                                                    </button>
+
+                                                }
+                                                else
+                                                {
+                                                    <label>Histórico No disponible</label>
+                                                }
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.MaxValue" readonly="readonly"
+                                                       class="form-control" />
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.MinValue" readonly="readonly"
+                                                       class="form-control" />
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.AvgValue" readonly="readonly"
+                                                       class="form-control" />
+                                            </td>
+                                            <td align="justify">
+                                                <input type="checkbox" class="yes-no-variable-selector" id="CriticalParametersCheckTrue@(entry.Id)"
+                                                       form-control-lg
+                                                       data-linde-control-value="true"
+                                                       data-linde-control-group="CriticalParameters"
+                                                       data-linde-control-id="@(entry.Id)" />
+                                                <label>Cumple</label><br />
+                                                <input type="checkbox" class="yes-no-variable-selector" id="CriticalParametersCheckFalse@(entry.Id)"
+                                                       form-control-lg
+                                                       data-linde-control-value="false"
+                                                       data-linde-control-group="CriticalParameters"
+                                                       data-linde-control-id="@(entry.Id)" />
+                                                <label>No cumple</label>
+                                                <input asp-for="@entry.InCompliance" id="CriticalParametersInCompliance@(entry.Id)" hidden class="form-control" />
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.DeviationReport.Folio" readonly="readonly"
+                                                       class="form-control" />
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.DeviationReport.Notes" readonly="readonly"
+                                                       class="form-control" />
+                                            </td>
+                                            <td>
+                                                <input class="form-control text-center" asp-for="@entry.ReviewedBy" id="CriticalParametersReviewedBy@(entry.Id)" hidden="hidden" />
+                                                <input class="form-control text-center" asp-for="@entry.ReviewedDate" id="CriticalParametersReviewedDate@(entry.Id)" hidden="hidden" />
+                                                <div id="CriticalParametersReviewedSignature@(entry.Id)"></div>
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.Notes" readonly="readonly"
+                                                       class="form-control" />
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div id="op-step4">
+        <fieldset>
+            <div class="row">
+                <div style="width:100%;">
+                    @{
+                        Html.RenderPartial("~/Views/ProductionOrder/_Step4Text.cshtml", Model);
+                    }
+
+                    <div class="table-responsive">
+                        <table id="table-7" class="table table-striped table-bordered" style="width:140%;">
+                            <thead>
+                                <tr>
+                                    <th colspan="12">Tabla 7: Atributos críticos de calidad</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col">Área</th>
+                                    <th scope="col">Etapa de proceso / equipo utilizado</th>
+                                    <th scope="col">
+                                        Equipo de monitoreo / atributos críticos de calidad /
+                                        especificación
+                                    </th>
+                                    <th scope="col">Gráficas del atributos crítico de calidad</th>
+                                    <th scope="col">Valor máximo</th>
+                                    <th scope="col">Valor mínimo</th>
+                                    <th scope="col">Valor promedio</th>
+                                    <th scope="col" style="width: 200px;">Cumple</th>
+                                    <th scope="col" colspan="2" style="padding: 0; text-align: center;">
+                                        <div style="width: 400px;">
+                                            <div style="width: 100%; border-bottom: 1px solid; padding-top: 8px;">Informe de desviación</div>
+                                            <div style="width: 25%; float: left; border-right: 1px solid; display: inline-block;">Folio</div>
+                                            <div style="width: 75%; display: inline-block;">Observaciones</div>
+                                        </div>
+                                    </th>
+                                    <th scope="col" style="width: 100px;">Revisado por</th>
+                                    <th scope="col" style="width: 300px;">Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.CriticalQualityAttributes != null)
+                                {
+                                    int criticalQualityAttributesIndex = 0;
+                                    @foreach (var entry in Model.CriticalQualityAttributes)
+                                    {
+                                        <tr>
+                                            <td hidden="hidden" id="CriticalQualityAttributesId@(entry.Id)">@entry.Id</td>
+                                            <td>
+                                                <input asp-for="@entry.Area" id="CriticalQualityAttributesArea@(entry.Id)" hidden />
+                                                <label>@entry.Area</label>
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.Description" id="CriticalQualityAttributesDescription@(entry.Id)" hidden />
+                                                <label>@entry.Description</label>
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.Attribute" id="CriticalQualityAttributesAttribute@(entry.Id)" hidden />
+                                                <label>@entry.Attribute</label>
+                                            </td>
+                                            <td>
+                                                @{
+                                                    var tittle = "'Atributo crítico de calidad: " + entry.Attribute + "'";
+                                                }
+                                                @if (!String.IsNullOrEmpty(entry.Historical))
+                                                {
+
+                                                    <button class='btn btn' type="button" style="background-color:transparent; margin: 20px auto;" onclick="showHistoricalGraph(@entry.Historical,@entry.LowLimit,@entry.TopLimit,@tittle); return false;">
+                                                        <i class="fa fa-chart-bar"></i> Histórico
+                                                    </button>
+
+                                                }
+                                                else
+                                                {
+
+                                                    //MEG 20211204
+                                                    if (entry.Attribute.Contains("Identidad") && Model.ProductName.Contains("Nitrógeno"))
+                                                    {
+                                                        if (!String.IsNullOrEmpty(entry.ChartPath))
+                                                        {
+                                                            if (entry.ChartPath.Contains(".pdf"))
+                                                            {
+
+                                                                var nameFile = entry.ChartPath.Substring(entry.ChartPath.LastIndexOf("\\") + 1);
+                                                                <div id="ContainerFile@(criticalQualityAttributesIndex)">
+                                                                    @Html.ActionLink(nameFile, "DownloadFile", "ProductionOrder", new { path = entry.ChartPath }, new { target = "_blank", @class = "btn btn-white m-r-5" })
+                                                                    <br />
+                                                                </div>
+                                                                <div id="ContainerFileName@(criticalQualityAttributesIndex)">
+
+                                                                </div>
+                                                            }
+                                                        }
+
+                                                    }
+                                                    else if (entry.Attribute.Contains("Identidad"))
+                                                    {
+                                                        <label>NA</label>
+                                                    }
+                                                    else
+                                                    {
+                                                        <label>Histórico No disponible</label>
+                                                    }
+
+                                                }
+
+                                                <input type="hidden" id="fileAtributoValue@(criticalQualityAttributesIndex)" />
+
+                                            </td>
+                                            @if (entry.Attribute.Contains("Identidad"))
+                                            {
+                                                <td colspan="3" style="padding-left:10px;padding-right:10px;padding-top:15px;">
+                                                    <select asp-for="@entry.AvgValue" class="custom-select my-1 mr-sm-2" disabled>
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Positiva">Positiva</option>
+                                                        <option value="Negativa">Negativa</option>
+                                                    </select>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td>
+                                                    <input asp-for="@entry.MaxValue" readonly="readonly"
+                                                           class="form-control" />
+                                                </td>
+                                                <td>
+                                                    <input asp-for="@entry.MinValue" readonly="readonly"
+                                                           class="form-control" />
+                                                </td>
+                                                <td>
+                                                    <input asp-for="@entry.AvgValue" readonly="readonly"
+                                                           class="form-control" />
+                                                </td>
+                                            }
+                                            <td>
+                                                <input type="checkbox" class="yes-no-variable-selector" id="CriticalQualityAttributesCheckTrue@(entry.Id)"
+                                                       form-control-lg
+                                                       data-linde-control-value="true"
+                                                       data-linde-control-group="CriticalQualityAttributes"
+                                                       data-linde-control-id="@(entry.Id)" />
+                                                <label>Cumple</label>
+                                                <input type="checkbox" class="yes-no-variable-selector" id="CriticalQualityAttributesCheckFalse@(entry.Id)"
+                                                       form-control-lg
+                                                       data-linde-control-value="false"
+                                                       data-linde-control-group="CriticalQualityAttributes"
+                                                       data-linde-control-id="@(entry.Id)" />
+                                                <label>No cumple</label>
+                                                <input asp-for="@entry.InCompliance" id="CriticalQualityAttributesInCompliance@(entry.Id)" hidden class="form-control" />
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.DeviationReport.Folio" readonly="readonly"
+                                                       class="form-control" />
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.DeviationReport.Notes" readonly="readonly"
+                                                       class="form-control" />
+                                            </td>
+                                            <td>
+                                                <input class="form-control text-center" asp-for="@entry.ReviewedBy" id="CriticalQualityAttributesReviewedBy@(entry.Id)" hidden="hidden" />
+                                                <input class="form-control text-center" asp-for="@entry.ReviewedDate" id="CriticalQualityAttributesReviewedDate@(entry.Id)" hidden="hidden" />
+                                                <div id="CriticalQualityAttributesReviewedSignature@(entry.Id)"></div>
+                                            </td>
+                                            <td>
+                                                <input asp-for="@entry.Notes" readonly="readonly" class="form-control" />
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div id="op-step5">
+        <fieldset>
+            <div class="row">
+                <div style="width:100%;">
+                    @{
+                        Html.RenderPartial("~/Views/ProductionOrder/_Step5Text.cshtml", Model);
+                    }
+
+                    <div class="table-responsive">
+                        <table id="table-8" class="table table-striped table-bordered" style="width:140%;">
+                            <thead>
+                                <tr>
+                                    <th colspan="@(Model.BatchDetails.Analysis.Count + 8)">Tabla 8: Lotificación y análisis de producto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th colspan="2">Número de lote de producción</th>
+                                    <td colspan="@(Model.BatchDetails.Analysis.Count + 6)">@Model.BatchDetails.Number</td>
+                                </tr>
+                            </tbody>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Número o código del tanque</th>
+                                    <th scope="col">Nivel del tanque</th>
+                                    <th scope="col">Tamaño del lote</th>
+                                    <th scope="col" colspan="@(Model.BatchDetails.Analysis.Count)" style="padding: 0;">
+                                        <table class="table table-striped table-bordered" style="margin: 0;padding: 0;width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="@(Model.BatchDetails.Analysis.Count)">Análisis</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    @if (Model.BatchDetails.Analysis != null)
+                                                    {
+                                                        @foreach (var entry in Model.BatchDetails.Analysis)
+                                                        {
+                                                            <td>@entry.ParameterName</td>
+                                                        }
+                                                    }
+                                                </tr>
+                                                <tr>
+                                                    @if (Model.BatchDetails.Analysis != null)
+                                                    {
+                                                        @foreach (var entry in Model.BatchDetails.Analysis)
+                                                        {
+                                                            <td>@entry.MeasureUnit.Replace(",", ".")</td> 
+                                                        }
+                                                    }
+                                                </tr>
+
+                                                <tr>
+                                                    @if (Model.BatchDetails.Analysis != null)
+                                                    {
+                                                        @foreach (var entry in Model.BatchDetails.Analysis)
+                                                        {
+                                                            <td>Limite Inferior: @entry.LowerLimit.Replace(",", ".")</td>
+
+                                                        }
+                                                    }
+                                                </tr>
+                                                <tr>
+                                                    @if (Model.BatchDetails.Analysis != null)
+                                                    {
+                                                        @foreach (var entry in Model.BatchDetails.Analysis)
+                                                        {
+
+                                                            <td>Limite Superior: @entry.UpperLimit.Replace(",", ".")</td>
+                                                        }
+                                                    }
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </th>
+                                    <th scope="col">Fecha y hora del análisis</th>
+                                    <th scope="col" style="width: 150px;">Analizado por</th>
+                                    <th scope="col" style="width: 150px;">Producto conforme</th>
+                                    <th scope="col" colspan="2" style="padding: 0;">
+                                        <table class="table table-striped table-bordered" style="margin: 0;padding: 0;width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="2">Reporte de producto no conforme</th>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">Folio</th>
+                                                    <th scope="col">Observaciones</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@Model.BatchDetails.Tank</td>
+                                    <td>@Model.BatchDetails.Level</td>
+                                    <td>@Model.BatchDetails.Size</td>
+                                    @if (Model.BatchDetails.Analysis != null)
+                                    {
+                                        @foreach (var entry in Model.BatchDetails.Analysis)
+                                        {
+                                      
+                                            decimal nVal;
+                                            decimal.TryParse(entry.Value.Replace(",", "."), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out nVal);
+                                            var nValue = entry.Value;
+
+                                            if (entry.ParameterName.ToLower().Trim() == "identidad")
+                                            {
+                                                if (nVal == 1)
+                                                    nValue = "Positiva";
+                                                else
+                                                    nValue = "Negativa";
+                                            }
+                                          
+                                            <td>@nValue.Replace(",", ".")</td>
+                                        }
+                                    }
+                                    <td>
+                                        @(Model.BatchDetails.AnalyzedDate.HasValue ?
+                                        Model.BatchDetails.AnalyzedDate.Value.ToString("yyyy-MM-dd")
+                                        : string.Empty)
+                                        <br />
+                                        @(Model.BatchDetails.AnalyzedDate.HasValue ?
+                                        Model.BatchDetails.AnalyzedDate.Value.ToString("HH:mm") :
+                                        string.Empty)
+                                    </td>
+                                    <td>
+                                        @Model.BatchDetails.AnalyzedBy
+                                        <br />
+                                        @(Model.BatchDetails.AnalyzedDate.HasValue ?
+                                        Model.BatchDetails.AnalyzedDate.Value.ToString("yyyy-MM-dd")
+                                        : string.Empty)
+                                        <br />
+                                        @(Model.BatchDetails.AnalyzedDate.HasValue ?
+                                        Model.BatchDetails.AnalyzedDate.Value.ToString("HH:mm") :
+                                        string.Empty)
+                                    </td>
+                                    <td>
+                                        @if (Model.BatchDetails.InCompliance.HasValue && Model.BatchDetails.InCompliance.Value)
+                                        {
+                                            <input type="checkbox" id="BatchDetailsInComplianceCheckTrue" form-control-lg disabled checked />
+                                            <label>Sí</label>
+                                            <input type="checkbox" id="BatchDetailsInComplianceCheckFalse" form-control-lg disabled />
+                                            <label>No</label>
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" id="BatchDetailsInComplianceCheckTrue" form-control-lg disabled />
+                                            <label>Sí</label>
+                                            <input type="checkbox" id="BatchDetailsInComplianceCheckFalse" form-control-lg disabled checked />
+                                            <label>No</label>
+                                        }
+                                    </td>
+                                    <td>@Model.BatchDetails.NotInComplianceFolio</td>
+                                    <td>@Model.BatchDetails.NotInComplianceNotes</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="table-8" class="table table-striped table-bordered" style="width:75%;">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Lote liberado</th>
+                                    <th scope="col">Firma del responsable sanitario</th>
+                                    <th scope="col">Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" id="BatchDetailsReleasedCheckTrue" form-control-lg />
+                                        <label>Sí</label>
+                                        <input type="checkbox" id="BatchDetailsReleasedCheckFalse" form-control-lg />
+                                        <label>No</label>
+                                        <input asp-for="@Model.BatchDetails.IsReleased" id="BatchDetailsIsReleased" hidden class="form-control" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control text-center" asp-for="@Model.BatchDetails.ReleasedBy" id="BatchDetailsReleasedBy" hidden="hidden" />
+                                        <input class="form-control text-center" asp-for="@Model.BatchDetails.ReleasedDate" id="BatchDetailsReleasedDate" hidden="hidden" />
+                                        <div id="BatchDetailsReleasedSignature"></div>
+                                    </td>
+                                    <td>@Model.BatchDetails.ReleasedNotes</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div id="op-step6">
+        <fieldset>
+            <div class="row">
+                <div style="width:100%;">
+                    @{
+                        Html.RenderPartial("~/Views/ProductionOrder/_Step6Text.cshtml", Model);
+                    }
+
+                    <div class="table-responsive">
+                        <table id="table-9" class="table table-striped table-bordered" style="width:75%;">
+                            <thead>
+                                <tr>
+                                    <th colspan="3">Tabla 9: Liberación del producto</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col">Dictamen final</th>
+                                    <th scope="col">Elaborado por</th>
+                                    <th scope="col">Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" id="ReleasedCheckTrue" form-control-lg />
+                                        <label>Liberado</label>
+                                        <input type="checkbox" id="ReleasedCheckFalse" form-control-lg />
+                                        <label>Rechazado</label>
+                                        <input asp-for="@Model.IsReleased" id="IsReleased" hidden class="form-control" />
+                                    </td>
+                                    <td>
+                                        <input class="form-control text-center" asp-for="@Model.ReleasedBy" id="ReleasedBy" hidden="hidden" />
+                                        <input class="form-control text-center" asp-for="@Model.ReleasedDate" id="ReleasedDate" hidden="hidden" />
+                                        <div id="ReleasedSignature"></div>
+                                    </td>
+                                    <td>@Model.ReleasedNotes</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</div>

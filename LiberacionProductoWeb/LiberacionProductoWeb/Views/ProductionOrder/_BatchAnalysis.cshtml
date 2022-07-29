@@ -1,0 +1,250 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization;
+
+@model LiberacionProductoWeb.Models.ProductionOrderViewModels.ProductionOrderViewModel;
+@inject IViewLocalizer Localizer
+
+<table id="table-8" class="table table-striped table-bordered" style="width:140%;">
+    <thead>
+        <tr>
+            <th colspan="@(Model.BatchDetails.Analysis.Count + 8)">Tabla 8: Lotificación y análisis de producto</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th colspan="2">Número de lote de producción</th>
+            <td colspan="@(Model.BatchDetails.Analysis.Count + 6)" id="BatchDetailsNumber">@Model.BatchDetails.Number
+            </td>
+        </tr>
+    </tbody>
+    <thead>
+        <tr>
+            <th scope="col" align="center" style="vertical-align:middle">Número o código del tanque</th>
+            <th scope="col" align="center" style="vertical-align:middle">Tamaño del lote (Kg)</th>
+            <th scope="col" align="center" hidden>Tamaño del lote</th>
+            <th scope="col" colspan="@(Model.BatchDetails.Analysis.Count)" style="padding: 0;">
+                <table id="table-8-analysis-details" class="table table-striped table-bordered"
+                    style="margin: 0;padding: 0;width: 100%;">
+                    <thead>
+                        <tr>
+                            <th colspan="@(Model.BatchDetails.Analysis.Count)">Análisis</th>
+                        </tr>
+                        <tr class="analysis-detail">
+                            @if (Model.BatchDetails.Analysis != null)
+                            {
+                                int i = 0;
+                                @foreach (var entry in Model.BatchDetails.Analysis)
+                                {
+                                    <th scope="col" width="100px">
+                                        <input asp-for="@entry.Id" id="BatchDetailsAnalysisId@(i)" hidden
+                                    class="form-control" />
+                                        <input asp-for="@entry.ParameterName" id="BatchDetailsAnalysisParameterName@(i)" hidden
+                                    class="form-control" />
+                                        @entry.ParameterName
+                                    </th>
+                                    i++;
+                                }
+                            }
+                        </tr>
+                        <tr>
+                            @if (Model.BatchDetails.Analysis != null)
+                            {
+                                int i = 0;
+                                @foreach (var entry in Model.BatchDetails.Analysis)
+                                {
+                                    <th>
+                                        <input asp-for="@entry.MeasureUnit" id="BatchDetailsAnalysisMeasureUnit@(i)" hidden
+                                    class="form-control" />
+                                        @entry.MeasureUnit
+                                    </th>
+                                    i++;
+                                }
+                            }
+                        </tr>
+                        <tr>
+                            @if (Model.BatchDetails.Analysis != null)
+                            {
+                                int i = 0;
+                                @foreach (var entry in Model.BatchDetails.Analysis)
+                                {
+                                    var nLowerLimit = entry.LowerLimit;
+
+                                    if ((entry.ParameterName.ToLower().Trim() == "olor") && entry.LowerLimit.ToLower().Trim() == "bull")
+                                    {
+                                        nLowerLimit = "NA";
+                                    }
+
+                                    if (entry.ParameterName.ToLower().Trim() == "identidad")
+                                    {
+                                        nLowerLimit = "Positiva";
+                                    }
+
+                                    <th>
+                                        <input asp-for="@entry.LowerLimit" id="BatchDetailsAnalysisLowerLimit@(i)" hidden
+                                    class="form-control" />
+                                        @nLowerLimit.Replace(",",".")
+                                    </th>
+
+                                    i++;
+                                }
+                            }
+                        </tr>
+                        <tr>
+                            @if (Model.BatchDetails.Analysis != null)
+                            {
+                                int i = 0;
+                                @foreach (var entry in Model.BatchDetails.Analysis)
+                                {
+                                    var nUpperLimit = entry.UpperLimit;
+                                    if (entry.ParameterName.ToLower().Trim() == "olor")
+                                    {
+                                        nUpperLimit = "No detectado";
+                                    }
+
+                                    if (entry.ParameterName.ToLower().Trim() == "identidad")
+                                    {
+                                        nUpperLimit = "Positiva";
+                                    }
+                                    <th>
+                                        <input asp-for="@entry.UpperLimit" id="BatchDetailsAnalysisUpperLimit@(i)" hidden
+                                    class="form-control" />
+                                        @nUpperLimit.Replace(",",".")
+                                    </th>
+                                    i++;
+                                }
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            </th>
+            <th scope="col" align="center" style="vertical-align:middle">Término de Lote de Producción</th>
+            <th scope="col" style="width: 150px; vertical-align:middle" align="center">Analizado por</th>
+            <th scope="col" style="width: 150px; vertical-align:middle" align="center" ;>Producto conforme</th>
+            <th scope="col" colspan="2" style="padding: 0; vertical-align: middle;" align="center">
+                <table class="table table-striped table-bordered" style="margin: 0;padding: 0;width: 100%; ">
+                    <thead>
+                        <tr>
+                            <th colspan="2">Reporte de producto no conforme</th>
+                        </tr>
+                        <tr>
+                            <th scope="col" width=50%>Folio</th>
+                            <th scope="col">Observaciones</th>
+                        </tr>
+                    </thead>
+                </table>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="analysis-detail">
+            <td hidden="hidden" id="BatchDetailsId" scope="col" width="100px">@Model.BatchDetails.Id</td>
+            <td scope="col" width="100px">
+                <input asp-for="@Model.BatchDetails.Tank" id="BatchDetailsTank" hidden class="form-control" />
+                @Model.BatchDetails.Tank
+            </td>
+            <td scope="col" width="100px">
+                <input asp-for="@Model.BatchDetails.Level" id="BatchDetailsLevel" hidden class="form-control" />
+                @Model.BatchDetails.Level.ToString().Replace(",", ".")
+            </td>
+            <td scope="col" width="100px" hidden>
+                <input asp-for="@Model.BatchDetails.Size" id="BatchDetailsSize" hidden class="form-control" />
+                @Model.BatchDetails.Size.ToString("F", CultureInfo.InvariantCulture)
+            </td>
+            @if (Model.BatchDetails.Analysis != null)
+            {
+                int i = 0;
+                @foreach (var entry in Model.BatchDetails.Analysis)
+                {
+                    decimal nVal;
+                    decimal.TryParse(entry.Value.Replace(",", "."), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out nVal);
+                    var nValue = entry.Value;
+
+
+                    if (entry.ParameterName.ToLower().Trim() == "olor")
+                    {
+
+                        if (nVal == 0)
+                            nValue = "No detectado";
+                        else if (nVal > 0)
+                            nValue = "Detectado";
+                        else
+                            nValue = "NA";
+
+                    }
+                    if (entry.ParameterName.ToLower().Trim() == "identidad")
+                    {
+                        if (nVal == 1)
+                            nValue = "Positiva";
+                        else
+                            nValue = "Negativa";
+                    }
+                    <td scope="col" width="100px">
+                        <input asp-for="@entry.Value" id="BatchDetailsAnalysisValue@(i)" hidden class="form-control" />
+                        @nValue.Replace(",", ".")
+                    </td>
+                    i++;
+                }
+            }
+            <td scope="col" width="100px">
+                <input class="form-control text-center" asp-for="@Model.BatchDetails.AnalyzedDate"
+                    id="BatchDetailsAnalyzedDate" hidden="hidden" />
+                @(Model.BatchDetails.AnalyzedDate.HasValue ?
+                Model.BatchDetails.AnalyzedDate.Value.ToString("yyyy-MM-dd") : string.Empty)
+                <br />
+                @(Model.BatchDetails.AnalyzedDate.HasValue ? Model.BatchDetails.AnalyzedDate.Value.ToString("HH:mm") :
+                string.Empty)
+            </td>
+            <td scope="col" width="100px">
+                <input class="form-control text-center" asp-for="@Model.BatchDetails.AnalyzedBy"
+                    id="BatchDetailsAnalyzedBy" hidden="hidden" />
+                <span>@Model.BatchDetails.AnalyzedBy</span>
+                <br />
+                <span>@(Model.BatchDetails.AnalyzedDate.HasValue ?
+                    Model.BatchDetails.AnalyzedDate.Value.ToString("yyyy-MM-dd") : string.Empty)</span>
+                <br />
+                <span>@(Model.BatchDetails.AnalyzedDate.HasValue ?
+                    Model.BatchDetails.AnalyzedDate.Value.ToString("HH:mm") : string.Empty)</span>
+            </td>
+            <td scope="col" width="100px">
+                @if (Model.BatchDetails.InCompliance.HasValue && Model.BatchDetails.InCompliance.Value)
+                {
+                    <input type="checkbox" id="BatchDetailsInComplianceCheckTrue" form-control-lg disabled checked />
+                    <label>Sí</label>
+                    <input type="checkbox" id="BatchDetailsInComplianceCheckFalse" form-control-lg disabled />
+                    <label>No</label>
+                }
+                else
+                {
+                    <input type="checkbox" id="BatchDetailsInComplianceCheckTrue" form-control-lg disabled />
+                    <label>Sí</label>
+                    <input type="checkbox" id="BatchDetailsInComplianceCheckFalse" form-control-lg disabled checked />
+                    <label>No</label>
+                }
+            </td>
+            <td scope="col" width="100px">
+                @if (Model.BatchDetails.InCompliance.HasValue && Model.BatchDetails.InCompliance.Value)
+                {
+                    <input class="form-control text-center" asp-for="@Model.BatchDetails.NotInComplianceFolio"
+                    id="BatchDetailsNotInComplianceFolio" disabled />
+                }
+                else
+                {
+                    <input class="form-control text-center" asp-for="@Model.BatchDetails.NotInComplianceFolio"
+                    id="BatchDetailsNotInComplianceFolio" />
+                }
+            </td>
+            <td scope="col" width="100px">
+                @if (Model.BatchDetails.InCompliance.HasValue && Model.BatchDetails.InCompliance.Value)
+                {
+                    <input class="form-control text-center" asp-for="@Model.BatchDetails.NotInComplianceNotes"
+                    id="BatchDetailsNotInComplianceNotes" disabled />
+                }
+                else
+                {
+                    <input class="form-control text-center" asp-for="@Model.BatchDetails.NotInComplianceNotes"
+                    id="BatchDetailsNotInComplianceNotes" />
+                }
+            </td>
+        </tr>
+    </tbody>
+</table>

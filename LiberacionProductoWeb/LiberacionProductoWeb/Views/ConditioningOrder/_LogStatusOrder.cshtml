@@ -1,0 +1,25 @@
+﻿@model List<LiberacionProductoWeb.Models.ConditioningOrderViewModels.StatesHistoryViewModel>;
+
+<img id="imgLoadingLog" src="~/img/spinning-loading.gif" style="padding-left:10px;display: none; width:50px;" />
+<table id="table-estatus" class="table table-striped table-bordered" style="width:50%;">
+    <thead>
+        <tr>
+            <th colspan="2">
+                Historial de cierre/abierto de la orden de acondicionamiento
+            </th>
+        </tr>
+        <tr>
+            <th scope="col">Estatus</th>
+            <th scope="col">Firma del responsable sanitario</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var entry in Model)
+        {
+            <tr>
+                <td>@entry.State</td>
+                <td>@entry.User<br />@entry.Date.ToString("yyyy-MM-dd HH:mm")</td>
+            </tr>
+        }
+    </tbody>
+</table>

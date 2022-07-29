@@ -1,0 +1,1 @@
+Check List de Verificación de Pipas cancelado {CaseTag:paraPipa} de {CaseTag:paramFecha} 

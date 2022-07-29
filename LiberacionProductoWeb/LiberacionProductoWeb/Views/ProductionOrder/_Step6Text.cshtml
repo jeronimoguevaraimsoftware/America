@@ -1,0 +1,132 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model LiberacionProductoWeb.Models.ProductionOrderViewModels.ProductionOrderViewModel;
+@inject IViewLocalizer Localizer
+
+<div class="panel-group" id="step-6-accordion">
+    <div class="panel panel-primary overflow-hidden">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                    data-parent="#step-6-accordion" href="#step-6-collapse-three" aria-expanded="true">
+                    <i id="icon-6" class="fa fa-plus-circle pull-right"></i>
+                    6. Rendimiento del proceso y liberación del producto
+                </a>
+            </h3>
+        </div>
+        <div id="step-6-collapse-three" class="@Model.ShowPanelSteps" style="">
+            <div class="panel-body">
+                <p>
+                    El proceso de producción de @(Model.ProductName) medicinal es un proceso
+                    cerrado, continuo y en planta dedicada, en el que el rendimiento no
+                    influye en el cumplimiento de especificaciones.
+                </p>
+
+                <p>
+                    Adicionalmente, en la fabricación del @(Model.ProductName) medicinal no
+                    es significativo el cálculo del rendimiento del producto terminado
+                    contra la @(Model.ProductName != "CO2" ? "masa de aire" : "raw gas") (materia prima) que ingresa al proceso, debido a
+                    que:
+                </p>
+
+                <p>
+                    a) El tanque de almacenamiento siempre tiene producto remanente del lote
+                    anterior (por cuestiones operativas y para mantener la integridad
+                    mecánica del recipiente).
+                </p>
+
+                <p>
+                    b) La alimentación de producto terminado al tanque de almacenamiento es
+                    continua.
+                </p>
+                @if (Model.ProductName != "CO2")
+                {
+                    <p>
+                        c) No hay variación de materias primas y la proporción de los
+                        componentes del aire (O2, N2 y Ar) no cambia.
+                    </p>
+
+                    <p>
+                        d) La producción se controla en función del flujo de aire que ingresa al
+                        proceso.
+                    </p>
+
+                    <p>
+                        e) La producción de una mayor o menor cantidad de un producto, influye en
+                        la cantidad a obtener de los otros 2 productos.
+                    </p>
+                }
+                else
+                {
+                    <p>
+                        c) El flujo de materia prima(raw gas) va en función del comportamiento del proceso
+                        de producción del proveedor, por lo que es mas representativo calcular un rendimiento
+                        de la producción del día(KPI de ton raw gas/ton CO2).
+                    </p>
+                }
+
+
+                <p>
+                    Por consiguiente, la eficiencia y productividad del proceso se mide en
+                    función de la cantidad de O2 equivalente producido mensualmente vs los
+                    kWh de energía eléctrica utilizados para tal fin.
+                </p>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-group" id="step-7-accordion">
+    <div class="panel panel-primary overflow-hidden">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                    data-parent="#step-7-accordion" href="#step-7-collapse-three" aria-expanded="true">
+                    <i class="fa fa-plus-circle pull-right"></i>
+                    Liberación del producto
+                </a>
+            </h3>
+        </div>
+        <div id="step-7-collapse-three" class="@Model.ShowPanelSteps" style="">
+            <div class="panel-body">
+                <p>
+                    Con la firma del responsable sanitario en la Tabla 9- Liberación del
+                    producto, se avala que:
+                </p>
+
+                <p>a) se ha realizado un adecuado despeje de línea,</p>
+
+                <p>
+                    b) el producto a granel almacenado en el tanque cumple con las
+                    especificaciones establecidas en la FEUM vigente y, las buenas prácticas
+                    de fabricación,
+                </p>
+
+                <p>c) la documentación se encuentra completa,</p>
+
+                <p>
+                    d) la validación del proceso de producción de @(Model.ProductName)
+                    medicinal en planta @(Model.Location), se encuentra vigente,
+                </p>
+
+                <p>
+                    e) los controles de cambios se administran de acuerdo a lo establecido en
+                    el procedimiento “CC/P-08-001 – 30” vigente y,
+                </p>
+
+                <p>
+                    f) en caso de incumplimientos, se documentó el "Informe de desviación,
+                    CC/R-01-028 - 30" y se condujo de acuerdo a lo establecido en el
+                    procedimiento “Control de desviaciones, CC/P-01-009- 30” vigente, 
+                    por lo tanto, el producto puede ser empleado en la siguiente etapa del
+                    proceso de fabricación.
+                </p>
+
+                <p>
+                    
+                </p>
+
+            </div>
+        </div>
+    </div>
+</div>

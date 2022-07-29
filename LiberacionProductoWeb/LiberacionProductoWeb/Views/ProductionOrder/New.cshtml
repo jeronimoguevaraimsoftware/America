@@ -1,0 +1,3234 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@using LiberacionProductoWeb.Localize;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.AspNetCore.Identity;
+@using LiberacionProductoWeb.Helpers;
+@using LiberacionProductoWeb.Models.ProductionOrderViewModels;
+@model LiberacionProductoWeb.Models.ProductionOrderViewModels.ProductionOrderViewModel;
+@inject IViewLocalizer Localizer
+@inject IStringLocalizer<Resource> resource;
+@inject UserManager<LiberacionProductoWeb.Models.IndentityModels.ApplicationUser> UserManager
+@{
+    ViewData["Title"] = Localizer["Production order"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var notInformation = resource.GetString("NoInformation");
+    var lengthMenu = resource.GetString("LengthMenu");
+    var searchPlaceholder = resource.GetString("SearchPlaceholder");
+    var info = resource.GetString("Info");
+    var emptyTable = resource.GetString("EmptyTable");
+    var loadingRecords = resource.GetString("LoadingRecords");
+    var processing = resource.GetString("Processing");
+    var zeroRecords = resource.GetString("ZeroRecords");
+    var infoEmpty = resource.GetString("InfoEmpty");
+    var infoFiltered = resource.GetString("InfoFiltered");
+    var claimsIdentity = User.Identity as System.Security.Claims.ClaimsIdentity;
+    var userFirstName = "";
+    var btnActionName = "";
+    var hidden = "";
+    var multipleFactorText = Localizer["MultipleFactorText"];
+    var rolesUsr = "";
+    if (claimsIdentity != null)
+    {
+        var name = claimsIdentity.Name;
+        if (name != null)
+        {
+            var FullName = UserManager.FindByNameAsync(name);
+            userFirstName = FullName.Result.NombreUsuario;
+            rolesUsr = FullName.Result.Rol;
+        }
+    }
+}
+
+@await Html.PartialAsync("~/Views/Shared/_Navigation.cshtml")
+
+<!-- ============================================================== -->
+<!-- Page wrapper  -->
+<!-- ============================================================== -->
+<div id="content" class="content">
+    <div class="row">
+
+        <div class="col-6">
+            <label style="font-size:x-large;color: #005591">
+                @(Localizer["Production batch details"])
+            </label>
+        </div>
+
+
+        @if (Model.Id > 0)
+        {
+            <div class="col-6" style="font-size: large; padding: 10px;">
+                <label style="font-size:large">
+                    Fecha y hora de creación:
+                </label>
+                <span id="CreatedDateLbl">
+                    @(Model.CreatedDate.HasValue ? Model.CreatedDate.Value.ToString("yyyy-MM-dd HH:mm") : string.Empty)
+                </span>
+                <label>Estado:</label>
+                <span id="StatusLbl">@Model.Status</span>
+                <input asp-for="Status" hidden readonly />
+            </div>
+            <input id="HasHistorian" value="@Model.HasHistorian.ToString()" hidden readonly />
+            <input id="HasHistorianThree" value="@Model.HasHistorianThree.ToString()" hidden readonly />
+        }
+    </div>
+
+    <div class="section-container p-b-10">
+        <div class="row">
+            <a href="/ProductionOrder/New" class="btn btn-white m-r-5"><i class="fa fa-plus"></i> Crear nueva orden de producción</a>
+            @if (Model.Id > 0)
+            {
+                btnActionName = "Guardar";
+                hidden = "hidden";
+            }
+            else
+            {
+                btnActionName = "Crear OP";
+                hidden = "";
+            }
+
+            <button name="Guardar" class='btn btn' id="Guardar" data-toggle="modal" data-target="#ModalSave" type="button" style="background-color:transparent">
+                <i class="fa fa-save"></i> @btnActionName
+            </button>
+
+            @if (Model.Id > 0)
+            {
+                @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CANCELAR_OP))
+                {
+                    <button class="btn btn" id="BtnCancelar" type="button" style="background-color:transparent">
+                        <i class="fa fa-minus-circle"></i> Cancelar
+                    </button>
+                }
+                @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.APROBAR_CANCELACION_OP))
+                {
+                    <button class='btn btn' id="BtnCancelarApprove" type="button" style="background-color:transparent">
+                        <i class="fa fa-ban"></i> Aprobar cancelación
+                    </button>
+                }
+                <div id="ConsultarOA"> <a href="/ConditioningOrder/New?IdOP=@Model.Id" class="btn m-r-5" id="OA"><i class="fa fa-glasses"></i> Consultar orden de acondicionamiento</a></div>
+                <a href="/ProductionOrder/Index?Id=@Model.Id" class="btn m-r-5"><i class="fa fa-file"></i> Modo Lectura</a>
+                <button class="btn btn" type="button" style="background-color:transparent" id="btnPrevious">← Anterior</button>
+                <button class='btn btn' type="button" style="background-color:transparent" id="btnNext">Siguiente →</button>
+            }
+        </div>
+
+        <br />
+
+        <div class="row">
+            <div class="col-lg-20">
+                @if (Model.Id > 0)
+                {
+                    <div class="row">
+                        <div class="col-lg-3 m-b-15">
+                            <div class="m-b-5"><b>@(Localizer["Plant"]):</b></div>
+                            <div class="input-group">
+                                <input id="SelectedPlantFilter" name="SelectedPlantFilter" asp-for="Location" disabled class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-lg-3 m-b-15">
+                            <div class="m-b-5"><b>@(Localizer["Product"]):</b></div>
+                            <div class="input-group">
+                                <input id="SelectedProductFilter" name="SelectedProductFilter" asp-for="ProductName" disabled class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-lg-3 m-b-15">
+                            <div class="m-b-5"><b>@(Localizer["Tank"]):</b></div>
+                            <div class="input-group">
+                                <input id="SelectedTankFilter" name="SelectedTankFilter" asp-for="SelectedTankFilter" disabled class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-lg-3 m-b-15">
+                            <div class="m-b-5"><b>@(Localizer["Purity"]):</b></div>
+                            <div class="input-group">
+                                <input id="Purity" name="Purity" asp-for="SelectedPurityFilter" disabled class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <form method="post" enctype="multipart/form-data" asp-controller="ProductionOrder" asp-action="New">
+                        <div class="row" id="FilterInit">
+                            <div class="col-lg-3 m-b-15">
+                                <div class="m-b-5"><b>@(Localizer["Plant"]):</b></div>
+                                <div class="input-group">
+                                    <select id="SelectedPlantFilter" class="selectpicker show-menu-arrow" data-style="btn-inverse" data-live-search="true" title="Selecciona" onchange="getProducts(this)"> </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 m-b-15">
+                                <div class="m-b-5"><b>@(Localizer["Product"]):</b></div>
+                                <div class="input-group">
+                                    <select id="SelectedProductFilter" class="selectpicker show-menu-arrow" data-style="btn-inverse" data-live-search="true" title="Selecciona" onchange="getTanks(this)">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 m-b-15">
+                                <div class="m-b-5"><b>@(Localizer["Tank"]):</b></div>
+                                <div class="input-group">
+                                    <select id="SelectedTankFilter" class="selectpicker show-menu-arrow" data-style="btn-inverse" data-live-search="true" title="Selecciona">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 m-b-15">
+                                <div class="m-b-5"><b>@(Localizer["Purity"]):</b></div>
+                                <div class="input-group">
+                                    <input id="SelectedPurityFilter" name="SelectedPurityFilter" asp-for="SelectedPurityFilter" readonly class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-lg-3 m-b-15">
+                                <div class="m-b-5"> &nbsp; </div>
+                                <div class="input-group">
+                                    <button type="button" @hidden class="btn btn-inverse" onclick="getPurity()">Buscar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                }
+                <input asp-for="Plant" hidden readonly />
+                <input asp-for="ProductCode" hidden readonly />
+            </div>
+        </div>
+    </div>
+
+    <div class="container-op" hidden>
+        <div class="row">
+            @Html.AntiForgeryToken()
+            <form action="/" method="POST" id="form-wizard" name="form-wizard" class="form-input-flat" novalidate="">
+                <div id="wizard">
+                    <ol>
+                        <li>
+                            @(Localizer["Wizard title step 1"])
+                        </li>
+                        <li class="disabled">
+                            @(Localizer["Wizard title step 2"])
+                        </li>
+                        <li>
+                            @(Localizer["Wizard title step 3"])
+                        </li>
+                        <li>
+                            @(Localizer["Wizard title step 4"])
+                        </li>
+                        <li>
+                            @(Localizer["Wizard title step 5"])
+                        </li>
+                        <li>
+                            @(Localizer["Wizard title step 7"])
+                        </li>
+                    </ol>
+                    <input hidden="hidden" asp-for="@Model.Id" id="Id" value="@Model.Id" />
+                    <input hidden="hidden" asp-for="@Model.StepSaved" value="@Model.StepSaved" id="StepSaved" />
+                    <div id="step1">
+                        <fieldset>
+                            <div class="row">
+                                <div class="col-lg-10 offset-lg-1">
+                                    @{
+                                        Html.RenderPartial("_Step1Text", Model);
+                                    }
+
+                                    <div class="table-responsive">
+                                        <table id="table-1" class="table table-striped table-bordered center" style="width:50%;">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="2">Tabla 1: Equipos de producción</th>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">Equipos de proceso</th>
+                                                    <th scope="col">Revisado por</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <input type="checkbox" id="ProductionEquipmentCheckTrue" form-control-lg />
+                                                        <label>Disponible</label>
+                                                        <input type="checkbox" id="ProductionEquipmentCheckFalse" form-control-lg />
+                                                        <label>No disponible</label>
+                                                        <input asp-for="@Model.ProductionEquipment.IsAvailable" id="ProductionEquipmentIsAvailable" hidden class="form-control" />
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control text-center" asp-for="@Model.ProductionEquipment.ReviewedBy" id="ProductionEquipmentReviewedBy" hidden="hidden" />
+                                                        <input class="form-control text-center" asp-for="@Model.ProductionEquipment.ReviewedDate" id="ProductionEquipmentReviewedDate" hidden="hidden" />
+                                                        <div id="ProductionEquipmentReviewedSignature"></div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="table-responsive">
+                                        <table id="table-2" hidden="hidden" class="table table-striped table-bordered center" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="5">Tabla 2: Equipos de monitoreo</th>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">Código del equipo</th>
+                                                    <th scope="col">Descripción del equipo</th>
+                                                    <th scope="col">Estado de calibraciones</th>
+                                                    <th scope="col">Observaciones</th>
+                                                    <th scope="col">Revisado por</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (Model.MonitoringEquipmentList != null)
+                                                {
+                                                    int monitoringEquipmentIndex = 0;
+                                                    @foreach (var entry in Model.MonitoringEquipmentList)
+                                                    {
+                                                        <tr>
+                                                            <td hidden="hidden" id="MonitoringEquipmenId@(monitoringEquipmentIndex)">@entry.Id</td>
+                                                            <td>
+                                                                <label asp-for="@entry.Code" id="MonitoringEquipmentCode@(monitoringEquipmentIndex)">@entry.Code</label>
+                                                            </td>
+                                                            <td>
+                                                                <label asp-for="@entry.Description" id="MonitoringEquipmentDescription@(monitoringEquipmentIndex)">@entry.Description</label>
+                                                            </td>
+                                                            <td>
+                                                                <input type="checkbox" class="yes-no-monitoring-equipment" id="MonitoringEquipmentCheckTrue@(monitoringEquipmentIndex)"
+                                                                       form-control-lg
+                                                                       data-linde-control-value="true"
+                                                                       data-linde-control-group="MonitoringEquipment"
+                                                                       data-linde-control-id="@(monitoringEquipmentIndex)" />
+                                                                <label>Calibrado</label>
+                                                                <input type="checkbox" class="yes-no-monitoring-equipment" id="MonitoringEquipmentCheckFalse@(monitoringEquipmentIndex)"
+                                                                       form-control-lg
+                                                                       data-linde-control-value="false"
+                                                                       data-linde-control-group="MonitoringEquipment"
+                                                                       data-linde-control-id="@(monitoringEquipmentIndex)" />
+                                                                <label>No calibrado</label>
+                                                                <input asp-for="@entry.IsCalibrated" id="MonitoringEquipmentIsCalibrated@(monitoringEquipmentIndex)" hidden class="form-control" />
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="form-control" disabled value="@entry.Notes" id="MonitoringEquipmentNotes@(monitoringEquipmentIndex)" />
+                                                            </td>
+                                                            <td>
+                                                                <input class="form-control text-center" asp-for="@entry.ReviewedBy" id="MonitoringEquipmentReviewedBy@(monitoringEquipmentIndex)" hidden="hidden" />
+                                                                <input class="form-control text-center" asp-for="@entry.ReviewedDate" id="MonitoringEquipmentReviewedDate@(monitoringEquipmentIndex)" hidden="hidden" />
+                                                                <div id="MonitoringEquipmentReviewedSignature@(monitoringEquipmentIndex)"></div>
+                                                            </td>
+                                                        </tr>
+                                                        monitoringEquipmentIndex++;
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div id="step2">
+                        <fieldset>
+                            <div class="row">
+                                <div class="col-lg-10 offset-lg-1">
+                                    @{
+                                        Html.RenderPartial("_Step2Text", Model);
+                                    }
+
+                                    <div class="table-responsive">
+                                        <table id="table-3" class="table table-striped table-bordered center" style="width:95%;">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="5">Tabla 3: Despeje de línea</th>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">Actividad</th>
+                                                    <th scope="col" style="width: 200px;">Cumple</th>
+                                                    <th scope="col">Revisado por</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <p id="Activitie">
+                                                            Se lleva a cabo el despeje de línea de acuerdo a los puntos anteriores "@(Model.ProductName)" de la planta "@(Model.Location)"
+                                                        </p>
+
+                                                    </td>
+                                                    <td>
+                                                        @if (!@Model.PipelineClearance.HasPendingReview)
+                                                        {
+                                                            <input type="checkbox" id="PipelineClearanceCheckTrue" form-control-lg disabled />
+                                                            <label>Cumple</label>
+                                                            <input type="checkbox" id="PipelineClearanceCheckFalse" form-control-lg disabled />
+                                                            <label>No cumple</label>
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" id="PipelineClearanceCheckTrue" form-control-lg />
+                                                            <label>Cumple</label>
+                                                            <input type="checkbox" id="PipelineClearanceCheckFalse" form-control-lg />
+                                                            <label>No cumple</label>
+                                                        }
+                                                        <input asp-for="@Model.PipelineClearance.InCompliance" id="PipelineClearanceInCompliance" hidden class="form-control" />
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control text-center" asp-for="@Model.PipelineClearance.ReviewedBy" value="@Model.PipelineClearance.ReviewedBy" id="PipelineClearanceReviewedBy" hidden="hidden" />
+                                                        <input class="form-control text-center" asp-for="@Model.PipelineClearance.ReviewedDate" id="PipelineClearanceReviewedDate" hidden="hidden" />
+                                                        <div id="PipelineClearanceReviewedSignature"></div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div class="right" style="color: #005591; cursor: pointer;" id="ShowDetail">
+                                            <label onclick="ShowDetailDL(this);">Ver evaluaciones anteriores</label>
+                                            <label id="HiddeDetail" onclick="HiddeDetailDL(this)">Ocultar evaluaciones anteriores</label>
+                                        </div>
+                                        <div id="table3-detailInfo"></div>
+                                    </div>
+
+                                    <table id="table-4" display="none" class="table table-striped table-bordered center" style="width:50%; display:none;">
+                                        <thead>
+                                            <tr>
+                                                <th colspan="4">Tabla 4: Inicio y fin de lote de producción</th>
+                                            </tr>
+                                            <tr>
+                                                <th scope="col">Fecha de inicio de producción</th>
+                                                <th scope="col">Hora de inicio de producción</th>
+                                                <th scope="col">Fecha de fin de producción</th>
+                                                <th scope="col">Hora de fin de producción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <input asp-for="@Model.PipelineClearance.ProductionStartedDate" id="PipelineClearanceProductionStartedDate" hidden="hidden" />
+                                                    <input class="form-control date-format" Id="TxtDateProduccionLot" />
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <div class='input-group date' id='datetimepicker3'>
+                                                            <input type='text' class="form-control" id='TxtDateHProduccionLot' />
+                                                            <span class="input-group-addon">
+                                                                <span class="fa fa-clock"></span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <input asp-for="@Model.PipelineClearance.ProductionEndDate" id="PipelineClearanceProductionEndDate" hidden="hidden" />
+                                                    <input class="form-control date-format" Id="TxtDateProduccionLotEnd" />
+                                                </td>
+                                                <td>
+                                                    <div class="form-group">
+                                                        <div class='input-group date' id='datetimepicker4'>
+                                                            <input type='text' class="form-control" id='TxtDateHProduccionLotEnd' />
+                                                            <span class="input-group-addon">
+                                                                <span class="fa fa-clock"></span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div id="step3">
+                        <fieldset>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    @{
+                                        Html.RenderPartial("_Step3Text", Model);
+                                    }
+                                    <div id="tablesStep3">
+                                        @{
+                                            Html.RenderPartial("_ControlVariablesCriticalParams", Model);
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div id="step4">
+                        <fieldset>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    @{
+                                        Html.RenderPartial("_Step4Text", Model);
+                                    }
+
+                                    <div class="table-responsive" id="divStep4">
+                                        @{
+                                            Html.RenderPartial("_Step4", Model);
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div id="step5">
+                        <fieldset>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    @{
+                                        Html.RenderPartial("_Step5Text", Model);
+                                    }
+
+                                    <button class='btn btn btn-inverse' id="updateBatchDetailsAnalysisBtn" type="button" style="margin: 20px auto;" onclick="updateBatchDetailsAnalysis()">
+                                        <i class="fa fa-sync"></i>  Actualizar
+                                    </button>
+
+                                    <button class='btn btn btn-inverse' type="button" style="margin: 20px auto;" onclick="notificationConfirm()" id="btnNotificationConfirm">
+                                        <i class="fa fa-sync"></i>  Enviar notificación de conformidad
+                                    </button>
+                                    <img id="imgLoadingConfirmNotificacion" src="~/img/spinning-loading.gif" style="padding-left:10px;display: none; width:50px;" />
+
+                                    @if (ViewBag.MultipleFactor != null & ViewBag.MultipleFactor)
+                                    {
+                                        <div class="alert alert-danger">@multipleFactorText.Value</div>
+                                    }
+
+                                    <div class="table-responsive" id="tabla8">
+                                        @{
+                                            Html.RenderPartial("_BatchAnalysis", Model);
+                                        }
+                                    </div>
+                                    @if (rolesUsr.Contains(SecurityConstants.PERFIL_RESPONSABLE_SANITARIO))
+                                    {
+                                        <div class="table-responsive">
+                                            <table id="table-8-batch" class="table table-striped table-bordered center" style="width:75%;">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Lote liberado</th>
+                                                        <th scope="col">Firma del Responsable Sanitario</th>
+                                                        <th scope="col">Observaciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <input type="checkbox" id="BatchDetailsReleasedCheckTrue"
+                                                                   form-control-lg />
+                                                            <label>Sí</label>
+                                                            <input type="checkbox" id="BatchDetailsReleasedCheckFalse" form-control-lg />
+                                                            <label>No</label>
+                                                            <input asp-for="@Model.BatchDetails.IsReleased" id="BatchDetailsIsReleased" hidden class="form-control" />
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-control text-center" asp-for="@Model.BatchDetails.ReleasedBy" id="BatchDetailsReleasedBy" hidden="hidden" />
+                                                            <input class="form-control text-center" asp-for="@Model.BatchDetails.ReleasedDate" id="BatchDetailsReleasedDate" hidden="hidden" />
+                                                            <div id="BatchDetailsReleasedSignature"></div>
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-control text-center" asp-for="@Model.BatchDetails.ReleasedNotes" id="BatchDetailsReleasedNotes" disabled />
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="table-responsive">
+                                            <table id="table-8-batch" class="table table-striped table-bordered center" style="pointer-events:none">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Lote liberado</th>
+                                                        <th scope="col">Firma del Responsable Sanitario</th>
+                                                        <th scope="col">Observaciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <input type="checkbox" id="BatchDetailsReleasedCheckTrue"
+                                                                   form-control-lg />
+                                                            <label>Sí</label>
+                                                            <input type="checkbox" id="BatchDetailsReleasedCheckFalse" form-control-lg />
+                                                            <label>No</label>
+                                                            <input asp-for="@Model.BatchDetails.IsReleased" id="BatchDetailsIsReleased" hidden class="form-control" />
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-control text-center" asp-for="@Model.BatchDetails.ReleasedBy" id="BatchDetailsReleasedBy" hidden="hidden" />
+                                                            <input class="form-control text-center" asp-for="@Model.BatchDetails.ReleasedDate" id="BatchDetailsReleasedDate" hidden="hidden" />
+                                                            <div id="BatchDetailsReleasedSignature"></div>
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-control text-center" asp-for="@Model.BatchDetails.ReleasedNotes" id="BatchDetailsReleasedNotes" disabled />
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div id="step6">
+                        <fieldset>
+                            <div class="row">
+                                <div class="col-lg-10 offset-lg-1">
+                                    @{
+                                        Html.RenderPartial("_Step6Text", Model);
+                                    }
+
+                                    <div class="table-responsive">
+                                        <table id="table-9" class="table table-striped table-bordered center" style="width:75%;">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="3">Tabla 9: Liberación del producto</th>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">Dictamen final</th>
+                                                    <th scope="col">Elaborado por</th>
+                                                    <th scope="col">Observaciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <input type="checkbox" id="ReleasedCheckTrue"
+                                                               form-control-lg />
+                                                        <label>Liberado</label>
+                                                        <input type="checkbox" id="ReleasedCheckFalse" form-control-lg />
+                                                        <label>Rechazado</label>
+                                                        <input asp-for="@Model.IsReleased" id="IsReleased" hidden class="form-control" />
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control text-center" asp-for="@Model.ReleasedBy" id="ReleasedBy" hidden="hidden" />
+                                                        <input class="form-control text-center" asp-for="@Model.ReleasedDate" id="ReleasedDate" hidden="hidden" />
+                                                        <div id="ReleasedSignature"></div>
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control text-center" asp-for="@Model.ReleasedNotes" id="ReleasedNotes" disabled />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div style="display: flex; align-items: center; justify-content: center;">
+                                        <button type="button" id="btnCloseOrder" data-toggle="modal" data-target="#ModalCloseOP" class="btn btn-linde">Cerrar orden de producción</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+
+                @*historyNotes*@
+                <div class="right" style="color: #005591; cursor: pointer;" id="ShowDetail">
+                    <label onclick="ShowHistory(this); return false;">Ver observaciones</label>/
+                    <label id="HiddeHistory" onclick="HiddeHistory(this); return false;">Ocultar Observaciones</label>
+                </div>
+                <div id="detailInfo">
+                    <table id="table-HistoryNotes" hidden="hidden" class="table table-striped table-bordered" style="width:95%;">
+                        <thead>
+                            <tr>
+                                <th colspan="8">Historial de observaciones</th>
+                            </tr>
+                            <tr>
+                                <th scope="col">Observaciones</th>
+                                <th scope="col">Fuente</th>
+                                <th scope="col">Usuario</th>
+                                <th scope="col">Fecha y hora</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+
+                @*historyStates*@
+                <div class="right" style="color: #005591; cursor: pointer;" id="ShowDetailState">
+                    <label onclick="ShowHistoryState(this); return false;">Ver estados</label>/
+                    <label id="HiddeState" onclick="HiddeStateHistory(this); return false;">Ocultar estados</label>
+                </div>
+                <div id="detailInfoState">
+                    <table id="table-HistoryState" hidden="hidden" class="table table-striped table-bordered" style="width:95%;">
+                        <thead>
+                            <tr>
+                                <th colspan="8">Historial de estados</th>
+                            </tr>
+                            <tr>
+                                <th scope="col">Usuario</th>
+                                <th scope="col">Fecha y hora</th>
+                                <th scope="col">Estado</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="text-center container-empty-op" hidden> <h3>La información será visible después de crear la orden de producción.</h3></div>
+
+    @*modales*@
+    <div class="container-fluid">
+        <div class="modal fade" id="ModalSave" tabindex="-1" role="dialog" aria-labelledby="ModalSaveLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="ModalSaveLabel">
+                            ¿Deseas guardar la orden de producción?
+
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                        <button type="button" class="btn btn-success" data-dismiss="modal" name="GuardarOP" onclick="Save()" id="GuardarOP">Si</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="ModalCancel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h5 class="modal-title" id="exampleModalLabel">
+                            ¿Deseas solicitar la aprobación de la orden de producción?
+                        </h5>
+                        <input class="form-control" asp-for="Id" hidden="hidden" value="@Model.Id" />
+                    </div>
+                    <div class="modal-body">
+                        <label>Motivo de cancelación</label>
+                        <textarea id="ReasonRejectCancel" class="form-control">@Model.ReasonReject</textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal" id="btnCancelModalCancel">No</button>
+                        <button type="button" class="btn btn-success" onclick="CancelPro()" id="Cancel">Si</button>
+                        <img id="imgLoadingCancelNotificacion" src="~/img/spinning-loading.gif" style="padding-left:10px;display: none; width:50px;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="ModalCancelApprove" tabindex="-1" role="dialog" aria-labelledby="ModalCancelApproveLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h5 class="modal-title" id="ModalCancelApproveLabel">
+                            ¿Deseas aprobar o rechazar la solicitud de la orden de producción?
+                            <input class="form-control" asp-for="Id" hidden="hidden" value="@Model.Id" />
+                        </h5>
+                    </div>
+                    <div class="modal-body">
+                        <label>Motivo de cancelación</label>
+                        <textarea id="ReasonRejectCancelApprove" class="form-control">@Model.ReasonReject</textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" onclick="CancelReject()" id="btnRejectCancel">Rechazar</button>
+                        <img id="imgLoadingCancelAproveNotificacion" src="~/img/spinning-loading.gif" style="padding-left:10px;display: none; width:50px;" />
+                        <button type="button" class="btn btn-success" onclick="CancelApprove()" id="btnApproveCancel">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form id="formDespeje">
+            <div class="modal fade" id="ModalDespeje" tabindex="-1" role="dialog" aria-labelledby="ModalDespejeLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="clearDespeje()">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h5 class="modal-title" id="ModalDespejeLabel">
+                                Informe de desviación
+                                <input class="form-control" hidden="hidden" asp-for="@Model.PipelineClearance.Activitie" id="PipelineClearance_Activitie" value="Se lleva a cabo el despeje de línea de acuerdo a los puntos anteriores '@(Model.ProductName)' de la planta '@(Model.Location)'" />
+                            </h5>
+                        </div>
+                        <div class="modal-body">
+                            <div id="ModalSaveDespejeError" class="alert alert-danger" role="alert" hidden></div>
+                            <label>Folio</label>
+                            <input class="form-control" asp-for="@Model.PipelineClearance.Bill" id="PipelineClearance_Bill" />
+                            <label>Observaciones</label>
+                            <textarea class="form-control" asp-for="@Model.PipelineClearance.Notes" id="PipelineClearance_Notes"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="btnDespejeNotificacionCancel" type="button" class="btn btn-danger" data-dismiss="modal" onclick="clearDespeje()">Cancelar</button>
+                            <button id="btnDespejeNotificacionSave" type="button" class="btn btn-success" onclick="SaveDespeje()">Guardar</button>
+                            <img id="imgLoadingDespejeNotificacion" src="~/img/spinning-loading.gif" style="padding-left:10px;display: none; width:50px;" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="modal fade" id="ModalCloseOP" tabindex="-1" role="dialog" aria-labelledby="ModalCloseOPLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="ModalCloseOPLabel">
+                            ¿Deseas cerrar la orden de producción?
+
+                        </h5>
+
+                    </div>
+                    <div class="modal-body">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                        <button type="button" class="btn btn-success" data-dismiss="modal" onclick="validateStep(6);" id="CloseOP">Si</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="ModalMensajes" tabindex="-1" role="dialog" aria-labelledby="ModalMensajesLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div style="" class="modal-content">
+                    <div class="modal-header">
+                        <h5 style="font-size:30px" class="modal-title" id="ModalMensajesLabel">
+                            Error
+                        </h5>
+                    </div>
+                    <div style="font-size:20px" class="modal-body" id="mbody">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="ModalNextStep" tabindex="-1" role="dialog" aria-labelledby="ModalNextStepLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="ModalNextStepLabel">
+                            ¿Deseas continuar?
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        La Información ingresada será guardada y no podra ser Editada.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                        <button type="button" class="btn btn-success btnOk" data-dismiss="modal" name="StepValidation">Si</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="ModalShowGraph" tabindex="-1" role="dialog" aria-labelledby="ModalShowGraphLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="ModalShowGraphLabel">
+                            Histórico
+                        </h5>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div>
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-inverse" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div id="chart-div" class="modal-body">
+                                <canvas id="line-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="ModalMensajesRelease" tabindex="-1" role="dialog" aria-labelledby="ModalMensajesRelease" aria-hidden="true" data-backdrop="false" data-keyboard="false" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog" role="document">
+                <div style="" class="modal-content">
+                    <div class="modal-header">
+                        <h5 style="font-size:30px" class="modal-title" id="ModalMensajesLabelRelease">
+                            Error
+                        </h5>
+                    </div>
+                    <div style="font-size:20px" class="modal-body" id="mbodyRelease">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="BtnsuccessRelease" class="btn btn-success" data-dismiss="modal">SI</button>
+                        <button type="button" id="BtndangerRelease" class="btn btn-danger" data-dismiss="modal">NO</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal  bd-example-modal-lg" id="ModalSpinner" data-backdrop="static" data-keyboard="false" tabindex="-1">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content" style="width: 48px">
+                    <span class="fa fa-spinner fa-spin fa-3x"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Styles {
+    <link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-wizard/css/bwizard.min.css" rel="stylesheet" />
+
+    <link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+    <link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+
+    <link href="~/css/production-order.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-eonasdan-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+    <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+
+
+}
+
+@section scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+        <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+        <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+        <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+
+        <script src="~/plugins/bootstrap-wizard/js/bwizard.min.js"></script>
+        <script src="~/js/production-order/production-order-form-wizards.js"></script>
+
+        <script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+
+        <script src="~/js/demo.min.js"></script>
+        <script src="~/js/apps.min.js"></script>
+        <script src="~/plugins/bootstrap-daterangepicker/moment.js"></script>
+        <script src="~/plugins/bootstrap-eonasdan-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+        <script src="~/plugins/chart-js/Chart.js"></script>
+        <script src="~/js/linde.js"></script>
+    </environment>
+
+    <script>
+
+        $(".accordion-toggle").click(function () {
+            if ($(this).find("i").hasClass("fa-minus-circle")) {
+                $(this).find("i").removeClass("fa-minus-circle").addClass("fa-plus-circle");
+            } else {
+                $(this).find("i").removeClass("fa-plus-circle").addClass("fa-minus-circle");
+
+            }
+
+        });
+
+        var loadingWizard = true;
+
+        $(function () {
+            $(document).ready(function () {
+                App.init();
+                Demo.init();
+
+                // init filters
+                getPlans();
+
+                loadButtonsFromStatus()
+
+                $("#TxtDateProduccionLot").datepicker({
+                    dateFormat: 'yy-mm-dd',
+                    changeYear: true,
+                    changeMonth: true,
+                });
+                $('#OA').hide();
+                $('.selectpicker').selectpicker();
+                PageDemo.init();
+
+                $(".date-format").datepicker({
+                    dateFormat: 'yy-mm-dd'
+                });
+
+                $('.time-format').datetimepicker({
+                    format: 'HH:mm'
+                });
+
+                $("input[name='SelectedPurityFilter']").on('input', function () {
+                    $(this).val(function (i, v) {
+                        return v.replace('%', '') + '%';
+                    });
+                });
+                if(@Model.Id > 0) {
+                    $('#FilterInit').prop("disabled", true)
+                    $('#FilterInit').css('pointer-events', 'none')
+                    $('.container-op').removeAttr('hidden');
+                    $('.container-empty-op').prop("hidden", true);
+                }
+                else {
+                    $('.container-op').prop("hidden", true);
+                    $('.container-empty-op').removeAttr('hidden');
+                }
+
+                if (@Model.StepSaved >= 0) {
+                    let checkedProductionEquipmentIsAvailable = $("#ProductionEquipmentIsAvailable").val()
+                    if(checkedProductionEquipmentIsAvailable === "True")
+                    {
+                        $("#ProductionEquipmentCheckTrue").prop("checked", true)
+                        $("#ProductionEquipmentCheckFalse").prop("checked", false)
+                        $('#table-2').removeAttr('hidden');
+                    }
+                    else if(checkedProductionEquipmentIsAvailable === "False")
+                    {
+                        $("#ProductionEquipmentCheckTrue").prop("checked", false)
+                        $("#ProductionEquipmentCheckFalse").prop("checked", true)
+                        $('#table-2').prop('hidden', true);
+                    }
+
+                    let reviewedBy = $("#ProductionEquipmentReviewedBy").val()
+                    let reviewedDateString = $("#ProductionEquipmentReviewedDate").val()
+                    let reviewedDate = !isNullOrEmpty(reviewedDateString) ? new Date(reviewedDateString) : null
+                    $('#ProductionEquipmentReviewedSignature').html(getSignature(reviewedBy, reviewedDate))
+
+                    $("#table-2").find("tbody tr").each(function (index) {
+                        let checked = $(this).find("#MonitoringEquipmentIsCalibrated"+index).val()
+
+                        if(checked === "True")
+                        {
+                            $(this).find("#MonitoringEquipmentCheckTrue"+index).prop("checked", true)
+                            $(this).find("#MonitoringEquipmentCheckFalse"+index).prop("checked", false)
+                        }
+                        else if(checked === "False")
+                        {
+                            $(this).find("#MonitoringEquipmentCheckTrue"+index).prop("checked", false)
+                            $(this).find("#MonitoringEquipmentCheckFalse"+index).prop("checked", true)
+                        }
+
+                        let reviewedBy = $(this).find("#MonitoringEquipmentReviewedBy"+index).val()
+                        let reviewedDateString = $(this).find("#MonitoringEquipmentReviewedDate"+index).val()
+                        let reviewedDate = !isNullOrEmpty(reviewedDateString) ? new Date(reviewedDateString) : null
+                        $(this).find("#MonitoringEquipmentReviewedSignature"+index).html(getSignature(reviewedBy, reviewedDate))
+                    });
+                }
+                if (@Model.StepSaved >= 1) {
+                    $('#step1').find('input').each(function () {
+                        $(this).prop("disabled", true);
+                    });
+
+                    let checkedPipelineClearanceInCompliance = $("#PipelineClearanceInCompliance").val()
+                    if(checkedPipelineClearanceInCompliance === "True")
+                    {
+                        $("#PipelineClearanceCheckTrue").prop("checked", true)
+                        $("#PipelineClearanceCheckFalse").prop("checked", false)
+
+                        $('#table-4').show()
+                    }
+                    else if(checkedPipelineClearanceInCompliance === "False")
+                    {
+                        $("#PipelineClearanceCheckTrue").prop("checked", false)
+                        $("#PipelineClearanceCheckFalse").prop("checked", true)
+
+                        $('#table-4').hide()
+                    }
+
+                    let reviewedBy = $("#PipelineClearanceReviewedBy").val()
+                    let reviewedDateString = $("#PipelineClearanceReviewedDate").val()
+                    let reviewedDate = !isNullOrEmpty(reviewedDateString) ? new Date(reviewedDateString) : null
+                    $('#PipelineClearanceReviewedSignature').html(getSignature(reviewedBy, reviewedDate))
+
+                    let productionStartedDateString = $("#PipelineClearanceProductionStartedDate").val()
+                    let productionStartedDate = !isNullOrEmpty(productionStartedDateString) ? new Date(productionStartedDateString) : null
+                    if(productionStartedDate !== null) {
+                        $('#TxtDateProduccionLot').val(getDate(productionStartedDate))
+                        $('#TxtDateHProduccionLot').val(getDateTime(productionStartedDate))
+                    }
+                    const productionEndDateString = $("#PipelineClearanceProductionEndDate").val()
+                    const productionEndDate = !isNullOrEmpty(productionEndDateString) ? new Date(productionEndDateString) : null
+                    if (productionEndDate !== null) {
+                        $('#TxtDateProduccionLotEnd').val(getDate(productionEndDate))
+                        $('#TxtDateHProduccionLotEnd').val(getDateTime(productionEndDate))
+                    }
+                }
+                if (@Model.StepSaved > 2) {
+                    $('#step2').find('input').each(function () {
+                        $(this).prop("disabled", true);
+                    });
+
+                    $("#table-5").find("tbody tr").each(function (index) {
+                        let checked = $(this).find("#ControlVariablesInCompliance"+index).val()
+
+                        if(checked === "True")
+                        {
+                            $(this).find("#ControlVariablesCheckTrue"+index).prop("checked", true)
+                            $(this).find("#ControlVariablesCheckFalse"+index).prop("checked", false)
+                        }
+                        else if(checked === "False")
+                        {
+                            $(this).find("#ControlVariablesCheckTrue"+index).prop("checked", false)
+                            $(this).find("#ControlVariablesCheckFalse"+index).prop("checked", true)
+                        }
+
+                        let reviewedBy = $(this).find("#ControlVariablesReviewedBy"+index).val()
+                        let reviewedDateString = $(this).find("#ControlVariablesReviewedDate"+index).val()
+                        let reviewedDate = !isNullOrEmpty(reviewedDateString) ? new Date(reviewedDateString) : null
+                        $(this).find("#ControlVariablesReviewedSignature"+index).html(getSignature(reviewedBy, reviewedDate))
+                    });
+
+                    $("#table-6").find("tbody tr").each(function (index) {
+                        let checked = $(this).find("#CriticalParametersInCompliance"+index).val()
+
+                        if(checked === "True")
+                        {
+                            $(this).find("#CriticalParametersCheckTrue"+index).prop("checked", true)
+                            $(this).find("#CriticalParametersCheckFalse"+index).prop("checked", false)
+                        }
+                        else if(checked === "False")
+                        {
+                            $(this).find("#CriticalParametersCheckTrue"+index).prop("checked", false)
+                            $(this).find("#CriticalParametersCheckFalse"+index).prop("checked", true)
+                        }
+
+                        let reviewedBy = $(this).find("#CriticalParametersReviewedBy"+index).val()
+                        let reviewedDateString = $(this).find("#CriticalParametersReviewedDate"+index).val()
+                        let reviewedDate = !isNullOrEmpty(reviewedDateString) ? new Date(reviewedDateString) : null
+                        $(this).find("#CriticalParametersReviewedSignature"+index).html(getSignature(reviewedBy, reviewedDate))
+                    });
+                }
+                if (@Model.StepSaved >= 3) {
+                    $("#table-7").find("tbody tr").each(function (index) {
+                        let checked = $(this).find("#CriticalQualityAttributesInCompliance"+index).val()
+
+                        if(checked === "True")
+                        {
+                            $(this).find("#CriticalQualityAttributesCheckTrue"+index).prop("checked", true)
+                            $(this).find("#CriticalQualityAttributesCheckFalse"+index).prop("checked", false)
+                        }
+                        else if(checked === "False")
+                        {
+                            $(this).find("#CriticalQualityAttributesCheckTrue"+index).prop("checked", false)
+                            $(this).find("#CriticalQualityAttributesCheckFalse"+index).prop("checked", true)
+                        }
+
+                        let reviewedBy = $(this).find("#CriticalQualityAttributesReviewedBy"+index).val()
+                        let reviewedDateString = $(this).find("#CriticalQualityAttributesReviewedDate"+index).val()
+                        let reviewedDate = !isNullOrEmpty(reviewedDateString) ? new Date(reviewedDateString) : null
+                        $(this).find("#CriticalQualityAttributesReviewedSignature"+index).html(getSignature(reviewedBy, reviewedDate))
+                    });
+                }
+                if (@Model.StepSaved >= 4) {
+                    let checkedBatchDetailsReleasedBy = $("#BatchDetailsIsReleased").val()
+                    if(checkedBatchDetailsReleasedBy === "True")
+                    {
+                        $("#BatchDetailsReleasedCheckTrue").prop("checked", true)
+                        $("#BatchDetailsReleasedCheckFalse").prop("checked", false)
+                    }
+                    else if(checkedBatchDetailsReleasedBy === "False")
+                    {
+                        $("#ReleasedCheckTrue").prop("disabled", true)
+                        $("#BatchDetailsReleasedCheckTrue").prop("checked", false)
+                        $("#BatchDetailsReleasedCheckFalse").prop("checked", true)
+                    }
+
+                    let releasedBy = $("#BatchDetailsReleasedBy").val()
+                    let releasedDateString = $("#BatchDetailsReleasedDate").val()
+                    let releasedDate = !isNullOrEmpty(releasedDateString) ? new Date(releasedDateString) : null
+                    $('#BatchDetailsReleasedSignature').html(getSignature(releasedBy, releasedDate))
+                }
+
+                if (@Model.StepSaved > 5) {
+                    $('#step5').find('input').each(function () {
+                        $(this).prop("disabled", true);
+                    });
+
+                    let checkedReleasedBy = $("#IsReleased").val()
+                    if(checkedReleasedBy === "True")
+                    {
+                        $("#ReleasedCheckTrue").prop("checked", true)
+                        $("#ReleasedCheckFalse").prop("checked", false)
+                    }
+                    else if(checkedReleasedBy === "False")
+                    {
+                        $("#ReleasedCheckTrue").prop("checked", false)
+                        $("#ReleasedCheckFalse").prop("checked", true)
+                    }
+
+
+                    let releasedBy = $("#ReleasedBy").val()
+                    let releasedDateString = $("#ReleasedDate").val()
+                    let releasedDate = !isNullOrEmpty(releasedDateString) ? new Date(releasedDateString) : null
+                    $('#ReleasedSignature').html(getSignature(releasedBy, releasedDate))
+                }
+                if (@Model.StepSaved >= 6) {
+                    $('#step3').find('input').each(function () {
+                        $(this).prop("disabled", true);
+                    });
+
+                    $('#step4').find('input').each(function () {
+                        $(this).prop("disabled", true);
+                    });
+                    $('#step4').find('select').each(function () {
+                        $(this).prop("disabled", true);
+                    });
+                    $('#step4').find('button').each(function () {
+                        if ($(this).attr('id').startsWith("Btngraphs")) {
+                            $(this).prop("disabled", false);
+                        }
+                        else if ($(this).attr('id').startsWith("btnshowFile")) {
+                            $(this).prop("disabled", false);
+                        }
+                        else {
+                            $(this).prop("disabled", true);
+                        }
+                    });
+                    $('#step6').find('input').each(function () {
+                        $(this).prop("disabled", true);
+                    });
+
+                    $("#btnCloseOrder").prop("disabled", true);
+                    $("#OA").show();
+                }
+                ///JJGR TABLE8
+                let checked = $(this).find("#BatchDetailsInComplianceCheckFalse").is(':checked')
+                if (checked === true) {
+                    $(this).find("#BatchDetailsReleasedCheckTrue").prop("disabled", true);
+                    $(this).find("#ReleasedCheckTrue").prop("disabled", true);
+                }
+
+                $('input[type=text]').focus(function() { $(this).removeClass("border-danger") })
+
+                // MEG set active tab ERROR SAVE IN LOAD PAGE
+                var step = isNullOrEmpty(@Model.StepSaved) ? 0 : @Model.StepSaved
+                step = step > 0 ? (step - 1) : 0
+                $("#wizard").bwizard("show", step)
+                loadingWizard = false;
+                //AHF
+                $("#btnPrevious").click(function () {
+                    if (+$("#StepSaved").val() >= 1) {
+                        $(".previous").click();
+                    }
+                });
+                $("#btnNext").click(function () {
+                    if (+$("#StepSaved").val() <= 6) {
+                        $(".next").click();
+                    }
+                });
+                const filesInitial = $('[id^=CriticalQualityAttributesChartPath]');
+                if (!!filesInitial && !!filesInitial.length) {
+                    $.each(filesInitial, (index, x) => {
+                        if (!!x.value) {
+                            $(`#btnuploadFile${index}`).hide();
+                            $(`#btndeleteFile${index}`).show();
+                            $(`#btnshowFile${index}`).show();
+                        }
+                    });
+                }
+                $("#BtnCancelar").click(function () {
+                    $("#ModalCancel").modal({
+                        backdrop: 'static',
+                        keyboard: false
+                    }, "show");
+                });
+                $("#BtnCancelarApprove").click(function () {
+                    $("#ModalCancelApprove").modal({
+                        backdrop: 'static',
+                        keyboard: false
+                    }, "show");
+                });
+            })
+        });
+
+        var loadButtonsFromStatus = function () {
+            //inicializa
+            $('#BtnCancelarApprove').prop('hidden', true);
+            $('#Guardar').prop('hidden', false);
+
+            ///cuando se encuentra en cancelación
+            if ($("#Status").val() === "OP-En cancelación") {
+                $('#BtnCancelarApprove').prop('hidden', false);
+                $('#BtnCancelar').prop('hidden', true);
+                $('#Guardar').prop('hidden', true);
+            }
+            ///cuando ya se dictaminó
+            if ($("#Status").val() === "OP-Cancelada" || $("#Status").val() === "OP-Liberada" || $("#Status").val() === "OP-Rechazada") {
+                $('#BtnCancelar').prop('hidden', true);
+                $('#BtnCancelarApprove').prop('hidden', true);
+                $('#Guardar').prop('hidden', true);
+                $('#btnCloseOrder').prop('hidden', true);
+                $('#ReleasedCheckFalse').prop('disabled', true);
+                $('#updateBatchDetailsAnalysisBtn').prop('disabled', true);
+                $('#btnNotificationConfirm').prop('disabled', true);
+            }
+            ///para eliminar boton consulta oa en OP-Cancelada
+            if ($("#Status").val() === "OP-Cancelada"){
+                  $('#ConsultarOA').prop('hidden', true);
+            }
+        }
+
+        var getPlans = function () {
+            $.ajax({
+                type: "GET",
+                url: "/ProductionOrder/GetPlants",
+                success: function (response) {
+                    $("#SelectedPlantFilter").empty()
+                    $("#SelectedProductFilter").empty()
+                    $("#SelectedTankFilter").empty()
+
+                    $("#SelectedProductFilter").prop("disabled", true)
+                    $("#SelectedTankFilter").prop("disabled", true)
+
+                    response.data.forEach(function(item) {
+                        $("#SelectedPlantFilter").append($('<option>', {
+                            value: item.value,
+                            text: item.text
+                        }))
+                    });
+
+                    $('.selectpicker').selectpicker('refresh');
+                }
+            });
+        }
+
+        var getProducts = function (element) {
+            const plantId = $(element).val()
+
+            $.ajax({
+                type: "GET",
+                url: "/ProductionOrder/GetProduts?plantId=" + plantId,
+                success: function (response) {
+                    $("#SelectedProductFilter").empty()
+                    $("#SelectedTankFilter").empty()
+
+                    $("#SelectedProductFilter").prop("disabled", false)
+                    $("#SelectedTankFilter").prop("disabled", true)
+
+                    response.data.forEach(function(item) {
+                        $("#SelectedProductFilter").append($('<option>', {
+                            value: item.value,
+                            text: item.text
+                        }))
+                    });
+
+                    $('.selectpicker').selectpicker('refresh');
+                }
+            });
+        }
+
+        var getTanks = function (element) {
+            const plantId = $("#SelectedPlantFilter").val()
+            const productId = $(element).val()
+
+            $.ajax({
+                type: "GET",
+                url: "/ProductionOrder/GetTanks?plantId=" + plantId + "&productId=" + productId,
+                success: function (response) {
+                    $("#SelectedTankFilter").empty()
+
+                    $("#SelectedTankFilter").prop("disabled", false)
+
+                    response.data.forEach(function(item) {
+                        $("#SelectedTankFilter").append($('<option>', {
+                            value: item.value,
+                            text: item.text
+                        }))
+                    });
+
+                    $('.selectpicker').selectpicker('refresh')
+                }
+            });
+        }
+
+        var getPurity = function () {
+            const productId = $("#SelectedProductFilter").val()
+
+            if(isNullOrEmpty(productId)) {
+                $("#SelectedProductFilter").addClass("btn-danger")
+                $("#SelectedProductFilter").addClass("border-danger")
+                $('.selectpicker').selectpicker()
+                return false
+            }
+
+            $.ajax({
+                type: "GET",
+                url: "/ProductionOrder/GetPurity?productId=" + productId,
+                success: function (response) {
+                    $("#SelectedPurityFilter").val(response.data)
+                }
+            });
+        }
+
+        var Save = function (event) {
+            if (@Model.Id > 0) {
+                var step = $('#StepSaved').val()
+                if (step === undefined || step === null || step === "" || step == 0) {
+                    step = 1
+                }
+                SaveSteps(parseInt(step))
+            }
+            else {
+                var valorAccion
+                $.ajax({
+                    type: "POST",
+                    url: "/ProductionOrder/SaveInitOP",
+                    data: serializeProductionOrder(),
+                    dataType: "json",
+                    success: function (response) {
+                        valorAccion = response.message;
+                        if (response.result == "Ok") {
+                            $.gritter.add({
+                                title: "Orden de produccion creada",
+                                class_name: "gritter-light"
+                            })
+                            window.location.href = '@Url.Action("New", "ProductionOrder")?Id=' + valorAccion;
+                        }
+                        else {
+                            $.gritter.add({
+                                title: "Ocurrió un error",
+                                text: response.message,
+                                class_name: "gritter-light"
+                            })
+
+                            return false;
+                        }
+                    }
+                });
+            }
+        }
+
+        var ShowDetailDL = function (event) {
+            //Despeje de línea historial
+            $.ajax({
+                type: "GET",
+                url: "/ProductionOrder/GetDetailDL/?Id=@Model.Id",
+                success: function (partialViewResult) {
+                    $("#table3-detailInfo").html(partialViewResult);
+                    $('#table3-detailInfo').prop('hidden', false);
+
+                    // load signature and second notes
+                    $("#table-3Detail").find("tbody tr").each(function (index) {
+                        let reviewedBy = $(this).find("#DeviationReportReviewedBySecond"+index).val()
+                        let reviewedDateString = $(this).find("#DeviationReportReviewedDateSecond"+index).val()
+                        let reviewedDate = !isNullOrEmpty(reviewedDateString) ? new Date(reviewedDateString) : null
+                        var reviewedSignature = getSignature(reviewedBy, reviewedDate)
+                        $(this).find("#DeviationReportReviewedSecondSignature"+index).html(reviewedSignature)
+
+                        if (!isNullOrEmpty(reviewedBy) || !isNullOrEmpty(reviewedDateString)) {
+                            $(this).find('#btnDeviationReportReviewedSecondSignature'+index).prop('hidden', true)
+                        }
+                    });
+                }
+            });
+        }
+
+        var HiddeDetailDL = function (event) {
+            $('#table3-detailInfo').prop('hidden', true);
+        }
+
+        function signDeviationReport(index) {
+            var reviewedDate = new Date(Date.now())
+            $('#DeviationReportReviewedBySecond'+index).val("@userFirstName")
+            $('#DeviationReportReviewedDateSecond'+index).val(getDateString(reviewedDate))
+            $('#DeviationReportReviewedSecondSignature'+index).html(getSignature("@userFirstName", reviewedDate))
+
+            Save()
+
+            $('#DeviationReportNotesSecond'+index).prop('disabled', false)
+            $("#PipelineClearanceCheckTrue").prop("disabled", false)
+            $("#PipelineClearanceCheckFalse").prop("disabled", false)
+            $('#btnDeviationReportReviewedSecondSignature'+index).prop('hidden', true)
+        }
+
+        var ShowHistory = function (event) {
+            $('#table-HistoryNotes').prop('hidden', false);
+            //Despeje de línea historial
+            var tableDLhistorial = $("#table-HistoryNotes").DataTable({
+                "ajax": {
+                    "url": "/ProductionOrder/GetHistoryDetail/?Id=@Model.Id",
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "note" },
+                    { "data": "source" },
+                    { "data": "user" },
+                    { "data": "date", "render": function ( data, type, row ) {
+                        return getDate(new Date(data)) + ' ' + getDateTime(new Date(data))
+                    } },                ],
+                destroy: true,
+                pageLength: 20,
+                orderCellsTop: true,
+                fixedHeader: true,
+                bLengthChange: false,
+                bFilter: true,
+                bAutoWidth: false,
+                bPaginate: false,
+                searching: false,
+                dom: 'Bfrtip',
+                "bInfo": false,
+                buttons: [
+                    {
+                        extend: 'pdf',
+                        className: 'hide',
+                        charset: 'utf-8',
+                        bom: true
+                    }
+                ],
+                "language": {
+                    "search": '<i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                    "searchPlaceholder": '@searchPlaceholder',
+                    "emptyTable": "@emptyTable",
+                    "lengthMenu": "@lengthMenu",
+                    "info": "@info",
+                    "loadingRecords": "@loadingRecords",
+                    "processing": "@processing",
+                    "zeroRecords": "@zeroRecords",
+                    "infoEmpty": "@infoEmpty",
+                    "infoFiltered": "@infoFiltered",
+                },
+                "order": [],
+                "columnDefs": [{
+                    "targets": 'no-sort',
+                    "orderable": false,
+                }]
+
+            });
+        }
+
+        var HiddeHistory = function (event) {
+            $('#table-HistoryNotes').prop('hidden', true);
+        }
+
+        var ShowHistoryState = function (event) {
+            $('#table-HistoryState').prop('hidden', false);
+            //Despeje de línea historial
+            var tableDLhistorial = $("#table-HistoryState").DataTable({
+                "ajax": {
+                    "url": "/ProductionOrder/GetHistoryStateDetail/?Id=@Model.Id",
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "user" },
+                    { "data": "date", "render": function ( data, type, row ) {
+                        return getDate(new Date(data)) + ' ' + getDateTime(new Date(data))
+                    } },
+                    { "data": "state" },
+                ],
+                destroy: true,
+                pageLength: 20,
+                orderCellsTop: true,
+                fixedHeader: true,
+                bLengthChange: false,
+                bFilter: true,
+                bAutoWidth: false,
+                bPaginate: false,
+                searching: false,
+                dom: 'Bfrtip',
+                "bInfo": false,
+                buttons: [
+                    {
+                        extend: 'pdf',
+                        className: 'hide',
+                        charset: 'utf-8',
+                        bom: true
+                    }
+                ],
+                "language": {
+                    "search": '<i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                    "searchPlaceholder": '@searchPlaceholder',
+                    "emptyTable": "@emptyTable",
+                    "lengthMenu": "@lengthMenu",
+                    "info": "@info",
+                    "loadingRecords": "@loadingRecords",
+                    "processing": "@processing",
+                    "zeroRecords": "@zeroRecords",
+                    "infoEmpty": "@infoEmpty",
+                    "infoFiltered": "@infoFiltered",
+                },
+                "order": [],
+                "columnDefs": [{
+                    "targets": 'no-sort',
+                    "orderable": false,
+                }]
+
+            });
+
+        }
+
+        var HiddeStateHistory  = function (event) {
+            $('#table-HistoryState').prop('hidden', true);
+        }
+
+        var CancelPro = function () {
+            var step = $('#StepSaved').val()
+            $("#btnCancelModalCancel").prop("disabled", true);
+            $("#Cancel").prop("hidden", true);
+            $("#imgLoadingCancelNotificacion").show();
+            $.ajax({
+                async: true,
+                type: "POST",
+                url: "/ProductionOrder/Cancel?step=" + step,
+                data: {
+                    __RequestVerificationToken: $("[name='__RequestVerificationToken']").val(),
+                    "Plant": $("#Plant").val(),
+                    "ReasonReject": $("#ReasonRejectCancel").val(),
+                    "Id": @Model.Id,
+                    "ProductName": $("#SelectedProductFilter").val(),
+                    "BatchDetails": {
+                        "Number": $("#BatchDetailsNumber").text()
+                    }
+                },
+                dataType: "json",
+                success: function (response) {
+                    if (response.result === "Ok") {
+                        $.gritter.add({
+                            title: "Mensaje",
+                            text: response.message,
+                            class_name: "gritter-light gritter-center"
+                        });
+                        $('#StatusLbl').text(response.status);
+                        $("#Status").val(response.status);
+                        $('#BtnCancelar').prop('hidden', true);
+                        $('#BtnCancelarApprove').prop('hidden', false);
+                        $("#ReasonRejectCancelApprove").val($("#ReasonRejectCancel").val());
+                    } else {
+                        $.gritter.add({
+                            title: "Ocurrió un error",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        });
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error(jqXHR);
+                    $.gritter.add({
+                        title: "Error",
+                        text: "Ocurrio un error, por favor comunicate con el Administrador",
+                        class_name: "gritter-light"
+                    });
+                },
+                complete: function (jqXHR, textStatus) {
+                    $("#btnCancelModalCancel").prop("disabled", false);
+                    $("#Cancel").prop("hidden", false);
+                    $("#imgLoadingCancelNotificacion").hide();
+                    $('#ModalCancel').modal('hide');
+                }
+            });
+        }
+
+        var CancelApprove = function () {
+            var step = $('#StepSaved').val()
+            $("#btnRejectCancel").prop("disabled", true);
+            $("#btnApproveCancel").prop("hidden", true);
+            $("#imgLoadingCancelAproveNotificacion").show();
+            $.ajax({
+                async: true,
+                type: "POST",
+                url: "/ProductionOrder/CancelApprove?step=" + step,
+                data: {
+                    __RequestVerificationToken: $("[name='__RequestVerificationToken']").val(),
+                    "Plant": $("#Plant").val(),
+                    "ReasonReject": $("#ReasonRejectCancelApprove").val(),
+                    "Id": @Model.Id,
+                    "ProductName": $("#SelectedProductFilter").val(),
+                    "BatchDetails": {
+                        "Number": $("#BatchDetailsNumber").text()
+                    }
+                },
+                dataType: "json",
+                success: function (response) {
+                    if (response.result === "Ok") {
+                        $.gritter.add({
+                            title: "Mensaje",
+                            text: response.message,
+                            class_name: "gritter-light gritter-center"
+                        });
+                        $('#StatusLbl').text(response.status);
+                        $("#Status").val(response.status);
+                        $('#BtnCancelar').prop('hidden', true);
+                        $('#BtnCancelarApprove').prop('hidden', true);
+                        $('#Guardar').prop('hidden', true);
+                        window.location.href = '@Url.Action("New", "ProductionOrder")?Id=' + @Model.Id;
+                    } else {
+                        $.gritter.add({
+                            title: "Ocurrió un error",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        });
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error(jqXHR);
+                    $.gritter.add({
+                        title: "Error",
+                        text: "Ocurrio un error, por favor comunicate con el Administrador",
+                        class_name: "gritter-light"
+                    });
+                },
+                complete: function (jqXHR, textStatus) {
+                    $("#btnRejectCancel").prop("disabled", false);
+                    $("#btnApproveCancel").prop("hidden", false);
+                    $("#imgLoadingCancelAproveNotificacion").hide();
+                    $('#ModalCancelApprove').modal('hide');
+                }
+            });
+        }
+
+        var CancelReject = function () {
+            var step = $('#StepSaved').val()
+            $("#btnRejectCancel").prop("hidden", true);
+            $("#btnApproveCancel").prop("disabled", true);
+            $("#imgLoadingCancelAproveNotificacion").show();
+            $.ajax({
+                async: true,
+                type: "POST",
+                url: "/ProductionOrder/CancelReject?step=" + step,
+                data: {
+                    __RequestVerificationToken: $("[name='__RequestVerificationToken']").val(),
+                    "Plant": $("#Plant").val(),
+                    "ReasonReject": $("#ReasonRejectCancelApprove").val(),
+                    "Id": @Model.Id,
+                    "ProductName": $("#SelectedProductFilter").val(),
+                    "BatchDetails": {
+                        "Number": $("#BatchDetailsNumber").text()
+                    }
+                },
+                dataType: "json",
+                success: function (response) {
+                    if (response.result === "Ok") {
+                        $.gritter.add({
+                            title: "Mensaje",
+                            text: response.message,
+                            class_name: "gritter-light gritter-center"
+                        });
+                        $("#StatusLbl").text(response.status);
+                        $("#Status").val(response.status);
+                        $('#BtnCancelar').prop('hidden', false);
+                        $('#BtnCancelarApprove').prop('hidden', true);
+                        $('#Guardar').prop('hidden', true);
+                    } else {
+                        $.gritter.add({
+                            title: "Ocurrió un error",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error(jqXHR);
+                    $.gritter.add({
+                        title: "Error",
+                        text: "Ocurrio un error, por favor comunicate con el Administrador",
+                        class_name: "gritter-light"
+                    });
+                },
+                complete: function (jqXHR, textStatus) {
+                    $("#btnRejectCancel").prop("hidden", false);
+                    $("#btnApproveCancel").prop("disabled", false);
+                    $("#imgLoadingCancelAproveNotificacion").hide();
+                    $('#ModalCancelApprove').modal('hide');
+                }
+            });
+        }
+
+        var SaveDespeje = function () {
+            if ( isNullOrEmpty($('#PipelineClearance_Notes').val()) || isNullOrEmpty($('#PipelineClearance_Bill').val()) )
+            {
+                $('#PipelineClearance_Notes').addClass("border-danger")
+                $('#PipelineClearance_Bill').addClass("border-danger")
+                $('#ModalSaveDespejeError').html('Folio y Observaciones son requeridos es requirido.')
+                $('#ModalSaveDespejeError').removeAttr('hidden')
+                return
+            }
+            $("#btnDespejeNotificacionCancel").prop("disabled", true);
+            $("#btnDespejeNotificacionSave").prop("hidden", true);
+            $("#imgLoadingDespejeNotificacion").show();
+            $.ajax({
+                type: "POST",
+                url: "/ProductionOrder/SaveDespeje/",
+                async: true,
+                data: {
+                    __RequestVerificationToken: $("[name='__RequestVerificationToken']").val(),
+                    "ProductionOrderId": @Model.Id,
+                    "Bill": $('#PipelineClearance_Bill').val(),
+                    "Notes": $('#PipelineClearance_Notes').val(),
+                    "ReviewedBy": $('#PipelineClearanceReviewedBy').val(),
+                    "ReviewedDate": $('#PipelineClearanceReviewedDate').val(),
+                    "InCompliance": false,
+                    "Activitie": $('#PipelineClearance_Activitie').val(),
+                    "SelectedPlantFilter": $('#SelectedPlantFilter').val(),
+                    "PlantId": '@Model.Plant',
+                    "BatchDetailsNumber": $("#BatchDetailsNumber").text()
+                },
+                dataType: "json",
+                success: function (response) {
+                    if (response.message) {
+                        $.gritter.add({
+                            title: "Mensaje",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+                    }
+                    $('#ModalDespeje').modal('hide')
+                    clearDespeje();
+                    $("#PipelineClearanceCheckTrue").prop("disabled", true)
+                    $("#PipelineClearanceCheckFalse").prop("disabled", true)
+                    ShowDetailDL();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error(jqXHR);
+                    $.gritter.add({
+                        title: "Error",
+                        text: "Ocurrio un error, por favor comunicate con el Administrador",
+                        class_name: "gritter-light"
+                    });
+                },
+                complete: function (jqXHR, textStatus) {
+                    $("#btnDespejeNotificacionCancel").prop("disabled", false);
+                    $("#btnDespejeNotificacionSave").prop("hidden", false);
+                    $("#imgLoadingDespejeNotificacion").hide();
+                }
+            });
+        }
+
+        var clearModalDespeje = function() {
+            $('#ModalSaveDespejeError').html('')
+            $('#ModalSaveDespejeError').prop("hidden", true)
+            $('#PipelineClearance_Notes').removeClass("border-danger")
+            $('#PipelineClearance_Bill').removeClass("border-danger")
+            $('#PipelineClearance_Notes').val('')
+            $('#PipelineClearance_Bill').val('')
+        }
+        function clearDespeje() {
+            $('#PipelineClearanceCheckFalse').prop('checked', false);
+            $('#PipelineClearanceReviewedSignature').html('');
+            clearModalDespeje();
+        }
+
+        function SaveSteps(step) {
+            return $.ajax({
+                type: "POST",
+                url: "/ProductionOrder/Save/?step=" + step,
+                data: serializeProductionOrder(),
+                dataType: "json",
+                async: false,
+                success: function (response) {
+                    console.log(response);
+                    if (response.result === "Ok") {
+
+                        //$.gritter.add({
+                        //    title: "Mensaje",
+                        //    text: response.message,
+                        //    class_name: "gritter-light gritter-center"
+                        //});
+                    }
+                    else {
+                        $.gritter.add({
+                            title: "Ocurrió un error",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+                    }
+                }
+            });
+        }
+
+        $("#ProductionEquipmentCheckTrue").change(function () {
+            if ($(this).is(':checked')) {
+                $('#ProductionEquipmentCheckFalse').prop('checked', false);
+
+                var reviewedDate = new Date(Date.now());
+                $('#ProductionEquipmentReviewedBy').val("@userFirstName")
+                $('#ProductionEquipmentReviewedDate').val(getDateString(reviewedDate));
+                $('#ProductionEquipmentReviewedSignature').html(getSignature("@userFirstName", reviewedDate));
+
+                $('#table-2').removeAttr('hidden');
+
+                if(validateStep1()) {
+                    $('#ModalMensajesLabel').html('Información ')
+                    $('#mbody').text("La información ha sido completada en este paso, al avanzar la información sera inalterable");
+                    $('#ModalMensajes').modal('show');
+                }
+            }
+            else {
+                $('#ProductionEquipmentReviewedBy').val('')
+                $('#ProductionEquipmentReviewedDate').val('')
+                $('#ProductionEquipmentReviewedSignature').html("")
+
+                $('#table-2').prop('hidden', true);
+            }
+        });
+        $("#ProductionEquipmentCheckFalse").change(function () {
+            if ($(this).is(':checked')) {
+                $('#ProductionEquipmentCheckTrue').prop('checked', false);
+
+                var reviewedDate = new Date(Date.now());
+                $('#ProductionEquipmentReviewedBy').val("@userFirstName")
+                $('#ProductionEquipmentReviewedDate').val(getDateString(reviewedDate))
+                $('#ProductionEquipmentReviewedSignature').html(getSignature("@userFirstName", reviewedDate));
+
+                $('#table-2').prop('hidden', true);
+            }
+            else {
+                $('#ProductionEquipmentReviewedBy').val('')
+                $('#ProductionEquipmentReviewedDate').val('')
+                $('#ProductionEquipmentReviewedSignature').html("")
+
+                $('#table-2').prop('hidden', true);
+            }
+        });
+
+        $("#PipelineClearanceCheckTrue").change(function () {
+            if ($(this).is(':checked')) {
+                $('#PipelineClearanceCheckFalse').prop('checked', false);
+                var reviewedDate = new Date(Date.now());
+                $('#PipelineClearanceReviewedBy').val("@userFirstName")
+                $('#PipelineClearanceReviewedDate').val(getDateString(reviewedDate))
+                $('#PipelineClearanceReviewedSignature').html(getSignature("@userFirstName", reviewedDate))
+
+                $("#TxtDateProduccionLot").datepicker('option', 'minDate', 0);
+                $('#TxtDateProduccionLot').val(getDate(reviewedDate));
+                $('#TxtDateHProduccionLot').val(getDateTime(reviewedDate));
+                $('#table-4').show();
+
+                if(validateStep2()) {
+                    $('#ModalMensajesLabel').html('Información completada')
+                    $('#mbody').text("La información ha sido completada en este paso, al avanzar la información sera inalterable");
+                    $('#ModalMensajes').modal('show');
+                }
+            }
+            else {
+                $('#PipelineClearanceReviewedBy').val('')
+                $('#PipelineClearanceReviewedDate').val('')
+                $('#PipelineClearanceReviewedSignature').html("")
+
+                $('#TxtDateProduccionLot').val('')
+                $('#TxtDateHProduccionLot').val('')
+                $('#table-4').hide()
+            }
+        });
+        $("#PipelineClearanceCheckFalse").change(function () {
+            if ($(this).is(':checked')) {
+                $('#PipelineClearanceCheckTrue').prop('checked', false);
+
+                var reviewedDate = new Date(Date.now());
+                $('#PipelineClearanceReviewedBy').val("@userFirstName")
+                $('#PipelineClearanceReviewedDate').val(getDateString(reviewedDate))
+                $('#PipelineClearanceReviewedSignature').html(getSignature("@userFirstName", reviewedDate));
+
+                $('#TxtDateProduccionLot').val('')
+                $('#TxtDateHProduccionLot').val('')
+                $('#table-4').hide()
+
+                // abrir modal para capturar folio y observaciones y guardar, actualizar tabla de detalles
+                clearModalDespeje()
+                $('#ModalDespeje').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                }, 'show');
+            }
+            else {
+                $('#PipelineClearanceReviewedBy').val('')
+                $('#PipelineClearanceReviewedDate').val('')
+                $('#PipelineClearanceReviewedSignature').html("")
+
+                $('#TxtDateProduccionLot').val('')
+                $('#TxtDateHProduccionLot').val('')
+                $('#table-4').hide()
+            }
+        });
+
+        VariableSelector();
+
+        $(".yes-no-monitoring-equipment").each(function () {
+            $(this).change(function () {
+                let controlValue = $(this).attr("data-linde-control-value")
+                let controlGroup = $(this).attr("data-linde-control-group")
+                let controlId = $(this).attr("data-linde-control-id")
+
+                if (controlValue == "true")
+                {
+                    if ($(this).is(':checked')) {
+                        $('#' + controlGroup + 'CheckFalse' + controlId).prop('checked', false);
+
+                        var reviewedDate = new Date(Date.now());
+                        $('#' + controlGroup + 'ReviewedBy' + controlId).val("@userFirstName")
+                        $('#' + controlGroup + 'ReviewedDate' + controlId).val(getDateString(reviewedDate))
+                        $('#' + controlGroup + 'ReviewedSignature' + controlId).html(getSignature("@userFirstName", reviewedDate))
+
+                        $('#' + controlGroup + 'Notes' + controlId).val('NA')
+                        $('#' + controlGroup + 'Notes' + controlId).prop("disabled", true)
+
+                        if(validateStep1()) {
+                            $('#ModalMensajesLabel').html('Información completada')
+                            $('#mbody').text("La información ha sido completada en este paso, al avanzar la información sera inalterable");
+                            $('#ModalMensajes').modal('show');
+                        }
+                    }
+                    else {
+                        $('#' + controlGroup + 'ReviewedBy' + controlId).val('')
+                        $('#' + controlGroup + 'ReviewedDate' + controlId).val('')
+                        $('#' + controlGroup + 'ReviewedSignature' + controlId).html("")
+
+                        $('#' + controlGroup + 'Notes' + controlId).val('')
+                        $('#' + controlGroup + 'Notes' + controlId).prop("disabled", true)
+                    }
+                }
+                else
+                {
+                    if ($(this).is(':checked')) {
+                        $('#' + controlGroup + 'CheckTrue' + controlId).prop('checked', false);
+
+                        var reviewedDate = new Date(Date.now());
+                        $('#' + controlGroup + 'ReviewedBy' + controlId).val("@userFirstName")
+                        $('#' + controlGroup + 'ReviewedDate' + controlId).val(getDateString(reviewedDate))
+                        $('#' + controlGroup + 'ReviewedSignature' + controlId).html(getSignature("@userFirstName", reviewedDate))
+
+                        $('#' + controlGroup + 'Notes' + controlId).val('')
+                        $('#' + controlGroup + 'Notes' + controlId).prop("disabled", false)
+                    }
+                    else {
+                        $('#' + controlGroup + 'ReviewedBy' + controlId).val('')
+                        $('#' + controlGroup + 'ReviewedDate' + controlId).val('')
+                        $('#' + controlGroup + 'ReviewedSignature' + controlId).html("")
+
+                        $('#' + controlGroup + 'Notes' + controlId).val('')
+                        $('#' + controlGroup + 'Notes' + controlId).prop("disabled", true)
+                    }
+                }
+            })
+        });
+
+        $("#BatchDetailsReleasedCheckTrue").change(function () {
+            if ($(this).is(':checked')) {
+                $('#BatchDetailsReleasedCheckFalse').prop('checked', false)
+
+                @*var reviewedDate = new Date(Date.now())
+                $('#BatchDetailsReleasedBy').val("@userFirstName")
+                $('#BatchDetailsReleasedDate').val(getDateString(reviewedDate))
+                $('#BatchDetailsReleasedSignature').html(getSignature("@userFirstName", reviewedDate))
+
+                $('#BatchDetailsReleasedNotes').val('')
+                $('#BatchDetailsReleasedNotes').prop("disabled", false)*@
+
+                if(validateStep5()) {
+                    $('#ModalMensajesLabelRelease').html('Info')
+                    $('#mbodyRelease').text("¿Los datos fueron capturados correctamente?");
+                    $('#ModalMensajesRelease').modal('show');
+                    $('#BtnsuccessRelease').attr("onclick", "ReleaseTable8(1)")
+                    $('#BtndangerRelease').attr("onclick", "ReleaseTable8(0)")
+                }
+            }
+            else {
+                $('#BatchDetailsReleasedBy').val('')
+                $('#BatchDetailsReleasedDate').val('')
+                $('#BatchDetailsReleasedSignature').html("")
+
+                $('#BatchDetailsReleasedNotes').val('')
+                $('#BatchDetailsReleasedNotes').prop("disabled", true)
+            }
+        });
+        $("#BatchDetailsReleasedCheckFalse").change(function () {
+            if ($(this).is(':checked')) {
+                $('#BatchDetailsReleasedCheckTrue').prop('checked', false)
+
+                var reviewedDate = new Date(Date.now())
+                $('#BatchDetailsReleasedBy').val("@userFirstName")
+                $('#BatchDetailsReleasedDate').val(getDateString(reviewedDate))
+                $('#BatchDetailsReleasedSignature').html(getSignature("@userFirstName", reviewedDate))
+
+                $('#BatchDetailsReleasedNotes').val('')
+                $('#BatchDetailsReleasedNotes').prop("disabled", false)
+
+                if(validateStep5()) {
+                    $('#ModalMensajesLabel').html('Info')
+                    $('#mbody').text("Este paso ha sido completadas, al avanzar al Siguiente los cambios serán guardados y no podrás editarlos");
+                    $('#ModalMensajes').modal('show');
+                    $("#ReleasedCheckTrue").prop("disabled", true)
+                }
+            }
+            else {
+                $('#BatchDetailsReleasedBy').val('')
+                $('#BatchDetailsReleasedDate').val('')
+                $('#BatchDetailsReleasedSignature').html("")
+
+                $('#BatchDetailsReleasedNotes').val('')
+                $('#BatchDetailsReleasedNotes').prop("disabled", true)
+            }
+        });
+
+        $("#ReleasedCheckTrue").change(function () {
+            if ($(this).is(':checked')) {
+                $('#ReleasedCheckFalse').prop('checked', false)
+
+                @*var reviewedDate = new Date(Date.now())
+                $('#ReleasedBy').val("@userFirstName")
+                $('#ReleasedDate').val(getDateString(reviewedDate))
+                $('#ReleasedSignature').html(getSignature("@userFirstName", reviewedDate))
+
+                $('#ReleasedNotes').val('')
+                $('#ReleasedNotes').prop("disabled", false)
+                $('#OA').show();*@
+                $('#ModalMensajesLabelRelease').html('Info')
+                $('#mbodyRelease').text("¿Los datos fueron capturados correctamente?");
+                $('#ModalMensajesRelease').modal('show');
+                $('#BtnsuccessRelease').attr("onclick", "ReleaseTable9(1)")
+                $('#BtndangerRelease').attr("onclick", "ReleaseTable9(0)")
+
+            }
+            else {
+                $('#ReleasedBy').val('')
+                $('#ReleasedDate').val('')
+                $('#ReleasedSignature').html("")
+
+                $('#ReleasedNotes').val('')
+                $('#ReleasedNotes').prop("disabled", true)
+                $('#OA').hide();
+            }
+        });
+        $("#ReleasedCheckFalse").change(function () {
+            if ($(this).is(':checked')) {
+                $('#ReleasedCheckTrue').prop('checked', false)
+
+                var reviewedDate = new Date(Date.now())
+                $('#ReleasedBy').val("@userFirstName")
+                $('#ReleasedDate').val(getDateString(reviewedDate))
+                $('#ReleasedSignature').html(getSignature("@userFirstName", reviewedDate))
+
+                $('#ReleasedNotes').val('')
+                $('#ReleasedNotes').prop("disabled", false)
+                $('#OA').hide();
+            }
+            else {
+                $('#ReleasedBy').val('')
+                $('#ReleasedDate').val('')
+                $('#ReleasedSignature').html("")
+
+                $('#ReleasedNotes').val('')
+                $('#ReleasedNotes').prop("disabled", true)
+                $('#OA').hide();
+            }
+        });
+
+        function ChangeLine() {
+            var checkBox = document.getElementById("DlCheck2");
+            if (checkBox.checked == true) {
+            } else {
+                let now = new Date();
+                let today = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
+                $('#TxtDateProduccionLot').val(today);
+            }
+        }
+        function updateBatchDetailsAnalysis() {
+            let plantId = $('#Plant').val()
+            let productId = $('#ProductCode').val()
+            let tankId = $('#SelectedTankFilter').val()
+            let product = "@Model.ProductCode"
+            $.ajax({
+                async: true,
+                type: "GET",
+                url: "/ProductionOrder/GetBatchDetails?PlantId=" + plantId + "&ProductId=" + productId + "&TankId=" + tankId + "&product=" + product,
+                success: function (response) {
+                    $("#tabla8").html(response);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error(jqXHR);
+                    $.gritter.add({
+                        title: "Ocurrió un error",
+                        class_name: "gritter-light"
+                    });
+                },
+                complete: function (jqXHR, textStatus) {
+                    let checked = $("#BatchDetailsInComplianceCheckFalse").is(':checked')
+                    if (checked === false) {
+                        $("#BatchDetailsReleasedCheckTrue").prop("disabled", false);
+                        $("#BatchDetailsReleasedCheckFalse").prop("disabled", false);
+                    }
+                    else {
+                        $("#BatchDetailsReleasedCheckTrue").prop("disabled", true);
+                         if (isNullOrEmpty($('#BatchDetailsNotInComplianceFolio').val())) {
+                            $('#BatchDetailsNotInComplianceFolio').addClass("border-danger")
+                            $('#BatchDetailsNotInComplianceFolio').attr("onchange", "validateBatchDetailsInCompliance(this)")
+                        }
+                        if (isNullOrEmpty($('#BatchDetailsNotInComplianceNotes').val())) {
+                            $('#BatchDetailsNotInComplianceNotes').addClass("border-danger")
+                            $('#BatchDetailsNotInComplianceNotes').attr("onchange", "validateBatchDetailsInCompliance(this)")
+                        }
+                    }
+                }
+            });
+        }
+
+        function serializeProductionOrder() {
+            let monitoringEquipmentList = [];
+            $("#table-2").find("tbody tr").each(function (index) {
+                monitoringEquipmentList.push({
+                    "Id": $(this).find("#MonitoringEquipmenId"+index).text(),
+                    "Code": $(this).find("#MonitoringEquipmentCode"+index).text(),
+                    "Description": $(this).find("#MonitoringEquipmentDescription"+index).text(),
+                    "IsCalibrated": getCheckboxPairValue($(this).find("#MonitoringEquipmentCheckTrue"+index), $(this).find("#MonitoringEquipmentCheckFalse"+index)),
+                    "Notes": $(this).find("#MonitoringEquipmentNotes"+index).val(),
+                    "ReviewedBy": $(this).find("#MonitoringEquipmentReviewedBy"+index).val(),
+                    "ReviewedDate": $(this).find("#MonitoringEquipmentReviewedDate"+index).val(),
+                })
+            })
+
+            let pipelineClearanceHistory = [];
+            $("#table-3Detail").find("tbody tr").each(function (index) {
+                pipelineClearanceHistory.push({
+                    "Id": $(this).find("#DeviationReportId"+index).text(),
+                    "ReviewedBySecond": $(this).find("#DeviationReportReviewedBySecond"+index).val(),
+                    "ReviewedDateSecond": $(this).find("#DeviationReportReviewedDateSecond"+index).val(),
+                    "NotesSecond": $(this).find("#DeviationReportNotesSecond"+index).val(),
+                })
+            })
+
+            let controlVariablesList = [];
+            $("#table-5").find("tbody tr").each(function (index) {
+                controlVariablesList.push({
+                    "Id": $(this).find("#ControlVariablesId"+index).text(),
+                    "Area": $(this).find("#ControlVariablesArea"+index).val(),
+                    "Description": $(this).find("#ControlVariablesDescription"+index).val(),
+                    "Variable": $(this).find("#ControlVariablesVariable"+index).val(),
+                    "Specification": $(this).find("#ControlVariablesSpecification"+index).val(),
+                    "ChartPath": $(this).find("#ControlVariablesChartPath"+index).text(),
+                    "MaxValue": $(this).find("#ControlVariablesMaxValue"+index).val(),
+                    "MinValue": $(this).find("#ControlVariablesMinValue"+index).val(),
+                    "AvgValue": $(this).find("#ControlVariablesAvgValue"+index).val(),
+                    "InCompliance": getCheckboxPairValue($(this).find("#ControlVariablesCheckTrue"+index), $(this).find("#ControlVariablesCheckFalse"+index)),
+                    "DeviationReport": {
+                        "Folio": $(this).find("#ControlVariablesDeviationReportFolio"+index).val(),
+                        "Notes": $(this).find("#ControlVariablesDeviationReportNotes"+index).val(),
+                    },
+                    "Notes": $(this).find("#ControlNotes"+index).val(),
+                    "ReviewedBy": $(this).find("#ControlVariablesReviewedBy"+index).val(),
+                    "ReviewedDate": $(this).find("#ControlVariablesReviewedDate"+index).val(),
+                    "Type": 0,
+                    "LowLimit": $("#LowLimitVariable" + index).val(),
+                    "TopLimit": $("#TopLimitVariable" + index).val(),
+                    "DisplayName": $(`#DisplayNameVariable${index}`).text(),
+                    "VariableCode": $("#VariableCode" + index).val(),
+                })
+            })
+
+            let criticalParametersList = [];
+            $("#table-6").find("tbody tr").each(function (index) {
+                criticalParametersList.push({
+                    "Id": $(this).find("#CriticalParametersId"+index).text(),
+                    "Area": $(this).find("#CriticalParametersArea"+index).val(),
+                    "Description": $(this).find("#CriticalParametersDescription"+index).val(),
+                    "Parameter": $(this).find("#CriticalParametersParameter"+index).val(),
+                    "Specification": $(this).find("#CriticalParametersSpecification"+index).val(),
+                    "ChartPath": $(this).find("#CriticalParametersChartPath"+index).text(),
+                    "MaxValue": $(this).find("#CriticalParametersMaxValue"+index).val(),
+                    "MinValue": $(this).find("#CriticalParametersMinValue"+index).val(),
+                    "AvgValue": $(this).find("#CriticalParametersAvgValue"+index).val(),
+                    "InCompliance": getCheckboxPairValue($(this).find("#CriticalParametersCheckTrue"+index), $(this).find("#CriticalParametersCheckFalse"+index)),
+                    "DeviationReport": {
+                        "Folio": $(this).find("#CriticalParametersDeviationReportFolio"+index).val(),
+                        "Notes": $(this).find("#CriticalParametersDeviationReportNotes"+index).val(),
+                    },
+                    "Notes": $(this).find("#CriticalParametersNotes"+index).val(),
+                    "ReviewedBy": $(this).find("#CriticalParametersReviewedBy"+index).val(),
+                    "ReviewedDate": $(this).find("#CriticalParametersReviewedDate"+index).val(),
+                    "Type": 1,
+                    "FileValue": $("#fileAtributoValue" + index).val(),
+                    "LowLimit": $("#LowLimitCritical" + index).val(),
+                    "TopLimit": $("#TopLimitCritical" + index).val(),
+                    "DisplayName": $(`#DisplayNameCritical${index}`).text(),
+                    "VariableCode": $("#VariableCriticalCode" + index).val(),
+                })
+            })
+
+            let criticalQualityAttributesList = [];
+            $("#table-7").find("tbody tr").each(function (index) {
+                criticalQualityAttributesList.push({
+                    "Id": $(this).find("#CriticalQualityAttributesId" + index).text(),
+                    "Area": $(this).find("#CriticalQualityAttributesArea" + index).val(),
+                    "Description": $(this).find("#CriticalQualityAttributesDescription" + index).val(),
+                    "Attribute": $(this).find("#CriticalQualityAttributesAttribute" + index).val(),
+                    "Specification": $(this).find("#CriticalQualityAttributesSpecification" + index).val(),
+                    "ChartPath": $(this).find("#CriticalQualityAttributesChartPath" + index).val(),
+                    "MaxValue": !!$(this).find("#CriticalQualityAttributesMaxValue" + index).length ? $(this).find("#CriticalQualityAttributesMaxValue" + index).val() : "N/A",
+                    "MinValue": !!$(this).find("#CriticalQualityAttributesMinValue" + index).length ? $(this).find("#CriticalQualityAttributesMinValue" + index).val() : "N/A",
+                    "AvgValue": $(this).find("#CriticalQualityAttributesAvgValue" + index).val(),
+                    "InCompliance": getCheckboxPairValue($(this).find("#CriticalQualityAttributesCheckTrue" + index), $(this).find("#CriticalQualityAttributesCheckFalse" + index)),
+                    "DeviationReport": {
+                        "Folio": $(this).find("#CriticalQualityAttributesDeviationReportFolio" + index).val(),
+                        "Notes": $(this).find("#CriticalQualityAttributesDeviationReportNotes" + index).val(),
+                    },
+                    "Notes": $(this).find("#CriticalQualityAttributesNotes" + index).val(),
+                    "ReviewedBy": $(this).find("#CriticalQualityAttributesReviewedBy" + index).val(),
+                    "ReviewedDate": $(this).find("#CriticalQualityAttributesReviewedDate" + index).val(),
+                    "Type": 2,
+                    "FileValue": $("#fileAtributoValue" + index).val(),
+                    "DisplayName": $(`#displayName${index}`).text(),
+                    "LowLimit": $(`#lowLimit${index}`).val(),
+                    "TopLimit": $(`#topLimit${index}`).val(),
+                    "VariableCode": $("#VariableQualityAttributesCode" + index).val(),
+                });
+            });
+
+            let batchDetailsAnalysisList = [];
+            $("#table-8-analysis-details").find(".analysis-detail th").each(function (index) {
+                batchDetailsAnalysisList.push({
+                    "Id": $("#BatchDetailsAnalysisId"+index).val(),
+                    "ParameterName": $("#BatchDetailsAnalysisParameterName"+index).val(),
+                    "MeasureUnit": $("#BatchDetailsAnalysisMeasureUnit"+index).val(),
+                    "LowerLimit": $("#BatchDetailsAnalysisLowerLimit"+index).val(),
+                    "UpperLimit": $("#BatchDetailsAnalysisUpperLimit"+index).val(),
+                    "Value": $("#BatchDetailsAnalysisValue"+index).val(),
+                })
+            })
+
+            return {
+                "Id": @Model.Id,
+                "ProductionEquipment": {
+                    "IsAvailable": getCheckboxPairValue($("#ProductionEquipmentCheckTrue"), $("#ProductionEquipmentCheckFalse")),
+                    "ReviewedBy": $('#ProductionEquipmentReviewedBy').val(),
+                    "ReviewedDate": $('#ProductionEquipmentReviewedDate').val(),
+                },
+                "MonitoringEquipmentList": monitoringEquipmentList,
+                "PipelineClearance": {
+                    "InCompliance": getCheckboxPairValue($("#PipelineClearanceCheckTrue"), $("#PipelineClearanceCheckFalse")),
+                    "ReviewedBy": $('#PipelineClearanceReviewedBy').val(),
+                    "ReviewedDate": $('#PipelineClearanceReviewedDate').val(),
+                    "ProductionStartedDate": $('#TxtDateProduccionLot').val() + 'T' + $('#TxtDateHProduccionLot').val(),
+                    "ProductionEndDate": $('#TxtDateProduccionLotEnd').val() + 'T' + $('#TxtDateHProduccionLotEnd').val(),
+                },
+                "PipelineClearanceHistory": pipelineClearanceHistory,
+                "ControlVariables": controlVariablesList,
+                "CriticalParameters": criticalParametersList,
+                "CriticalQualityAttributes": criticalQualityAttributesList,
+                "BatchDetails": {
+                    "Id": $("#BatchDetailsId").text(),
+                    "Number": $("#BatchDetailsNumber").text(),
+                    "Level": $("#BatchDetailsLevel").val(),
+                    "Size": $("#BatchDetailsSize").val(),
+                    "Tank": $("#BatchDetailsTank").val(),
+                    "Analysis": batchDetailsAnalysisList,
+                    "AnalyzedBy": $("#BatchDetailsAnalyzedBy").val(),
+                    "AnalyzedDate": $("#BatchDetailsAnalyzedDate").val(),
+                    "InCompliance": getCheckboxPairValue($("#BatchDetailsInComplianceCheckTrue"), $("#BatchDetailsInComplianceCheckFalse")),
+                    "NotInComplianceFolio": $('#BatchDetailsNotInComplianceFolio').val(),
+                    "NotInComplianceNotes": $('#BatchDetailsNotInComplianceNotes').val(),
+                    "IsReleased": getCheckboxPairValue($("#BatchDetailsReleasedCheckTrue"), $("#BatchDetailsReleasedCheckFalse")),
+                    "ReleasedBy": $('#BatchDetailsReleasedBy').val(),
+                    "ReleasedDate": $('#BatchDetailsReleasedDate').val(),
+                    "ReleasedNotes": $('#BatchDetailsReleasedNotes').val(),
+                },
+                "IsReleased": getCheckboxPairValue($("#ReleasedCheckTrue"), $("#ReleasedCheckFalse")),
+                "ReleasedBy": $('#ReleasedBy').val(),
+                "ReleasedDate": $('#ReleasedDate').val(),
+                "ReleasedNotes": $('#ReleasedNotes').val(),
+                "SelectedPlantFilter": $('#SelectedPlantFilter').val(),
+                "SelectedProductFilter": $('#SelectedProductFilter').val(),
+                "SelectedTankFilter": $('#SelectedTankFilter').val(),
+                "SelectedPurityFilter": $('#SelectedPurityFilter').val(),
+                "Plant": '@Model.Plant',
+                "Location": '@Model.Location',
+                "ProductCode": '@Model.ProductCode',
+                "ProductName": $("#SelectedProductFilter").val()
+            }
+        }
+
+        var validateStep = function (step, disable = true) {
+            if (loadingWizard) {
+                return true
+            }
+
+            var plant = $('#SelectedPlantFilter').val()
+            var product = $('#SelectedProductFilter').val()
+            var tank = $('#SelectedTankFilter').val()
+
+            if (plant === '' || product === '' || tank === '')
+            {
+                $.gritter.add({
+                    title: "Error",
+                    text: "Planta, Producto y Tanque deben ser seleccionados",
+                    class_name: "gritter-light gritter-center"
+                })
+                return false
+            }
+
+            // if step was already saved should skip
+            var currentStep = $('#StepSaved').val();
+
+            // Order is already closed
+            if(@Model.StepSaved == 6 || currentStep > 6)
+            {
+                return true
+            }
+
+            // Order is open, steps 3 and 4 could be always updated
+            if ((@Model.StepSaved > step || currentStep > step) && (step != 3 && step != 4)) {
+                return true
+            }
+            // validate form for current step
+            switch (step) {
+                case 1:
+                    if (!1 === validateStep1()) {
+                        $('#ModalMensajesLabel').html('Error')
+                        $('#mbody').text("Todos los Equipos de monitoreo deberán estar calibrados para continuar");
+                        $('#ModalMensajes').modal('show');
+                        return false;
+                    }
+                    break
+                case 2:
+                    if (!1 === validateStep2()) {
+                        $('#ModalMensajesLabel').html('Error')
+                        $('#mbody').text("El despeje de línea deberá cumplir para continuar");
+                        $('#ModalMensajes').modal('show');
+                        return false
+                    }
+                    break
+                case 3:
+                    if (!1 === validateStep3()) {
+                        $('#ModalMensajesLabel').html('Error')
+                        $('#mbody').text("Es necesario llenar todos los Valores max, min y promedio para continuar");
+                        $('#ModalMensajes').modal('show');
+                        return false;
+                    }
+                    break;
+                case 4:
+                    if(!1 === validateStep4()) {
+                        $('#ModalMensajesLabel').html('Error')
+                        $('#mbody').text("Es necesario llenar todos los Valores max, min y promedio para continuar");
+                        $('#ModalMensajes').modal('show');
+                        return false
+                    }
+                    break
+                case 5:
+                    if(!1 === validateStep5()) {
+                        $('#ModalMensajesLabel').html('Error')
+                        $('#mbody').text("Deberás seleccionar si el lote está liberado o no para continuar");
+                        $('#ModalMensajes').modal('show');
+                        return false
+                    }
+                    break
+                case 6:
+                    if (!1 === validateStep6()) {
+                        return false
+                    }
+                    break
+                default:
+                    $('#ModalMensajesLabel').html('Error')
+                    $('#mbody').text("Acción inválida");
+                    $('#ModalMensajes').modal('show');
+                    return false
+            }
+
+            var res = SaveSteps(step);
+            if (res.status !== 200 || res.responseJSON.result !== "Ok" || res.responseJSON.nextStep < step) {
+                if (res.status === 403) {
+                    $.gritter.add({
+                        title: "Acceso Denegado",
+                        class_name: "gritter-light"
+                    })
+                }
+                ret = false
+            }
+
+            if (!isNullOrEmpty(res.responseJSON.status)) {
+                $("#StatusLbl").text(res.responseJSON.status)
+                $('#Status').val(res.responseJSON.status)
+                loadButtonsFromStatus()
+            }
+
+            // current step will be set to readonly mode
+            if (disable === true) {
+                $('#step' + step).find('input').each(function () {
+                    $(this).prop("disabled", true);
+                });
+            }
+            if (step >= 6) {
+                $('#step3').find('button').each(function () {
+                    if ($(this).attr('id').startsWith("BtngraphsVariables") || $(this).attr('id').startsWith("BtngraphsCritical")) {
+                        $(this).prop("disabled", false);
+                    }
+                    else {
+                        $(this).prop("disabled", true);
+                    }
+                });
+
+                $('#step4').find('input').each(function () {
+                    $(this).prop("disabled", true);
+                });
+                $('#step4').find('button').each(function () {
+                    if ($(this).attr('id').startsWith("Btngraphs")) {
+                        $(this).prop("disabled", false);
+                    }
+                    else {
+                        $(this).prop("disabled", true);
+                    }
+                });
+                $('#step5').find('input').each(function () {
+                    $(this).prop("disabled", true);
+                });
+
+                $("#btnCloseOrder").prop("disabled", true);
+            }
+
+            // bump current step
+            $('#StepSaved').val(step + 1);
+            //validate step 2 and call new function
+            if (+step === 2 && $("#HasHistorian").val() === "False" && $("#HasHistorianThree").val() === "False") {
+                GetHistorianEndPipelineClearance(2);
+            } else if (+step === 3 && $("#HasHistorian").val() === "False") {
+                queryHistorianAtStep4();
+            }
+            return true;
+        }
+        function GetHistorianEndPipelineClearance(step) {
+             $('#ModalSpinner').modal('show');
+             $.ajax({
+                type: "POST",
+                async: true,
+                url: "/ProductionOrder/GetHistorianEndPipelineClearance/?step=" + step,
+                data: serializeProductionOrder(),
+                success: function (response) {
+                    if (response.result === "fail") {
+                        $.gritter.add({
+                            title: "",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+                    }
+                    else {
+                        $("#tablesStep3").html(response);
+                        $('#ModalSpinner').modal('hide');
+                        $("#HasHistorianThree").val("True");
+                        VariableSelector();
+                    }
+                },
+            })
+        }
+
+        var validateStep1 = function () {
+
+            if (!1 === $("#ProductionEquipmentCheckTrue").prop("checked")) {
+                $("#ProductionEquipmentCheckTrue").addClass("border-danger")
+
+                return false;
+            }
+
+            let isValid = true;
+
+            $("#table-2").find("tbody tr").each(function (index) {
+                if (!1 === $(this).find("#MonitoringEquipmentCheckTrue" + index).prop("checked")) {
+                    $(this).find("#MonitoringEquipmentCheckTrue" + index).addClass("border-danger")
+
+                    isValid = false;
+                }
+            });
+
+            return isValid;
+        }
+
+        var validateStep2 = function () {
+            if (!1 === $("#PipelineClearanceCheckTrue").prop("checked")) {
+                $("#PipelineClearanceCheckTrue").addClass("border-danger")
+
+                return false;
+            }
+            if ($('#TxtDateProduccionLot').val() === '' || $('#TxtDateHProduccionLot').val() === '') {
+                $('#TxtDateProduccionLot').addClass("border-danger")
+                $('#TxtDateHProduccionLot').addClass("border-danger")
+
+                return false;
+            }
+            else {
+                const reviewedDate = new Date($('#PipelineClearanceReviewedDate').val());
+                const date = $("#TxtDateProduccionLot").val();
+                const time = $("#TxtDateHProduccionLot").val();
+                const arrayDate = date.split("-");
+                const arrayTime = time.split(":");
+                const dateEnd = $("#TxtDateProduccionLotEnd").val();
+                const timeEnd = $("#TxtDateHProduccionLotEnd").val();
+                const arrayDateEnd = dateEnd.split("-");
+                const arrayTimeEnd = timeEnd.split(":");
+
+                if (arrayTime.length !== 2) {
+                    $('#TxtDateProduccionLot').addClass("border-danger");
+                    $('#TxtDateHProduccionLot').addClass("border-danger");
+                    return false;
+                }
+                const datetime = new Date(arrayDate[0], --arrayDate[1], arrayDate[2], arrayTime[0], arrayTime[1]);
+                const newDate = new Date(datetime);
+                if (reviewedDate > newDate) {
+                    $('#TxtDateProduccionLot').addClass("border-danger");
+                    $('#TxtDateHProduccionLot').addClass("border-danger");
+                    return false;
+                } else {
+                    $('#TxtDateProduccionLot').removeClass("border-danger");
+                    $('#TxtDateHProduccionLot').removeClass("border-danger");
+                }
+
+                ////////////////
+                if (arrayTimeEnd.length !== 2) {
+                    $('#TxtDateProduccionLotEnd').addClass("border-danger");
+                    $('#TxtDateHProduccionLotEnd').addClass("border-danger");
+                    return false;
+                }
+
+
+                const datetimeEnd = new Date(arrayDateEnd[0], --arrayDateEnd[1], arrayDateEnd[2], arrayTimeEnd[0], arrayTimeEnd[1]);
+                const newDateEnd = new Date(datetimeEnd);
+                if (reviewedDate > newDateEnd) {
+                    $('#TxtDateProduccionLotEnd').addClass("border-danger");
+                    $('#TxtDateHProduccionLotEnd').addClass("border-danger");
+                    return false;
+                } else {
+                    $('#TxtDateProduccionLotEnd').removeClass("border-danger");
+                    $('#TxtDateHProduccionLotEnd').removeClass("border-danger");
+                }
+            }
+            return true;
+        }
+
+        var validateStep3 = function () {
+            let isValid = true;
+
+            $("#table-5").find("tbody tr").each(function (index) {
+                if (!1 === $(this).find("#ControlVariablesCheckTrue"+index).prop("checked") && !1 === $("#ControlVariablesCheckFalse"+index).prop("checked")) {
+                    $(this).find("#ControlVariablesCheckTrue"+index).addClass("border-danger")
+                    $(`#labelRequiredTable5${index}`).prop("hidden", false);
+                    isValid = false
+                }
+
+                if ($("#ControlVariablesCheckFalse"+index).prop("checked")) {
+                    if ($('#ControlVariablesDeviationReportFolio'+index).val() === ''
+                        || $('#ControlVariablesDeviationReportNotes'+index).val() === '') {
+                        $('#ControlVariablesDeviationReportFolio'+index).addClass("border-danger")
+                        $('#ControlVariablesDeviationReportNotes'+index).addClass("border-danger")
+
+                        isValid = false
+                    }
+                }
+                if ($('#ControlVariablesMaxValue' + index).val() === '') {
+                    $('#ControlVariablesMaxValue' + index).addClass("border-danger");
+                    isValid = false
+                }
+                if ($('#ControlVariablesMinValue' + index).val() === '') {
+                    $('#ControlVariablesMinValue' + index).addClass("border-danger");
+                    isValid = false
+                }
+                if ($('#ControlVariablesAvgValue' + index).val() === '') {
+                    $('#ControlVariablesAvgValue' + index).addClass("border-danger");
+                    isValid = false
+                }
+            });
+
+            $("#table-6").find("tbody tr").each(function (index) {
+                if (!1 === $(this).find("#CriticalParametersCheckTrue"+index).prop("checked") && !1 === $("#CriticalParametersCheckFalse"+index).prop("checked")) {
+                    $(this).find("#CriticalParametersCheckTrue"+index).addClass("border-danger")
+                    $(`#labelRequiredTable6${index}`).prop("hidden", false);
+                    isValid = false
+                }
+
+                if ($("#CriticalParametersCheckFalse"+index).prop("checked")) {
+                    if ($('#CriticalParametersDeviationReportFolio'+index).val() === ''
+                        || $('#CriticalParametersDeviationReportNotes'+index).val() === '') {
+                        $('#CriticalParametersDeviationReportFolio'+index).addClass("border-danger")
+                        $('#CriticalParametersDeviationReportNotes'+index).addClass("border-danger")
+
+                        isValid = false
+                    }
+                }
+
+                if ($('#CriticalParametersMaxValue' + index).val() === '') {
+                    $('#CriticalParametersMaxValue' + index).addClass("border-danger");
+                    isValid = false
+                }
+                if ($('#CriticalParametersMinValue' + index).val() === '') {
+                    $('#CriticalParametersMinValue' + index).addClass("border-danger");
+                    isValid = false
+                }
+                if ($('#CriticalParametersAvgValue' + index).val() === '') {
+                    $('#CriticalParametersAvgValue' + index).addClass("border-danger");
+                    isValid = false
+                }
+            });
+
+
+            //TODO no aplica en 3
+            return isValid;
+        }
+
+        var validateStep4 = function () {
+            let isValid = true;
+
+            $("#table-7").find("tbody tr").each(function (index) {
+                if (!1 === $(this).find("#CriticalQualityAttributesCheckTrue"+index).prop("checked") && !1 === $("#CriticalQualityAttributesCheckFalse"+index).prop("checked")) {
+                    $('#CriticalQualityAttributesCheckTrue'+index).addClass("border-danger")
+                    $(`#labelRequiredTable7${index}`).prop("hidden", false);
+                    isValid = false
+                }
+
+                if ($("#CriticalQualityAttributesCheckFalse"+index).prop("checked")) {
+                    if ($('#CriticalQualityAttributesDeviationReportFolio'+index).val() === ''
+                        || $('#CriticalQualityAttributesDeviationReportNotes'+index).val() === '') {
+                        $('#CriticalQualityAttributesDeviationReportFolio'+index).addClass("border-danger")
+                        $('#CriticalQualityAttributesDeviationReportNotes'+index).addClass("border-danger")
+
+                        isValid = false
+                    }
+                }
+
+                if ($('#CriticalQualityAttributesMaxValue' + index).val() === '') {
+                    $('#CriticalQualityAttributesMaxValue' + index).addClass("border-danger");
+                    isValid = false;
+                }
+                if ($('#CriticalQualityAttributesMinValue' + index).val() === '') {
+                    $('#CriticalQualityAttributesMinValue' + index).addClass("border-danger");
+                    isValid = false;
+                }
+                if ($('#CriticalQualityAttributesAvgValue' + index).val() === '') {
+                    $('#CriticalQualityAttributesAvgValue' + index).addClass("border-danger");
+                    isValid = false;
+                }
+            });
+                //TODO no aplica en 4
+            return isValid;
+        }
+
+        var validateStep5 = function () {
+            if (($("#BatchDetailsInComplianceCheckFalse").prop("checked"))) {
+                if (isNullOrEmpty($('#BatchDetailsNotInComplianceFolio').val())) {
+                    $("#BatchDetailsNotInComplianceFolio").addClass("border-danger")
+                    return false;
+                }
+                if (isNullOrEmpty($('#BatchDetailsNotInComplianceNotes').val())) {
+                    $("#BatchDetailsNotInComplianceNotes").addClass("border-danger")
+                    return false;
+                }
+            }
+            if (!1 === $("#BatchDetailsReleasedCheckTrue").prop("checked") && !1 === $("#BatchDetailsReleasedCheckFalse").prop("checked")) {
+                $("#BatchDetailsReleasedCheckTrue").addClass("border-danger")
+                return false;
+            }
+
+            // Modal
+
+            return true;
+        }
+
+        var validateStep6 = function () {
+            let isValid = true;
+
+            // For Ni a chromatograph file is required
+            $("#table-7").find("tbody tr").each(function (index) {
+                if ($('#CriticalQualityAttributesAttribute'+index).val().includes("Identidad")
+                    && $('#SelectedProductFilter').val().includes("Nitrógeno")
+                    && !!!$('#CriticalQualityAttributesChartPath'+index).val()) {
+
+                    // Missing chromatograph
+                    $('#ModalMensajesLabel').html('Error');
+                    $('#mbody').text("Es necesario cargar el archivo cromatograma para continuar.");
+                    $('#ModalMensajes').modal('show');
+
+                    isValid = false
+                }
+            })
+
+            if (!1 === $("#ReleasedCheckTrue").prop("checked") && !1 === $("#ReleasedCheckFalse").prop("checked")) {
+                $("#ReleasedCheckTrue").addClass("border-danger");
+                $('#ModalMensajesLabel').html('Error')
+                $('#mbody').text("Se deberá dictaminar la orden de producción para continuar");
+                $('#ModalMensajes').modal('show');
+                isValid = false
+            }
+            $("#btnCloseOrder").prop("disabled", true);
+            return isValid;
+        }
+
+        function Ocultar() {
+            $("#buscar").attr('disabled', true);
+            $("#filtros").attr('disabled', true);
+        }
+
+        function verifyVariable(element, control, index, table, cumple = false, idNotes = "", idFolio = "") {
+            if (!!cumple && $(element).prop("checked")) {
+                $(`#${idNotes}${index}`).removeClass("border-danger");
+                $(`#${idFolio}${index}`).removeClass("border-danger");
+            }
+            if ($('#' + control + 'MaxValue' + index).val() === ''
+                || $('#' + control + 'MinValue' + index).val() === ''
+                || $('#' + control + 'AvgValue' + index).val() === '') {
+                $(element).prop("checked", false)
+                return false
+            } else if ($(element).is(":checked")) {
+                $(`#labelRequired${table}${index}`).prop("hidden", true);
+            }
+        }
+
+        function showHistoricalGraph(json, low, top, t) {
+            $('#line-chart').remove(); // this is my <canvas> element
+            $('#chart-div').append('<canvas id="line-chart"><canvas>');
+            $('#ModalShowGraph').modal('show');
+            var labels = json.map(function (e) {
+                return e.Period;
+            });
+            var data = json.map(function (e) {
+                return e.Value;
+            });
+            const values = json.map(x => x.Value);
+            const maxY = Math.max.apply(null, values);
+            const minY = Math.min.apply(null, values);
+            if (minY > low) {
+                top = Math.max(top, maxY);
+                low = Math.min(low, minY);
+            }
+            var ctx = document.getElementById("line-chart").getContext("2d");
+            var config = {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Registro de variable',
+                        data: data,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    legend: {
+                        position: 'bottom',
+                    },
+                    hover: {
+                        mode: 'label'
+                    },
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: false,
+                                labelString: 'Fecha/hora'
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            ticks: {
+                                min: low,
+                                max: top
+                            }
+                        }]
+                    },
+                    title: {
+                        display: true,
+                        text: t
+                    }
+                }
+            };
+
+            var chart = new Chart(ctx, config);
+
+        }
+
+        $(function () {
+            $('#datetimepicker3').datetimepicker({
+                format: 'HH:mm',
+                icons: {
+                    time: "fa fa-clock-",
+                    date: "fa fa-calendar",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down"
+                }
+            });
+            $('#datetimepicker4').datetimepicker({
+                format: 'HH:mm',
+                icons: {
+                    time: "fa fa-clock-",
+                    date: "fa fa-calendar",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down"
+                },
+            });
+        });
+        //AHF
+        function readFile(input, id) {
+            if (!!input.files && !!input.files.length) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $(`#fileAtributoValue${id}`).val(e.target.result);
+                    const file = input.files[0];
+                    var objectURL = URL.createObjectURL(file);
+                    $('#CriticalQualityAttributesChartPath' + id).val(objectURL);
+                    $(`#fileAtributoLink${id}`).attr({ 'download': file.name, 'href': objectURL, 'target': '_blank' });
+                    $(`#fileText${id}`).val(file.name);
+                    $(`#btnuploadFile${id}`).hide();
+                    $(`#btndeleteFile${id}`).show();
+                    $(`#btnshowFile${id}`).show();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        function showFile(index) {
+            if (!!$(`#fileAtributoLink${index}`).attr("href")) {
+                $(`#fileAtributoLink${index}`)[0].click();
+            } else {
+                $(`#fileShowLink${index}`)[0].click();
+            }
+        }
+        function uploadFile(index) {
+            $(`#file${index}`).click();
+        }
+        function removeFile(index) {
+            $(`#btnuploadFile${index}`).show();
+            $(`#btndeleteFile${index}`).hide();
+            $(`#btnshowFile${index}`).hide();
+            $(`#fileText${index}`).val('');
+            $(`#file${index}`).val(null);
+        }
+        function changeSelect(control) {
+            $(control).removeClass("border-danger");
+        }
+        function notificationConfirm() {
+            $("#imgLoadingConfirmNotificacion").show();
+            $("#btnNotificationConfirm").prop("hidden", true);
+            $.ajax({
+                type: "POST",
+                url: "/ProductionOrder/EnviarCorreoConformidad/",
+                async: true,
+                data: {
+                    __RequestVerificationToken: $("[name='__RequestVerificationToken']").val(),
+                    "ProductionOrderId": @Model.Id,
+                    "Bill": $('#PipelineClearance_Bill').val(),
+                    "Notes": $('#PipelineClearance_Notes').val(),
+                    "ReviewedBy": $('#PipelineClearanceReviewedBy').val(),
+                    "ReviewedDate": $('#PipelineClearanceReviewedDate').val(),
+                    "Activitie": $('#PipelineClearance_Activitie').val(),
+                    "SelectedPlantFilter": $('#SelectedPlantFilter').val(),
+                    "PlantId": '@Model.Plant',
+                    "BatchDetailsNumber": $("#BatchDetailsNumber").text(),
+                    "InCompliance": getCheckboxPairValue($("#BatchDetailsInComplianceCheckTrue"), $("#BatchDetailsInComplianceCheckFalse"))
+                },
+                dataType: "json",
+                success: function (response) {
+                    if (response.result === "Ok") {
+                        $.gritter.add({
+                            title: "Mensaje",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        });
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error(jqXHR);
+                    $.gritter.add({
+                        title: "Ocurrió un error",
+                        text: "Surgio un error al enviar la notificación.",
+                        class_name: "gritter-light"
+                    });
+                },
+                complete: function (jqXHR, textStatus) {
+                    $("#imgLoadingConfirmNotificacion").hide();
+                    $("#btnNotificationConfirm").prop("hidden", false);
+                }
+            });
+        }
+        function queryHistorianAtStep4() {
+            $('#ModalSpinner').modal('show');
+            $.ajax({
+                async: true,
+                type: "POST",
+                url: "/ProductionOrder/GetHistorianStep4",
+                data: serializeProductionOrder(),
+                success: function (response) {
+                    $("#divStep4").html(response);
+                    $("#HasHistorian").val("True");
+                    VariableSelector();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error(jqXHR);
+                    $.gritter.add({
+                        title: "Ocurrió un error",
+                        class_name: "gritter-light"
+                    });
+                },
+                complete: function (jqXHR, textStatus) {
+                    $('#ModalSpinner').modal('hide');
+                }
+            });
+        }
+
+        function ReleaseTable8(option) {
+            if (option == 1) {
+                var reviewedDate = new Date(Date.now())
+                $('#BatchDetailsReleasedBy').val("@userFirstName")
+                $('#BatchDetailsReleasedDate').val(getDateString(reviewedDate))
+                $('#BatchDetailsReleasedSignature').html(getSignature("@userFirstName", reviewedDate))
+                 $("#ReleasedCheckTrue").prop("disabled", false)
+                $('#BatchDetailsReleasedNotes').val('')
+                $('#BatchDetailsReleasedNotes').prop("disabled", false)
+            }
+            else {
+                $('#BatchDetailsReleasedCheckTrue').prop('checked', false)
+                $('#BatchDetailsReleasedBy').val("")
+                $('#BatchDetailsReleasedDate').val("")
+                $('#BatchDetailsReleasedSignature').html("")
+
+                $('#BatchDetailsReleasedNotes').val('')
+                $('#BatchDetailsReleasedNotes').prop("disabled", true)
+            }
+        }
+
+        function ReleaseTable9(option) {
+            if (option == 1) {
+
+                var reviewedDate = new Date(Date.now())
+                $('#ReleasedBy').val("@userFirstName")
+                $('#ReleasedDate').val(getDateString(reviewedDate))
+                $('#ReleasedSignature').html(getSignature("@userFirstName", reviewedDate))
+
+                $('#ReleasedNotes').val('')
+                $('#ReleasedNotes').prop("disabled", false)
+                $('#OA').show();
+            }
+            else {
+                $('#ReleasedCheckTrue').prop('checked', false)
+                $('#ReleasedBy').val("")
+                $('#ReleasedDate').val("")
+                $('#ReleasedSignature').html("")
+
+                $('#ReleasedNotes').val('')
+                $('#ReleasedNotes').prop("disabled", true)
+                $('#OA').hide();
+            }
+        }
+         function VariableSelector() {
+         $(".yes-no-variable-selector").each(function () {
+             $(this).change(function () {
+                 let controlValue = $(this).attr("data-linde-control-value")
+                 let controlGroup = $(this).attr("data-linde-control-group")
+                 let controlId = $(this).attr("data-linde-control-id")
+                 if (controlValue == "true")
+                 {
+                     if ($(this).is(':checked')) {
+                         $('#' + controlGroup + 'CheckFalse' + controlId).prop('checked', false);
+
+                         var reviewedDate = new Date(Date.now());
+                         $('#' + controlGroup + 'ReviewedBy' + controlId).val("@userFirstName")
+                         $('#' + controlGroup + 'ReviewedDate' + controlId).val(getDateString(reviewedDate))
+                         $('#' + controlGroup + 'ReviewedSignature' + controlId).html(getSignature("@userFirstName", reviewedDate))
+
+                         $('#' + controlGroup + 'DeviationReportFolio' + controlId).val('NA')
+                         $('#' + controlGroup + 'DeviationReportNotes' + controlId).val('NA')
+                         $('#' + controlGroup + 'DeviationReportFolio' + controlId).prop("disabled", true)
+                         $('#' + controlGroup + 'DeviationReportNotes' + controlId).prop("disabled", true)
+                     }
+                     else {
+                         $('#' + controlGroup + 'ReviewedBy' + controlId).val('')
+                         $('#' + controlGroup + 'ReviewedDate' + controlId).val('')
+                         $('#' + controlGroup + 'ReviewedSignature' + controlId).html("")
+
+                         $('#' + controlGroup + 'DeviationReportFolio' + controlId).val('')
+                         $('#' + controlGroup + 'DeviationReportNotes' + controlId).val('')
+                         $('#' + controlGroup + 'DeviationReportFolio' + controlId).prop("disabled", true)
+                         $('#' + controlGroup + 'DeviationReportNotes' + controlId).prop("disabled", true);
+                     }
+                 }
+                 else
+                 {
+                     if ($(this).is(':checked')) {
+                         $('#' + controlGroup + 'CheckTrue' + controlId).prop('checked', false);
+
+                         var reviewedDate = new Date(Date.now());
+                         $('#' + controlGroup + 'ReviewedBy' + controlId).val("@userFirstName")
+                         $('#' + controlGroup + 'ReviewedDate' + controlId).val(getDateString(reviewedDate))
+                         $('#' + controlGroup + 'ReviewedSignature' + controlId).html(getSignature("@userFirstName", reviewedDate))
+
+                         $('#' + controlGroup + 'DeviationReportFolio' + controlId).val('')
+                         $('#' + controlGroup + 'DeviationReportNotes' + controlId).val('')
+                         $('#' + controlGroup + 'DeviationReportFolio' + controlId).prop("disabled", false)
+                         $('#' + controlGroup + 'DeviationReportNotes' + controlId).prop("disabled", false)
+                     }
+                     else {
+                         $('#' + controlGroup + 'ReviewedBy' + controlId).val('')
+                         $('#' + controlGroup + 'ReviewedDate' + controlId).val('')
+                         $('#' + controlGroup + 'ReviewedSignature' + controlId).html("")
+
+                         $('#' + controlGroup + 'DeviationReportFolio' + controlId).val('')
+                         $('#' + controlGroup + 'DeviationReportNotes' + controlId).val('')
+                         $('#' + controlGroup + 'DeviationReportFolio' + controlId).prop("disabled", true)
+                         $('#' + controlGroup + 'DeviationReportNotes' + controlId).prop("disabled", true)
+                     }
+                 }
+             })
+         });
+        $("#table-7").find("tbody tr").each(function (index) {
+            let checked = $(this).find("#CriticalQualityAttributesInCompliance"+index).val()
+            if(checked === "True")
+            {
+                $(this).find("#CriticalQualityAttributesCheckTrue"+index).prop("checked", true)
+                $(this).find("#CriticalQualityAttributesCheckFalse"+index).prop("checked", false)
+            }
+            else if(checked === "False")
+            {
+                $(this).find("#CriticalQualityAttributesCheckTrue"+index).prop("checked", false)
+                $(this).find("#CriticalQualityAttributesCheckFalse"+index).prop("checked", true)
+            }
+        });
+     }
+
+        $("#TxtDateHProduccionLotEnd").blur(function () {
+            if (!isNullOrEmpty($('#TxtDateHProduccionLotEnd').val()) && !isNullOrEmpty($('#TxtDateProduccionLotEnd').val())) {
+                $('#ModalMensajesLabel').html('Información completada')
+                $('#mbody').text("Al dar siguiente queda guardada la información y no se podrá editar.");
+                $('#ModalMensajes').modal('show');
+            }
+        });
+
+
+       var validateInputsStep3 = function () {
+            let isValid = true;
+            $("#table-5").find("tbody tr").each(function (index) {
+                if ($("#ControlVariablesCheckFalse"+index).prop("checked")) {
+                    if ($('#ControlVariablesDeviationReportFolio'+index).val() === ''
+                        || $('#ControlVariablesDeviationReportNotes'+index).val() === '') {
+                        $('#ControlVariablesDeviationReportFolio'+index).addClass("border-danger")
+                        $('#ControlVariablesDeviationReportNotes'+index).addClass("border-danger")
+
+                        isValid = false
+                    }
+                    if ($('#ControlVariablesDeviationReportFolio'+index).val() != '') {
+                        $('#ControlVariablesDeviationReportFolio'+index).removeClass("border-danger")
+                        isValid = false
+
+                    }
+                    if ($('#ControlVariablesDeviationReportNotes'+index).val() != '') {
+                        $('#ControlVariablesDeviationReportNotes'+index).removeClass("border-danger")
+                        isValid = false
+                    }
+                }
+
+                if ($('#ControlVariablesMaxValue' + index).val() === '') {
+                    $('#ControlVariablesMaxValue' + index).addClass("border-danger");
+                    isValid = false
+                }
+                else{
+                    $('#ControlVariablesMaxValue'+index).removeClass("border-danger")
+                }
+                if ($('#ControlVariablesMinValue' + index).val() === '') {
+                    $('#ControlVariablesMinValue' + index).addClass("border-danger");
+                    isValid = false
+                }
+                else{
+                      $('#ControlVariablesMinValue'+index).removeClass("border-danger")
+                }
+                if ($('#ControlVariablesAvgValue' + index).val() === '') {
+                    $('#ControlVariablesAvgValue' + index).addClass("border-danger");
+                    isValid = false
+                }
+                else{
+                     $('#ControlVariablesAvgValue'+index).removeClass("border-danger")
+                }
+            });
+
+            $("#table-6").find("tbody tr").each(function (index) {
+                if ($("#CriticalParametersCheckFalse"+index).prop("checked")) {
+                    if ($('#CriticalParametersDeviationReportFolio'+index).val() === ''
+                        || $('#CriticalParametersDeviationReportNotes'+index).val() === '') {
+                        $('#CriticalParametersDeviationReportFolio'+index).addClass("border-danger")
+                        $('#CriticalParametersDeviationReportNotes'+index).addClass("border-danger")
+
+                        isValid = false
+                    }
+                     if ($('#CriticalParametersDeviationReportFolio'+index).val() != '') {
+                          $('#CriticalParametersDeviationReportFolio'+index).removeClass("border-danger")
+                          isValid = false
+                    }
+                     if ($('#CriticalParametersDeviationReportNotes'+index).val() != '') {
+                        $('#CriticalParametersDeviationReportNotes'+index).removeClass("border-danger")
+                        isValid = false
+                    }
+                }
+
+                if ($('#CriticalParametersMaxValue' + index).val() === '') {
+                    $('#CriticalParametersMaxValue' + index).addClass("border-danger");
+                    isValid = false
+                }
+                else{
+                    $('#CriticalParametersMaxValue'+index).removeClass("border-danger")
+                }
+                if ($('#CriticalParametersMinValue' + index).val() === '') {
+                    $('#CriticalParametersMinValue' + index).addClass("border-danger");
+                    isValid = false
+                }
+                else{
+                     $('#CriticalParametersMinValue'+index).removeClass("border-danger")
+                }
+                if ($('#CriticalParametersAvgValue' + index).val() === '') {
+                    $('#CriticalParametersAvgValue' + index).addClass("border-danger");
+                    isValid = false
+                }
+                else{
+                    $('#CriticalParametersAvgValue'+index).removeClass("border-danger")
+                }
+
+            });
+
+
+            //TODO no aplica en 3
+            return isValid;
+        }
+
+
+       var validateInputsStep4 = function () {
+            let isValid = true;
+           $("#table-7").find("tbody tr").each(function (index) {
+
+                if ($("#CriticalQualityAttributesCheckFalse"+index).prop("checked")) {
+                    if ($('#CriticalQualityAttributesDeviationReportFolio'+index).val() === ''
+                        || $('#CriticalQualityAttributesDeviationReportNotes'+index).val() === '') {
+                        $('#CriticalQualityAttributesDeviationReportFolio'+index).addClass("border-danger")
+                        $('#CriticalQualityAttributesDeviationReportNotes'+index).addClass("border-danger")
+
+                        isValid = false
+                    }
+                    if ($('#CriticalQualityAttributesDeviationReportFolio'+index).val() != '') {
+                         $('#CriticalQualityAttributesDeviationReportFolio'+index).removeClass("border-danger")
+                         isValid = false
+                    }
+                     if ( $('#CriticalQualityAttributesDeviationReportNotes'+index).val() != '') {
+                         $('#CriticalQualityAttributesDeviationReportNotes'+index).removeClass("border-danger")
+                         isValid = false
+                    }
+                }
+
+                if ($('#CriticalQualityAttributesMaxValue' + index).val() === '') {
+                    $('#CriticalQualityAttributesMaxValue' + index).addClass("border-danger");
+                    isValid = false;
+                }
+                else{
+                     $('#CriticalQualityAttributesMaxValue'+index).removeClass("border-danger")
+                }
+                if ($('#CriticalQualityAttributesMinValue' + index).val() === '') {
+                    $('#CriticalQualityAttributesMinValue' + index).addClass("border-danger");
+                    isValid = false;
+                }
+                else{
+                    $('#CriticalQualityAttributesMinValue'+index).removeClass("border-danger")
+                }
+                if ($('#CriticalQualityAttributesAvgValue' + index).val() === '') {
+                    $('#CriticalQualityAttributesAvgValue' + index).addClass("border-danger");
+                    isValid = false;
+                }
+                else{
+                    $('#CriticalQualityAttributesAvgValue'+index).removeClass("border-danger")
+                }
+            });
+
+            //TODO no aplica en 3
+            return isValid;
+        }
+
+    </script>
+}
+
+<style>
+    .divRequired {
+        font-size: 20px;
+        margin-left: 5px;
+        color: red;
+        font-weight: bolder;
+    }
+</style>

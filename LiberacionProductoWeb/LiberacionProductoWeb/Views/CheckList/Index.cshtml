@@ -1,0 +1,1828 @@
+﻿@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@using Microsoft.AspNetCore.Identity;
+@using LiberacionProductoWeb.Helpers;
+@using System.Globalization;
+@model LiberacionProductoWeb.Models.CheckListViewModels.CheckListVM
+@inject IStringLocalizer<Resource> resource;
+@inject UserManager<LiberacionProductoWeb.Models.IndentityModels.ApplicationUser> UserManager
+@{
+    ViewData["Title"] = "CheckList";
+    var checkLisPipas = resource.GetString("CheckLisPipas");
+    var select = resource.GetString("Select");
+    var claimsIdentity = User.Identity as System.Security.Claims.ClaimsIdentity;
+    var userFirstName = "";
+    var name = claimsIdentity.Name;
+    var rolesUsr = "";
+    if (name != null)
+    {
+        var FullName = UserManager.FindByNameAsync(name);
+        userFirstName = FullName.Result.NombreUsuario;
+        rolesUsr = FullName.Result.Rol;
+
+    }
+    var btnFind = resource.GetString("BtnFind");
+    var btnFilter = resource.GetString("BtnFilter");
+    var notInformation = resource.GetString("NoInformation");
+    var lengthMenu = resource.GetString("LengthMenu");
+    var searchPlaceholder = resource.GetString("SearchPlaceholder");
+    var info = resource.GetString("Info");
+    var emptyTable = resource.GetString("EmptyTable");
+    var paginatefirst = resource.GetString("Paginatefirst");
+    var paginatelast = resource.GetString("Paginatelast");
+    var pageNext = resource.GetString("PageNext");
+    var pagePreviuos = resource.GetString("PagePreviuos");
+    var loadingRecords = resource.GetString("LoadingRecords");
+    var processing = resource.GetString("Processing");
+    var zeroRecords = resource.GetString("ZeroRecords");
+    var infoEmpty = resource.GetString("InfoEmpty");
+    var infoFiltered = resource.GetString("InfoFiltered");
+    var strDate = Model.LastDateRecord.ToString("yyyy-MM-dd HH:mm");
+    var validateHtml = resource.GetString("validateHtml");
+    var idOA = Context.Request.Query["idOA"];
+    var tournumber = Context.Request.Query["tournumber"];
+    var distributionBatch = Context.Request.Query["distributionBatch"];
+    var checkListId = Context.Request.Query["checkListId"];
+    var IsHttps = Context.Request.IsHttps;
+    var url = Context.Request.Host.Value;
+}
+
+@await Html.PartialAsync("~/Views/Shared/_Navigation.cshtml")
+
+<div id="content" class="content">
+
+    <div class="section-container PantallaPrincipalContenedor section-with-top-border p-b-10">
+
+        <form method="post" asp-action="Save" id="CheckListForm" enctype="multipart/form-data">
+            <!-- begin #content -->
+            <div id="content">
+                @*<select required id="doc_type" class="selectpicker show-menu-arrow combobox"  oninvalid="this.setCustomValidity('captura este campo')" oninput="setCustomValidity('')"></select>*@
+                <div class="form-group-sm">
+                    <h1 class="page-header">@checkLisPipas</h1>
+                    <div class="break"></div>
+                    @Html.ValidationMessage("Ok", new { @class = "text-success" })
+                    <button class='btn btn' name="Editar" id="Editar" type="button" style="background-color:transparent">
+                        <i class="fa fa-edit"></i> Editar
+                    </button>
+                    <button name="Guardar" class='btn btn' id="Guardar" type="submit" onclick="Save(this); return false;" style="background-color:transparent">
+                        <i class="fa fa-save"></i> Guardar
+                    </button>
+
+                    <button class="btn btn" data-toggle="modal" id="BtnCancel" data-target="#ModalCancel" type="button" style="background-color:transparent">
+                        <i class="fa fa-minus-circle"></i> Cancelar
+                    </button>
+
+                    @if (rolesUsr.Contains(SecurityConstants.PERFIL_RESPONSABLE_SANITARIO))
+                    {
+                        <button data-toggle="modal" data-target="#ModalCancelApprove" id="BtnCancelApprove" class='btn btn' type="button" style="background-color:transparent">
+                            <i class="fa fa-ban"></i> Aprobar cancelación
+                        </button>
+                    }
+             
+                <a href="/CheckList/ExportCheckListToPDF?idOA=@Model.NumberOrder&tourNumber=@Model.TourNumber&distributionBatch=@Model.DistributionBatch&checkListId=@Model.checkListId " class="btn btn-white m-r-5"><i class="fa fa-file-pdf"></i>Exportar a PDF</a>
+
+
+                    <div class="break"></div>
+                    <div class="pull-right">
+                        <label>Fecha y hora de creación:</label>
+                        <label>@strDate</label>
+                        <label>Estado:</label>
+                        <label>@Model.LastStatusRecord</label>
+                        <input type="text" name="TxtStatus" id="TxtStatus" value="@Model.LastStatusRecord" readonly hidden />
+                    </div>
+                    <br />
+                    <br />
+                    <div class="break"></div>
+
+                    <div class="form-inline col-md-14">
+                        <!-- end page-header -->
+                        <label>Localidad</label>
+                        <input type="text" class="form-control col-1.3" asp-for="Localizate" readonly="readonly" />
+                        <label>Pipa No.</label>
+                        <input type="text" class="form-control col-1" asp-for=Pipe readonly="readonly" />
+                        <label>Producto</label>
+                        <input type="text" class="form-control col-1.2" asp-for="Product" readonly="readonly" />
+                        <label hidden="hidden">Numero de orden de acondicionamiento</label>
+                        <input type="text" class="form-control col-1" asp-for="NumberOrder" hidden="hidden" readonly="readonly" />
+
+
+                    </div>
+                    <div class="form-inline col-md-14">
+                        <label>Lote de distribuicion</label>
+                        <input type="text" class="form-control col-3" asp-for="DistributionBatch" readonly="readonly" />
+                        <label>Tour number</label>
+                        <input type="text" class="form-control col-3" asp-for="TourNumber" readonly="readonly" />
+                        <input type="number" class="form-control col-3" asp-for="checkListId" value="@Model.checkListId" readonly="readonly" hidden="hidden" />
+                    </div>
+
+
+                    <div name="contenedorChecks">
+                        <div class="break"></div>
+                        <h5 class="page-item">Inspección visual de pipas al recibo</h5>
+                        <label class="text-justify">IMPORTANTE: La calificación de cualquier elemento en esta sección como "NO CUMPLE", implica que la pipa NO reúne las condiciones necesarias para ser llenado o liberada, por lo cuál deberán definirse las acciones a seguir y, documentarse en este registro para su seguimiento.</label>
+                        <div class="break"></div>
+
+                        <div class="panel panel-primary ">
+                            <div class="panel-heading">
+                                <div class="btn-group pull-left">
+                                    @*<a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel"><i class="fa fa-file-excel"></i> Exportar a Excel</a>*@
+
+                                </div>
+                                <div class="btn-group pull-right">
+
+                                </div>
+                                <h4 class="panel-title">
+                                    &nbsp;
+                                </h4>
+                            </div>
+                            <div class="panel-body ">
+                                <div class="table-responsive">
+                                    <div class="table-responsive">
+                                        <table id="tbl-check" class="table table-striped table-bordered" style="width:140%;">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Requisito a evaluar \ criterios</th>
+                                                    <th scope="col">Verificación del requerimiento</th>
+                                                    <th scope="col">Descripción del incuplimiento</th>
+                                                    <th scope="col">Notificar a</th>
+                                                    <th scope="col">Acción</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{int count = 0;
+                                                    @foreach (var entry in Model.checkListsCatalog.Where(x => x.Group == "IV"))
+                                                    {
+                                                        count = count + 1;
+                                                        <tr>
+                                                            <td class="text-justify">
+                                                                @Html.Raw(entry.Requirement)
+                                                            </td>
+
+                                                            @if (count == 1)
+                                                            {
+                                                                <td class="col-6">
+                                                                    @if (@entry.Verification == "OK")
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check1" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check1" />
+                                                                    }
+                                                                    <label>Cumple</label>
+                                                                    @if (@entry.Verification == "NO")
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check2" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check2" />
+                                                                    }
+                                                                    <label>No Cumple</label>
+                                                                    @if (@entry.Verification == "NA")
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check3" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check3" />
+                                                                    }
+                                                                    <label>NA</label>
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="Description1" readonly="readonly" class="form-control" value="@entry.Description" />
+
+                                                                </td>
+                                                                <td>
+                                                                    <div name="TdDiv1" id="TdDiv1" hidden="hidden">
+                                                                        <select multiple asp-for="SelectedNotifyUsr1Filter" asp-items="Model.ListUserNotify" class="selectpicker" data-live-search="true" title="@select">
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="Action1" readonly="readonly" class="form-control" value="@entry.Action" />
+                                                                </td>
+                                                            }
+                                                            @if (count == 2)
+                                                            {
+                                                                <td>
+                                                                    @if (@entry.Verification == "OK")
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check4" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check4" />
+                                                                    }
+                                                                    <label>Cumple</label>
+                                                                    @if (@entry.Verification == "NO")
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check5" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check5" />
+                                                                    }
+                                                                    <label>No Cumple</label>
+                                                                    @if (@entry.Verification == "NA")
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check6" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check6" />
+                                                                    }
+                                                                    <label>NA</label>
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="Description2" readonly="readonly" class="form-control" value="@entry.Description" />
+                                                                </td>
+                                                                <td>
+                                                                    <div name="TdDiv2" id="TdDiv2" hidden="hidden">
+                                                                        <select multiple asp-for="SelectedNotifyUsr2Filter" asp-items="Model.ListUserNotify" class="selectpicker show-menu-arrow combobox" data-style="btn-inverse" data-live-search="true" title="@select">
+                                                                        </select>
+                                                                    </div>
+
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="Action2" readonly="readonly" class="form-control" value="@entry.Action" />
+                                                                </td>
+                                                            }
+
+                                                            @if (count == 3)
+                                                            {
+                                                                <td>
+                                                                    @if (@entry.Verification == "OK")
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check7" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check7" />
+                                                                    }
+                                                                    <label>Cumple</label>
+                                                                    @if (@entry.Verification == "NO")
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check8" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check8" />
+                                                                    }
+                                                                    <label>No Cumple</label>
+                                                                    @if (@entry.Verification == "NA")
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check9" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check9" />
+                                                                    }
+                                                                    <label>NA</label>
+
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="Description3" readonly="readonly" class="form-control" value="@entry.Description" />
+                                                                </td>
+                                                                <td>
+                                                                    <div name="TdDiv3" id="TdDiv3" hidden="hidden">
+                                                                        <select multiple asp-for="SelectedNotifyUsr3Filter" asp-items="Model.ListUserNotify" class="selectpicker show-menu-arrow combobox" data-style="btn-inverse" data-live-search="true" title="@select">
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="Action3" readonly="readonly" class="form-control" value="@entry.Action" />
+                                                                </td>
+                                                            }
+
+                                                            @if (count == 4)
+                                                            {
+                                                                <td>
+                                                                    @if (@entry.Verification == "OK")
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check10" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check10" />
+                                                                    }
+                                                                    <label>Cumple</label>
+                                                                    @if (@entry.Verification == "NO")
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check11" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check11" />
+                                                                    }
+                                                                    <label>No Cumple</label>
+                                                                    @if (@entry.Verification == "NA")
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check12" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check12" />
+                                                                    }
+                                                                    <label>NA</label>
+
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="Description4" readonly="readonly" class="form-control" value="@entry.Description" />
+                                                                </td>
+                                                                <td>
+                                                                    <div name="TdDiv4" id="TdDiv4" hidden="hidden">
+                                                                        <select multiple asp-for="SelectedNotifyUsr4Filter" asp-items="Model.ListUserNotify" class="selectpicker show-menu-arrow combobox" data-style="btn-inverse" data-live-search="true" title="@select">
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="Action4" readonly="readonly" class="form-control" value="@entry.Action" />
+                                                                </td>
+                                                            }
+
+                                                            @if (count == 5)
+                                                            {
+                                                                <td>
+                                                                    @if (@entry.Verification == "OK")
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check13" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check13" />
+                                                                    }
+                                                                    <label>Cumple</label>
+                                                                    @if (@entry.Verification == "NO")
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check14" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check14" />
+                                                                    }
+                                                                    <label>No Cumple</label>
+                                                                    @if (@entry.Verification == "NA")
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check15" checked />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" disabled="disabled" asp-for="Check15" />
+                                                                    }
+                                                                    <label>NA</label>
+
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="Description5" readonly="readonly" class="form-control" value="@entry.Description" />
+                                                                </td>
+                                                                <td>
+                                                                    <div name="TdDiv5" id="TdDiv5" hidden="hidden">
+                                                                        <select multiple asp-for="SelectedNotifyUsr5Filter" asp-items="Model.ListUserNotify" class="selectpicker show-menu-arrow combobox" data-style="btn-inverse" data-live-search="true" title="@select">
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="Action5" class="form-control" readonly="readonly" value="@entry.Action" />
+                                                                </td>
+                                                            }
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center col-14">
+                                <label name="observacionesInspeccionVS">Observaciones</label>
+                                <div class="break"></div>
+                                <input asp-for="CommentIv" readonly="readonly" placeholder="Escriba sus observaciones" class="form-control text-center" />
+
+                            </div>
+                        </div>
+                        <div class="break"></div>
+                        <h5 class="page-item">LLenado y verificación de pipas</h5>
+                        <label class="text-justify">IMPORTANTE: Esta sección contituye una verificación para asegurar que quien realiza el llenado de la pipa ha considerado las actividades definidas en el manual de BPM y prerrequisitos, así como en los procedimientos aplicables cualquier cosa o desviación se notificará inmediatamente al personal en turno responsable  de la localidad, para la toma  de acciones , las cuales deberán documentarse en este registro para su control.</label>
+                        <div class="panel panel-primary ">
+                            <div class="panel-heading">
+                                <div class="btn-group pull-left">
+                                    @*<a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel"><i class="fa fa-file-excel"></i> Exportar a Excel</a>*@
+
+                                </div>
+                                <div class="btn-group pull-right">
+
+                                </div>
+                                <h4 class="panel-title">
+                                    &nbsp;
+                                </h4>
+                            </div>
+                            <div class="panel-body ">
+                                <div class="table-responsive">
+                                    <div class="table-responsive">
+                                        <table id="tbl-check" class="table table-striped table-bordered" style="width:130%;">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Requerimiento</th>
+                                                    <th scope="col">Verificación del requerimiento</th>
+                                                    <th scope="col">Descripción del incuplimiento</th>
+                                                    <th scope="col">Notificar a</th>
+                                                    <th scope="col">Acción</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{int countf = 0;
+                                                    if (Model.checkListsfpCatalog != null)
+                                                    {
+                                                        @foreach (var entry in Model.checkListsfpCatalog.Where(x => x.Group == "FP"))
+                                                        {
+                                                            countf = countf + 1;
+                                                            <tr>
+                                                                <td class="text-justify">
+                                                                    @Html.Raw(entry.Requirement)
+                                                                </td>
+
+                                                                @if (countf == 1)
+                                                                {
+                                                                    <td>
+                                                                        @if (@entry.Verification == "OK")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp1" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp1" />
+                                                                        }
+                                                                        <label>Cumple</label>
+                                                                        @if (@entry.Verification == "NO")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp2" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp2" />
+                                                                        }
+                                                                        <label>No Cumple</label>
+                                                                        @if (@entry.Verification == "NA")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp3" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp3" />
+                                                                        }
+                                                                        <label>NA</label>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input asp-for="Descriptionfp1" readonly="readonly" class="form-control" value="@entry.Description" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <div name="TdDivfp1" id="TdDivfp1" hidden="hidden">
+                                                                            <select multiple asp-for="SelectedNotifyUsr1fpFilter" asp-items="Model.ListUserNotify" class="selectpicker show-menu-arrow combobox" data-style="btn-inverse" data-live-search="true" title="@select">
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input asp-for="Actionfp1" class="form-control" readonly="readonly" value="@entry.Action" />
+                                                                    </td>
+                                                                }
+                                                                @if (countf == 2)
+                                                                {
+                                                                    <td>
+                                                                        @if (@entry.Verification == "OK")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp4" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp4" />
+                                                                        }
+                                                                        <label>Cumple</label>
+                                                                        @if (@entry.Verification == "NO")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp5" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp5" />
+                                                                        }
+                                                                        <label>No Cumple</label>
+                                                                        <label>NA</label>
+                                                                        @if (@entry.Verification == "NA")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp6" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp6" />
+                                                                        }
+
+                                                                    </td>
+                                                                    <td>
+                                                                        <input asp-for="Descriptionfp2" readonly="readonly" class="form-control" value="@entry.Description" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <div name="TdDivfp2" id="TdDivfp2" hidden="hidden">
+                                                                            <select multiple asp-for="SelectedNotifyUsr2fpFilter" asp-items="Model.ListUserNotify" class="selectpicker show-menu-arrow combobox" data-style="btn-inverse" data-live-search="true" title="@select">
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input asp-for="Actionfp2" readonly="readonly" class="form-control" value="@entry.Action" />
+                                                                    </td>
+                                                                }
+
+                                                                @if (countf == 3)
+                                                                {
+                                                                    <td>
+                                                                        @if (@entry.Verification == "OK")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp7" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp7" />
+                                                                        }
+                                                                        <label>Cumple</label>
+                                                                        @if (@entry.Verification == "NO")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp8" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp8" />
+                                                                        }
+                                                                        <label>No Cumple</label>
+                                                                        <label>NA</label>
+                                                                        @if (@entry.Verification == "NA")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp9" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp9" />
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        <input asp-for="Descriptionfp3" readonly="readonly" class="form-control" value="@entry.Description" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <div name="TdDivfp3" id="TdDivfp3" hidden="hidden">
+                                                                            <select multiple asp-for="SelectedNotifyUsr3fpFilter" asp-items="Model.ListUserNotify" class="selectpicker show-menu-arrow combobox" data-style="btn-inverse" data-live-search="true" title="@select">
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input asp-for="Actionfp3" class="form-control" readonly="readonly" value="@entry.Action" />
+                                                                    </td>
+                                                                }
+
+                                                                @if (countf == 4)
+                                                                {
+                                                                    <td>
+                                                                        @if (@entry.Verification == "OK")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp10" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp10" />
+                                                                        }
+                                                                        <label>Cumple</label>
+                                                                        @if (@entry.Verification == "NO")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp11" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp11" />
+                                                                        }
+                                                                        <label>No Cumple</label>
+                                                                        <label>NA</label>
+                                                                        @if (@entry.Verification == "NA")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp12" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp12" />
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        <input asp-for="Descriptionfp4" readonly="readonly" class="form-control" value="@entry.Description" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <div name="TdDivfp4" id="TdDivfp4" hidden="hidden">
+                                                                            <select multiple asp-for="SelectedNotifyUsr4fpFilter" asp-items="Model.ListUserNotify" class="selectpicker show-menu-arrow combobox" data-style="btn-inverse" data-live-search="true" title="@select">
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input asp-for="Actionfp4" class="form-control" readonly="readonly" value="@entry.Action" />
+                                                                    </td>
+                                                                }
+
+                                                                @if (countf == 5)
+                                                                {
+                                                                    <td>
+                                                                        @if (@entry.Verification == "OK")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp13" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp13" />
+                                                                        }
+                                                                        <label>Cumple</label>
+                                                                        @if (@entry.Verification == "NO")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp14" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp14" />
+                                                                        }
+                                                                        <label>No Cumple</label>
+                                                                        <label>NA</label>
+                                                                        @if (@entry.Verification == "NA")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp15" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp15" />
+                                                                        }
+
+                                                                    </td>
+                                                                    <td>
+                                                                        <input asp-for="Descriptionfp5" readonly="readonly" class="form-control" value="@entry.Description" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <div name="TdDivfp5" id="TdDivfp5" hidden="hidden">
+                                                                            <select multiple asp-for="SelectedNotifyUsr5fpFilter" asp-items="Model.ListUserNotify" class="selectpicker show-menu-arrow combobox" data-style="btn-inverse" data-live-search="true" title="@select">
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input asp-for="Actionfp5" readonly="readonly" class="form-control" value="@entry.Action" />
+                                                                    </td>
+                                                                }
+
+                                                                @if (countf == 6)
+                                                                {
+                                                                    <td>
+                                                                        @if (@entry.Verification == "OK")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp16" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp16" />
+                                                                        }
+                                                                        <label>Cumple</label>
+                                                                        @if (@entry.Verification == "NO")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp17" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp17" />
+                                                                        }
+                                                                        <label>No Cumple</label>
+                                                                        <label>NA</label>
+                                                                        @if (@entry.Verification == "NA")
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp18" checked />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" disabled="disabled" asp-for="Checkfp18" />
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        <input asp-for="Descriptionfp6" readonly="readonly" class="form-control" value="@entry.Description" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <div name="TdDivfp6" id="TdDivfp6" hidden="hidden">
+                                                                            <select multiple asp-for="SelectedNotifyUsr6fpFilter" asp-items="Model.ListUserNotify" class="selectpicker show-menu-arrow combobox" data-style="btn-inverse" data-live-search="true" title="@select">
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input asp-for="Actionfp6" readonly="readonly" class="form-control" value="@entry.Action" />
+                                                                    </td>
+                                                                }
+                                                            </tr>
+                                                        }
+                                                    }
+                                                }
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <label name="observacionesInspeccionVP">Observaciones</label>
+                                <div class="break"></div>
+                                <input asp-for="CommentFP" readonly="readonly" placeholder="Escriba sus observaciones" class="form-control text-center" />
+                            </div>
+                        </div>
+
+
+
+                        <div class="panel panel-primary ">
+                            <div class="panel-heading">
+                                <div class="btn-group pull-left">
+                                    @*<a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel"><i class="fa fa-file-excel"></i> Exportar a Excel</a>*@
+                                    <label name="LblElaborate" class="text-black-50">Elaborado por</label>
+                                </div>
+                                <div class="btn-group pull-right">
+
+                                </div>
+                                <h4 class="panel-title">
+                                    &nbsp;
+                                </h4>
+                            </div>
+                            <div class="panel-body ">
+                                <div class="table-responsive">
+                                    <div class="table-responsive">
+                                        <table id="tbl-dictium" class="table table-striped table-bordered" style="@Model.Style">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Dictamen final cumple</th>
+                                                    <th scope="col">Elaborado por</th>
+                                                    <th scope="col">Observaciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (Model.checkListPipeDictiumAnswers != null)
+                                                {
+                                                    @foreach (var entry in Model.checkListPipeDictiumAnswers)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <label>Sí</label>
+                                                                @if (@entry.Verification == "OK")
+                                                                {
+                                                                    <input type="checkbox" asp-for="CheckDictium1" checked disabled="disabled" />
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="checkbox" asp-for="CheckDictium1" disabled="disabled" />
+                                                                }
+                                                                <label>No</label>
+                                                                @if (@entry.Verification == "NO")
+                                                                {
+                                                                    <input type="checkbox" asp-for="CheckDictium2" checked disabled="disabled" />
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="checkbox" asp-for="CheckDictium2" disabled="disabled" />
+                                                                }
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <button type="button" class="btn btn-success" id="BtnPipeFillingCustomerReviewedSignature" hidden="hidden" onclick="signPipeFillingCustomerRecord()">Firma del Responsable Sanitario</button>
+                                                                <input asp-for="DictumUser" hidden="hidden" />
+                                                                <input asp-for="DictiumDate" hidden="hidden" />
+                                                                <div id="PipeFillingCustomerReviewedSignature"></div>
+                                                            </td>
+                                                            <td class="text-justify">
+                                                                <textarea asp-for="DictumComment" disabled="disabled" placeholder="Escriba sus observaciones" class="form-control text-jus"></textarea>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="panel panel-primary ">
+                            <div class="panel-heading">
+                                <div class="btn-group pull-left">
+                                    @*<a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel"><i class="fa fa-file-excel"></i> Exportar a Excel</a>*@
+                                    <label name="LblHistObs" class="text-black-50">Historial de observaciones</label>
+                                </div>
+                                <div class="btn-group pull-right">
+
+                                </div>
+                                <h4 class="panel-title">
+                                    &nbsp;
+                                </h4>
+                            </div>
+                            <div class="panel-body ">
+                                <div class="table-responsive">
+                                    <div class="table-responsive">
+                                        <table id="tblHistorial" class="table table-striped table-bordered" style="width:130%;">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Sección</th>
+                                                    <th scope="col">Autor</th>
+                                                    <th scope="col">Fecha y hora</th>
+                                                    <th scope="col">Observaciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (Model.checkListPipeCommentsAnswers != null)
+                                                {
+                                                    @foreach (var entry in Model.checkListPipeCommentsAnswers)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <label class="text-black-50">@entry.Group</label>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <label name="LblHistObsAutor">@entry.Author</label>
+                                                            </td>
+                                                            <td class="text-center">
+
+                                                                <label name="LblHistObsDate">@entry.Date.ToString("yyyy-MM-dd HH:mm")</label>
+                                                            </td>
+                                                            <td class="text-justify">
+                                                                <label name="LblHistObsv">@entry.Comment</label>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="panel panel-primary ">
+                            <div class="panel-heading">
+                                <div class="btn-group pull-left">
+                                    @*<a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel"><i class="fa fa-file-excel"></i> Exportar a Excel</a>*@
+                                    <label name="LblHistObs" class="text-black-50">Historial de estados</label>
+                                </div>
+                                <div class="btn-group pull-right">
+
+                                </div>
+                                <h4 class="panel-title">
+                                    &nbsp;
+                                </h4>
+                            </div>
+                            <div class="panel-body ">
+                                <div class="table-responsive">
+                                    <div class="table-responsive">
+                                        <table id="tbl" class="table table-striped table-bordered" style="width:130%;">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Estado</th>
+                                                    <th scope="col">Fecha y hora</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (Model.checkListsRecord != null)
+                                                {
+                                                    @foreach (var entry in Model.checkListsRecord)
+                                                    {
+                                                        <tr>
+
+                                                            <td class="text-justify">
+                                                                @entry.Status
+                                                            </td>
+                                                            <td class="text-justify">
+                                                                <label name="LblStateDate">@entry.Date.ToString("yyyy-MM-dd HH:mm")</label>
+                                                            </td>
+                                                        </tr>
+
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="modal fade" id="ModalCancel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">
+                                    ¿Deseas solicitar la aprobación de la cancelación del checkList de verificación de pipas?
+
+                                </h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                @if (Model.FlagApproveSC != null)
+                                {
+                                    <label>Motivo de cancelación</label>
+                                    <textarea class="form-control" asp-for="ReasonReject">@Model.ReasonReject</textarea>
+                                }
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" onclick="CancelProNo(this); return false;" data-dismiss="modal">No</button>
+                                <button type="submit" class="btn btn-success" onclick="CancelPro(this); return false;" data-dismiss="modal" name="Cancel" id="Cancel">Si</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="ModalCancelApprove" tabindex="-1" role="dialog" aria-labelledby="ModalCancelApproveLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="ModalCancelApproveLabel">
+                                </h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <h5>¿Deseas aprobar o rechazar la solicitud de cancelación del checkList de verificación de Pipas?</h5>
+                                <label>Motivo de cancelación</label>
+                                <textarea class="form-control" asp-for="ReasonReject"></textarea>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" onclick="CancelReject(this); return false;" data-dismiss="modal">Rechazar</button>
+                                <button type="submit" class="btn btn-success" onclick="CancelApp(); return false;" data-dismiss="modal" name="CancelApprove" id="Cancel">Aceptar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Mensaje de error -->
+            <div class="col-md-12" id="message"></div>
+        </form>
+    </div>
+</div>
+<!-- end #content -->
+@section Styles {
+
+    <link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+    <link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+
+
+    <link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+
+
+}
+@section Scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+
+        <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+        <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+        <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+
+
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+
+
+        <script src="~/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.html5.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.print.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+
+        <script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+        <script src="~/js/demo.min.js"></script>
+        <script src="~/js/apps.min.js"></script>
+
+    </environment>
+
+    <script>
+        $(function () {
+
+               if ('@Model.MensajeError'.length > 1) {
+                $('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeError </div>');
+            }
+        });
+        $(function () {
+
+            if ('@Model.MensajeInfo'.length > 1) {
+                $('#message').append('<div class="alert alert-success"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeInfo </div>');
+            }
+        });
+
+        var CancelPro = function (event) {
+            $.ajax({
+                type: "POST",
+                url: "/CheckList/Cancel/",
+                data: $("#CheckListForm").serialize(),
+                dataType: "json",
+                success: function (response) {
+                    if (response.result === "Ok") {
+                        $.gritter.add({
+                            title: "",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+                        $('#BtnCancel').hide();
+                        $('#BtnCancelApprove').show();
+                    }
+                    else {
+                        $.gritter.add({
+                            title: "Ocurrió un error",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+                    }
+                }
+            });
+
+        }
+
+        var CancelReject = function (event) {
+            $.ajax({
+                type: "POST",
+                url: "/CheckList/CancelReject/",
+                data: $("#CheckListForm").serialize(),
+                dataType: "json",
+                success: function (response) {
+                 if (response.result === "Ok") {
+                     $.gritter.add({
+                         title: "",
+                         text: response.message,
+                         class_name: "gritter-light"
+                     })
+                     $('#BtnCancel').show();
+                     $('#BtnCancelApprove').hide();
+                 }
+                 else {
+                     $.gritter.add({
+                         title: "Ocurrió un error",
+                         text: response.message,
+                         class_name: "gritter-light"
+                     })
+                 }
+             }
+            });
+
+        }
+        var CancelProNo = function (event) {
+            $.ajax({
+                type: "POST",
+                url: "/CheckList/CancelNo/",
+                data: $("#CheckListForm").serialize(),
+                dataType: "json",
+                success: function (response) {
+                 if (response.result === "Ok") {
+                     $.gritter.add({
+                         title: "",
+                         text: response.message,
+                         class_name: "gritter-light"
+                     })
+                 }
+                 else {
+                     $.gritter.add({
+                         title: "Ocurrió un error",
+                         text: response.message,
+                         class_name: "gritter-light"
+                     })
+                 }
+             }
+            });
+
+        }
+        var Save = function (event) {
+         $.ajax({
+                type: "POST",
+                url: "/CheckList/Save/",
+                data: $("#CheckListForm").serialize(),
+                dataType: "json",
+                success: function (response) {
+                 if (response.result === "Ok") {
+                     $.gritter.add({
+                         title: "",
+                         text: response.message,
+                         class_name: "gritter-light"
+                     })
+                     ///redirect
+                     if ('@IsHttps' === 'True') {
+                         window.location.href = 'https://@url/CheckList/Index?idOA=@idOA&tournumber=@tournumber&distributionBatch=@distributionBatch&checkListId=@checkListId';
+                     }
+                     else {
+                         window.location.href = 'http://@url/CheckList/Index?idOA=@idOA&tournumber=@tournumber&distributionBatch=@distributionBatch&checkListId=@checkListId';
+                     }
+                     //$("#Guardar").hide();
+                     //$("#Editar").hide();
+                     //$('#BtnCancel').hide();
+                 }
+                 else {
+                     $.gritter.add({
+                         title: "Ocurrió un error",
+                         text: response.message,
+                         class_name: "gritter-light"
+                     })
+                 }
+             }
+            });
+
+
+        }
+
+
+        $("#Editar").on("click", function () {
+            $("#Guardar").show();
+            $('#tbl-dictium').show()
+            $("#DictumComment").removeAttr("disabled");
+
+            $("#Check1").removeAttr("disabled");
+            $("#Check2").removeAttr("disabled");
+            $("#Check3").removeAttr("disabled");
+            $("#Check4").removeAttr("disabled");
+            $("#Check5").removeAttr("disabled");
+            $("#Check6").removeAttr("disabled");
+            $("#Check7").removeAttr("disabled");
+            $("#Check8").removeAttr("disabled");
+            $("#Check9").removeAttr("disabled");
+            $("#Check10").removeAttr("disabled");
+            $("#Check11").removeAttr("disabled");
+            $("#Check12").removeAttr("disabled");
+            $("#Check13").removeAttr("disabled");
+            $("#Check14").removeAttr("disabled");
+            $("#Check15").removeAttr("disabled");
+
+            $("#Description1").removeAttr("readOnly");
+            $("#Description2").removeAttr("readOnly");
+            $("#Description3").removeAttr("readOnly");
+            $("#Description4").removeAttr("readOnly");
+            $("#Description5").removeAttr("readOnly");
+
+
+            $('#TdDiv1').removeAttr('hidden');
+            $('#TdDiv2').removeAttr('hidden');
+            $('#TdDiv3').removeAttr('hidden');
+            $('#TdDiv4').removeAttr('hidden');
+            $('#TdDiv5').removeAttr('hidden');
+
+            $("#Action1").removeAttr("readOnly");
+            $("#Action2").removeAttr("readOnly");
+            $("#Action3").removeAttr("readOnly");
+            $("#Action4").removeAttr("readOnly");
+            $("#Action5").removeAttr("readOnly");
+
+            ////second form
+            $("#Checkfp1").removeAttr("disabled");
+            $("#Checkfp2").removeAttr("disabled");
+            $("#Checkfp3").removeAttr("disabled");
+            $("#Checkfp4").removeAttr("disabled");
+            $("#Checkfp5").removeAttr("disabled");
+            $("#Checkfp6").removeAttr("disabled");
+            $("#Checkfp7").removeAttr("disabled");
+            $("#Checkfp8").removeAttr("disabled");
+            $("#Checkfp9").removeAttr("disabled");
+            $("#Checkfp10").removeAttr("disabled");
+            $("#Checkfp11").removeAttr("disabled");
+            $("#Checkfp12").removeAttr("disabled");
+            $("#Checkfp13").removeAttr("disabled");
+            $("#Checkfp14").removeAttr("disabled");
+            $("#Checkfp15").removeAttr("disabled");
+            $("#Checkfp16").removeAttr("disabled");
+            $("#Checkfp17").removeAttr("disabled");
+            $("#Checkfp18").removeAttr("disabled");
+
+            $("#Descriptionfp1").removeAttr("readOnly");
+            $("#Descriptionfp2").removeAttr("readOnly");
+            $("#Descriptionfp3").removeAttr("readOnly");
+            $("#Descriptionfp4").removeAttr("readOnly");
+            $("#Descriptionfp5").removeAttr("readOnly");
+            $("#Descriptionfp6").removeAttr("readOnly");
+
+            $('#TdDivfp1').removeAttr('hidden');
+            $('#TdDivfp2').removeAttr('hidden');
+            $('#TdDivfp3').removeAttr('hidden');
+            $('#TdDivfp4').removeAttr('hidden');
+            $('#TdDivfp5').removeAttr('hidden');
+            $('#TdDivfp6').removeAttr('hidden');
+
+            $("#Actionfp1").removeAttr("readOnly");
+            $("#Actionfp2").removeAttr("readOnly");
+            $("#Actionfp3").removeAttr("readOnly");
+            $("#Actionfp4").removeAttr("readOnly");
+            $("#Actionfp5").removeAttr("readOnly");
+            $("#Actionfp6").removeAttr("readOnly");
+
+
+            $("#CommentIv").removeAttr("readOnly");
+            $("#CommentFP").removeAttr("readOnly");
+
+
+
+        });
+
+        $("#CheckDictium1").change(function () {
+            if ($(this).is(':checked')) {
+                $("#BtnPipeFillingCustomerReviewedSignature").removeAttr('hidden');
+                $('#CheckDictium2').prop('checked', false);
+            }
+        });
+
+
+        $("#CheckDictium2").change(function () {
+            if ($(this).is(':checked')) {
+                $("#BtnPipeFillingCustomerReviewedSignature").removeAttr('hidden');
+                $('#CheckDictium1').prop('checked', false);
+            }
+        });
+
+
+        $("#Check1").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check2').prop('checked', false);
+                $('#Check3').prop('checked', false);
+                $("#Description1").removeAttr('required');
+                $("#Action1").removeAttr('required');
+                $('#Description1').val('NA');
+                $('#Action1').val('NA');
+                $("#SelectedNotifyUsr1Filter").removeAttr('required');
+                $('#SelectedNotifyUsr1Filter :nth-child(1)').prop('selected', true);
+                $('#SelectedNotifyUsr1Filter').prop('disabled', true);
+                ShowDictium();
+            }
+        });
+        $("#Check2").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check1').prop('checked', false);
+                $('#Check3').prop('checked', false);
+                $("#Description1").attr('required', '');
+                $("#Description1").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Description1").attr('oninput', 'this.setCustomValidity("")');
+                $("#Action1").attr('required', '');
+                $("#Action1").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Action1").attr('oninput', 'this.setCustomValidity("")');
+                $("#SelectedNotifyUsr1Filter").attr('required', '');
+                $('#SelectedNotifyUsr1Filter').prop('disabled', false);
+                $("#SelectedNotifyUsr1Filter")[0].selectedIndex = -1
+                $("#SelectedNotifyUsr1Filter").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#SelectedNotifyUsr1Filter").attr('oninput', 'this.setCustomValidity("")');
+                $('#Description1').val('');
+                $('#Action1').val('');
+                ShowDictium();
+            }
+        });
+        $("#Check3").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check1').prop('checked', false);
+                $('#Check2').prop('checked', false);
+                $("#Description1").removeAttr('required');
+                $("#Action1").removeAttr('required');
+                $('#Description1').val('NA');
+                $('#Action1').val('NA');
+                $("#SelectedNotifyUsr1Filter").removeAttr('required');
+                $('#SelectedNotifyUsr1Filter :nth-child(1)').prop('selected', true);
+                $('#SelectedNotifyUsr1Filter').prop('disabled', true);
+                ShowDictium();
+            }
+        });
+
+
+        $("#Check4").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check5').prop('checked', false);
+                $('#Check6').prop('checked', false);
+                $("#Description2").removeAttr('required');
+                $("#Action2").removeAttr('required');
+                $('#Description2').val('NA');
+                $('#Action2').val('NA');
+                ShowDictium();
+            }
+        });
+        $("#Check5").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check4').prop('checked', false);
+                $('#Check6').prop('checked', false);
+                $("#Description2").attr('required', '');
+                $("#Description2").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Description2").attr('oninput', 'this.setCustomValidity("")');
+                $("#Action2").attr('required', '');
+                $("#Action2").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Action2").attr('oninput', 'this.setCustomValidity("")');
+                ShowDictium()
+            }
+        });
+        $("#Check6").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check4').prop('checked', false);
+                $('#Check5').prop('checked', false);
+                $("#Description2").removeAttr('required');
+                $("#Action2").removeAttr('required');
+                $('#Description2').val('NA');
+                $('#Action2').val('NA');
+                ShowDictium()
+            }
+        });
+
+
+        $("#Check7").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check8').prop('checked', false);
+                $('#Check9').prop('checked', false);
+                $("#Description3").removeAttr('required');
+                $("#Action3").removeAttr('required');
+                $('#Description3').val('NA');
+                $('#Action3').val('NA');
+                ShowDictium();
+            }
+        });
+        $("#Check8").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check7').prop('checked', false);
+                $('#Check9').prop('checked', false);
+                $("#Description3").attr('required', '');
+                $("#Description3").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Description3").attr('oninput', 'this.setCustomValidity("")');
+                $("#Action3").attr('required', '');
+                $("#Action3").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Action3").attr('oninput', 'this.setCustomValidity("")');
+                ShowDictium()
+            }
+        });
+        $("#Check9").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check7').prop('checked', false);
+                $('#Check8').prop('checked', false);
+                $("#Description3").removeAttr('required');
+                $("#Action3").removeAttr('required');
+                $('#Description3').val('NA');
+                $('#Action3').val('NA');
+                ShowDictium()
+            }
+        });
+
+        $("#Check10").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check11').prop('checked', false);
+                $('#Check12').prop('checked', false);
+                $("#Description4").removeAttr('required');
+                $("#Action4").removeAttr('required');
+                $('#Description4').val('NA');
+                $('#Action4').val('NA');
+                ShowDictium();
+            }
+        });
+        $("#Check11").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check10').prop('checked', false);
+                $('#Check12').prop('checked', false);
+                $("#Description4").attr('required', '');
+                $("#Description4").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Description4").attr('oninput', 'this.setCustomValidity("")');
+                $("#Action4").attr('required', '');
+                $("#Action4").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Action4").attr('oninput', 'this.setCustomValidity("")');
+                ShowDictium()
+            }
+        });
+        $("#Check12").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check10').prop('checked', false);
+                $('#Check11').prop('checked', false);
+                $("#Description4").removeAttr('required');
+                $("#Action4").removeAttr('required');
+                $('#Description4').val('NA');
+                $('#Action4').val('NA');
+                ShowDictium()
+            }
+        });
+
+        $("#Check13").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check14').prop('checked', false);
+                $('#Check15').prop('checked', false);
+                $("#Description5").removeAttr('required');
+                $("#Action5").removeAttr('required');
+                $('#Description5').val('NA');
+                $('#Action5').val('NA');
+                ShowDictium();
+            }
+        });
+        $("#Check14").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check13').prop('checked', false);
+                $('#Check15').prop('checked', false);
+                $("#Description5").attr('required', '');
+                $("#Description5").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Description5").attr('oninput', 'this.setCustomValidity("")');
+                $("#Action5").attr('required', '');
+                $("#Action5").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Action5").attr('oninput', 'this.setCustomValidity("")');
+                ShowDictium();
+            }
+        });
+        $("#Check15").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check13').prop('checked', false);
+                $('#Check14').prop('checked', false);
+                $("#Description5").removeAttr('required');
+                $("#Action5").removeAttr('required');
+                $('#Description5').val('NA');
+                $('#Action5').val('NA');
+                ShowDictium();
+            }
+        });
+
+
+        $("#Checkfp1").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp2').prop('checked', false);
+                $('#Checkfp3').prop('checked', false);
+                $("#Descriptionfp1").removeAttr('required');
+                $("#Actionfp1").removeAttr('required');
+                $('#Descriptionfp1').val('NA');
+                $('#Actionfp1').val('NA');
+                ShowDictium();
+            }
+        });
+        $("#Checkfp2").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp1').prop('checked', false);
+                $('#Checkfp3').prop('checked', false);
+                $("#Descriptionfp1").attr('required', '');
+                $("#Descriptionfp1").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Descriptionfp1").attr('oninput', 'this.setCustomValidity("")');
+                $("#Actionfp1").attr('required', '');
+                $("#Actionfp1").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Actionfp1").attr('oninput', 'this.setCustomValidity("")');
+                ShowDictium();
+            }
+        });
+        $("#Checkfp3").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp1').prop('checked', false);
+                $('#Checkfp2').prop('checked', false);
+                $("#Descriptionfp1").removeAttr('required');
+                $("#Actionfp1").removeAttr('required');
+                $('#Descriptionfp1').val('NA');
+                $('#Actionfp1').val('NA');
+                ShowDictium();
+            }
+        });
+
+        $("#Checkfp4").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp5').prop('checked', false);
+                $('#Checkfp6').prop('checked', false);
+                $("#Descriptionfp2").removeAttr('required');
+                $("#Actionfp2").removeAttr('required');
+                $('#Descriptionfp2').val('NA');
+                $('#Actionfp2').val('NA');
+                ShowDictium();
+            }
+        });
+        $("#Checkfp5").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp4').prop('checked', false);
+                $('#Checkfp6').prop('checked', false);
+                $("#Descriptionfp2").attr('required', '');
+                $("#Descriptionfp2").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Descriptionfp2").attr('oninput', 'this.setCustomValidity("")');
+                $("#Actionfp2").attr('required', '');
+                $("#Actionfp2").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Actionfp2").attr('oninput', 'this.setCustomValidity("")');
+                ShowDictium();
+            }
+        });
+        $("#Checkfp6").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp4').prop('checked', false);
+                $('#Checkfp5').prop('checked', false);
+                $("#Descriptionfp2").removeAttr('required');
+                $("#Actionfp2").removeAttr('required');
+                $('#Descriptionfp2').val('NA');
+                $('#Actionfp2').val('NA');
+                ShowDictium();
+            }
+        });
+
+
+        $("#Checkfp7").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp8').prop('checked', false);
+                $('#Checkfp9').prop('checked', false);
+                $("#Descriptionfp3").removeAttr('required');
+                $("#Actionfp3").removeAttr('required');
+                $('#Descriptionfp3').val('NA');
+                $('#Actionfp3').val('NA');
+                ShowDictium();
+            }
+        });
+        $("#Checkfp8").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp7').prop('checked', false);
+                $('#Checkfp9').prop('checked', false);
+                $("#Descriptionfp3").attr('required', '');
+                $("#Descriptionfp3").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Descriptionfp3").attr('oninput', 'this.setCustomValidity("")');
+                $("#Actionfp3").attr('required', '');
+                $("#Actionfp3").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Actionfp3").attr('oninput', 'this.setCustomValidity("")');
+                ShowDictium();
+            }
+        });
+        $("#Checkfp9").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp7').prop('checked', false);
+                $('#Checkfp8').prop('checked', false);
+                $("#Descriptionfp3").removeAttr('required');
+                $("#Actionfp3").removeAttr('required');
+                $('#Descriptionfp3').val('NA');
+                $('#Actionfp3').val('NA');
+                ShowDictium();
+            }
+        });
+
+        $("#Checkfp10").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp11').prop('checked', false);
+                $('#Checkfp12').prop('checked', false);
+                $("#Descriptionfp4").removeAttr('required');
+                $("#Actionfp4").removeAttr('required');
+                $('#Descriptionfp4').val('NA');
+                $('#Actionfp4').val('NA');
+                ShowDictium();
+            }
+        });
+        $("#Checkfp11").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp10').prop('checked', false);
+                $('#Checkfp12').prop('checked', false);
+                $("#Descriptionfp4").attr('required', '');
+                $("#Descriptionfp4").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Descriptionfp4").attr('oninput', 'this.setCustomValidity("")');
+                $("#Actionfp4").attr('required', '');
+                $("#Actionfp4").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Actionfp4").attr('oninput', 'this.setCustomValidity("")');
+                ShowDictium();
+            }
+        });
+        $("#Checkfp12").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp10').prop('checked', false);
+                $('#Checkfp11').prop('checked', false);
+                $("#Descriptionfp4").removeAttr('required');
+                $("#Actionfp4").removeAttr('required');
+                $('#Descriptionfp4').val('NA');
+                $('#Actionfp4').val('NA');
+                ShowDictium();
+            }
+        });
+
+        $("#Checkfp13").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp14').prop('checked', false);
+                $('#Checkfp15').prop('checked', false);
+                $("#Descriptionfp5").removeAttr('required');
+                $("#Actionfp5").removeAttr('required');
+                $('#Descriptionfp5').val('NA');
+                $('#Actionfp5').val('NA');
+                ShowDictium();
+            }
+        });
+        $("#Checkfp14").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp13').prop('checked', false);
+                $('#Checkfp15').prop('checked', false);
+                $("#Descriptionfp5").attr('required', '');
+                $("#Descriptionfp5").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Descriptionfp5").attr('oninput', 'this.setCustomValidity("")');
+                $("#Actionfp5").attr('required', '');
+                $("#Actionfp5").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Actionfp5").attr('oninput', 'this.setCustomValidity("")');
+                ShowDictium();
+            }
+        });
+        $("#Checkfp15").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp13').prop('checked', false);
+                $('#Checkfp14').prop('checked', false);
+                $("#Descriptionfp5").removeAttr('required');
+                $("#Actionfp5").removeAttr('required');
+                $('#Descriptionfp5').val('NA');
+                $('#Actionfp5').val('NA');
+                ShowDictium();
+            }
+        });
+
+
+        $("#Checkfp16").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp17').prop('checked', false);
+                $('#Checkfp18').prop('checked', false);
+                $("#Descriptionfp6").removeAttr('required');
+                $("#Actionfp6").removeAttr('required');
+                $('#Descriptionfp6').val('NA');
+                $('#Actionfp6').val('NA');
+                ShowDictium();
+            }
+        });
+        $("#Checkfp17").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp16').prop('checked', false);
+                $('#Checkfp18').prop('checked', false);
+                $("#Descriptionfp6").attr('required', '');
+                $("#Descriptionfp6").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Descriptionfp6").attr('oninput', 'this.setCustomValidity("")');
+                $("#Actionfp6").attr('required', '');
+                $("#Actionfp6").attr('oninvalid', 'this.setCustomValidity("Se requiere capturar este campo")');
+                $("#Actionfp6").attr('oninput', 'this.setCustomValidity("")');
+                ShowDictium();
+            }
+        });
+        $("#Checkfp18").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Checkfp16').prop('checked', false);
+                $('#Checkfp17').prop('checked', false);
+                $("#Descriptionfp6").removeAttr('required');
+                $("#Actionfp6").removeAttr('required');
+                $('#Descriptionfp6').val('NA');
+                $('#Actionfp6').val('NA');
+                ShowDictium();
+            }
+        });
+
+
+        $("#Check1").change(function () {
+            if ($(this).is(':checked')) {
+                $('#Check2').prop('checked', false);
+                $('#Check3').prop('checked', false);
+                $("#Description1").removeAttr('required');
+            }
+        });
+        $("#CheckDictium1").change(function () {
+            if ($(this).is(':checked')) {
+                $('#CheckDictium2').prop('checked', false);
+            }
+        });
+
+        $("#CheckDictium2").change(function () {
+            if ($(this).is(':checked')) {
+                $('#CheckDictium1').prop('checked', false);
+            }
+        });
+
+
+        $(document).ready(function () {
+            App.init();
+            Demo.init();
+            $("#Guardar").hide();
+            $("#BtnCancelApprove").hide();
+            if ($(CheckDictium1).is(':checked')) {
+                $("#Editar").hide();
+                $("#BtnCancel").hide();
+                $("#BtnCancelApprove").hide();
+            }
+            if ($(CheckDictium2).is(':checked')) {
+                $("#Editar").hide();
+                $("#BtnCancel").hide();
+                $("#BtnCancelApprove").hide();
+            }
+
+            if ($('#TxtStatus').val() === 'CL-Cancelado' || $('#TxtStatus').val() === 'CL-Liberado' || $('#TxtStatus').val() === 'CL-Cerrado cumple') {
+                $("#BtnCancel").hide();
+                $("#BtnCancelApprove").hide();
+                $("#Editar").hide();
+            }
+
+            if ($('#DictumUser').val() != '') {
+                var reviewedDate = new Date($('#DictiumDate').val());
+                $('#PipeFillingCustomerReviewedSignature').html(getSignature("@userFirstName", reviewedDate))
+            }
+
+        });
+
+        function ShowDictium() {
+            if (document.querySelector('#Check1').checked && document.querySelector('#Check4').checked && document.querySelector('#Check7').checked
+                && document.querySelector('#Check10').checked && document.querySelector('#Check13').checked
+                && document.querySelector('#Checkfp1').checked && document.querySelector('#Checkfp4').checked && document.querySelector('#Checkfp7').checked
+                && document.querySelector('#Checkfp10').checked && document.querySelector('#Checkfp13').checked
+                && document.querySelector('#Checkfp16').checked) {
+                $("#tbl-dictium").removeAttr('style');
+                $("#CheckDictium1").removeAttr("disabled");
+                $("#CheckDictium2").removeAttr("disabled");
+
+            }
+            else if (document.querySelector('#Check2').checked || document.querySelector('#Check5').checked || document.querySelector('#Check8').checked
+                || document.querySelector('#Check11').checked || document.querySelector('#Check14').checked
+                || document.querySelector('#Checkfp2').checked || document.querySelector('#Checkfp5').checked && document.querySelector('#Checkfp8').checked
+                || document.querySelector('#Checkfp11').checked || document.querySelector('#Checkfp14').checked
+                || document.querySelector('#Checkfp17').checked) {
+                $("#tbl-dictium").removeAttr('style');
+                $("#CheckDictium1").attr("disabled", true);
+                $('#CheckDictium1').prop('checked', false);
+                $("#BtnPipeFillingCustomerReviewedSignature").attr('hidden', true);
+                $("#CheckDictium2").removeAttr("disabled");
+            }
+        }
+        var table = $("#tblHistorial").DataTable({
+            pageLength: 20,
+            orderCellsTop: true,
+            fixedHeader: true,
+            bLengthChange: false,
+            bFilter: true,
+            bAutoWidth: false,
+            searching: true,
+            sDom: 'lrtip',
+            "paging": false,
+            "bInfo": false,
+            buttons: [
+                {
+                    extend: 'csv',
+                    charset: 'utf-8',
+                    bom: true
+                }
+            ],
+            "language": {
+                "search": '<a href="@Url.Action("Index", "home" )" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> @btnFilter</a> <br><div><i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                "searchPlaceholder": '@searchPlaceholder',
+                "emptyTable": "@emptyTable",
+                "lengthMenu": "@lengthMenu",
+                "info": "@info",
+                "paginate": {
+                    "first": "@paginatefirst",
+                    "last": "@paginatelast",
+                    "next": "@pageNext",
+                    "previous": "@pagePreviuos"
+                },
+                "loadingRecords": "@loadingRecords",
+                "processing": "@processing",
+                "zeroRecords": "@zeroRecords",
+                "infoEmpty": "@infoEmpty",
+                "infoFiltered": "@infoFiltered",
+            },
+            "order": [],
+            "columnDefs": [{
+                "targets": 'no-sort',
+                "orderable": false,
+            }]
+
+        });
+
+
+
+        function CancelApp() {
+            $.ajax({
+                type: "POST",
+                url: "/CheckList/CancelApprove/",
+                data: $("#CheckListForm").serialize(),
+                dataType: "json",
+                success: function (response) {
+                    if (response.result === "Ok") {
+                        $.gritter.add({
+                            title: "",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+                        $('#BtnCancel').hide();
+                        $('#BtnCancelApprove').hide();
+                    }
+                    else {
+                        $.gritter.add({
+                            title: "Ocurrió un error",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+                    }
+                }
+            });
+        }
+
+
+        function signPipeFillingCustomerRecord() {
+            var reviewedDate = new Date(Date.now())
+            $('#PipeFillingCustomerReviewedSignature').html(getSignature("@userFirstName", reviewedDate))
+        }
+        function getSignature(name, date) {
+            if (date === null || date === undefined) {
+                return "<span>" + name + "</span>"
+            }
+            else {
+                var mm = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
+                var dd = date.getDate();
+                var yy = date.getFullYear();
+
+                return "<span>" + name + "</span><br /><span>" + yy + '/' + mm + '/' + dd + "</span><br /><span>" + date.toLocaleTimeString() + "</span>"
+            }
+        }
+    </script>
+
+}

@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NameOfLastUsedPublishProfile>C:\Users\ImSoftware\source\repos\liberacion-producto-web\LiberacionProductoWeb\LiberacionProductoWeb\Properties\PublishProfiles\FolderProfile.pubxml</NameOfLastUsedPublishProfile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Update="Reports\ConditioningOrder\Rpt6.cs">
+      <SubType>XtraReport</SubType>
+    </Compile>
+    <Compile Update="Reports\ConditioningOrder\Rpt7.cs">
+      <SubType>XtraReport</SubType>
+    </Compile>
+    <Compile Update="Reports\ConditioningOrder\RptChkList.cs">
+      <SubType>XtraReport</SubType>
+    </Compile>
+    <Compile Update="Reports\ConditioningOrder\RptOrAP.cs">
+      <SubType>XtraReport</SubType>
+    </Compile>
+    <Compile Update="Reports\ConditioningOrder\step4.cs">
+      <SubType>XtraReport</SubType>
+    </Compile>
+    <Compile Update="Reports\OrderProduction\rptOP.cs">
+      <SubType>XtraReport</SubType>
+    </Compile>
+    <Compile Update="Reports\OrderProduction\Step5.cs">
+      <SubType>XtraReport</SubType>
+    </Compile>
+    <Compile Update="Reports\OrderProduction\Step6.cs">
+      <SubType>XtraReport</SubType>
+    </Compile>
+    <Compile Update="Reports\OrderProduction\Step7.cs">
+      <SubType>XtraReport</SubType>
+    </Compile>
+    <Compile Update="Reports\OrderProduction\Step8.cs">
+      <SubType>XtraReport</SubType>
+    </Compile>
+    <Compile Update="Reports\OrderProduction\VariablesChart.cs">
+      <SubType>XtraReport</SubType>
+    </Compile>
+    <Compile Update="Reports\QuerysFiles.cs">
+      <SubType>XtraReport</SubType>
+    </Compile>
+    <Compile Update="Reports\Report1.cs">
+      <SubType>XtraReport</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>

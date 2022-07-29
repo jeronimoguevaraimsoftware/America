@@ -1,0 +1,32 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using LiberacionProductoWeb.Localize;
+@using Microsoft.Extensions.Localization;
+@model LiberacionProductoWeb.Models.LayoutCertificateViewModels.LeyendsCertificateVM;
+@inject IStringLocalizer<Resource> resource;
+@inject IViewLocalizer Localizer;
+@if (Model.leyendsFooterCertificateVM != null)
+{
+    int Index = 0;
+    @foreach (var item in Model.leyendsFooterCertificateVM)
+    {
+        <br />
+        <label>@item.PlantName</label>
+        <br />
+        <textarea id="FooterTxt-@Index"asp-for="@item.Footer" style="height: 130px;"></textarea>
+        <script>
+            $(document).ready(function () {
+                tinymce.init({
+                    selector: '#FooterTxt-@Index',
+                    height: "180",
+                    menubar: false,
+                    resize: false,
+                    elementpath: false,
+                    language: 'es_MX',
+                    mode: "readonly"
+                });
+                tinymce.activeEditor.mode.set("readonly")
+            });
+        </script>
+        Index++;
+    }
+}
